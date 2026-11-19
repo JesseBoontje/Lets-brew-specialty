@@ -11,5 +11,5 @@
 | Weekoverzicht en nachtstand weg, smaakgeheugen standaard uit | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd | mee in PR #12 |
 | Opzet gietcoach V60/Switch | aannemer 1 | geen code (docs/) | bezig | publiceren, aan Jesse laten zien |
 | Opzet AeroPress normaal/omgekeerd + recepten | aannemer 2 | geen code (docs/) | bezig | publiceren, aan Jesse laten zien |
-| Opzet shot clock E61 + pre-infusie | aannemer 3 | geen code (docs/) | bezig | publiceren, aan Jesse laten zien |
+| Opzet shot clock E61 + pre-infusie | aannemer 3 | geen code (docs/) | wacht op Jesse | https://claude.ai/artifact/STNHN6rDgvJXxiHnJcLmNQ ; open vraag: telt de rust mee in de doeltijd? |
 | Cloudflare-builds falen | volgende sessie | geen | wacht op koppeling | buildlogs lezen |
