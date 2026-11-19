@@ -40,6 +40,23 @@ Claude. Nog ideeën?"
 - Code in app/ deelt globale namen tussen bestanden (klassieke scripts).
   Code die bij het laden draait mag geen naam uit een later bestand gebruiken.
 
+## Besluiten van Jesse (2026-11-19, tweede ronde)
+- Hij zet de volledige Cloudflare-koppeling aan op claude.ai (connectors) en
+  start daarna een nieuwe sessie. Die sessie zoekt uit waarom beide Workers
+  Builds direct falen en welk account het hoofdaccount is.
+- Inlog en functies: hij kiest in de keuzelijst
+  https://claude.ai/artifact/9rSsUxqiN7tkyGho44H6Q2 (per functie behouden /
+  aanpassen / weg, nieuwe ideeën bouwen / aanpassen / weg, inlog Face ID /
+  mailcode / koppelcode). Uitlezen met ArtifactData list op collectie
+  "keuzes" (doc-id = functie-id, velden keuze en notitie). Bron van de pagina:
+  docs/keuzelijst.html (inwikkelen met de mockup-bouwer van nieuwe-feature).
+  Werkt bewaren niet, dan plakt hij een tekst die begint met "Keuzes voor Lets Brew".
+- Verschil 240/251 g: opgelost in commit c71b071 (gietschema volgt eigen
+  verhouding). Keuring daarvan liep bij het schrijven van deze bon.
+
 ## Eerstvolgende stap
-Wachten op Jesse: hoofdaccount Cloudflare, oorzaak build (dashboard of volledige
-Cloudflare-koppeling), inlogmanier, welke ideeën. Daarna mergen na akkoord.
+1. Cloudflare-koppeling gebruiken: buildlogs van beide Workers Builds lezen,
+   oorzaak oplossen, preview-link halen, Jesse testlink geven.
+2. Keuzes uitlezen, takenbord vullen, per keuze een klus (aannemers alleen waar
+   het loont, max 3, elk eigen deel van app/).
+3. Mergen alleen na akkoord van Jesse.
