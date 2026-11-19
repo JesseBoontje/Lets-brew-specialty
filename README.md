@@ -86,7 +86,8 @@ een Wrangler-update. Deze afhankelijkheden worden niet naar de browser verzonden
 
 `dist/` bevat alleen publieke app-assets. Testcode, Worker-broncode, configuratie,
 documentatie en credentials worden niet als site-assets gekopieerd. De voormalige
-monolithische HTML is opgesplitst in CSS, core, datamodel en controllers. Het
+monolithische HTML is opgesplitst in CSS, datamodel, controllers en de app
+zelf in `app/01..12-*.js` (in laadvolgorde, zie CLAUDE.md). Het
 bestaande logo wordt als cachebaar bestand hergebruikt. De geforceerde splash van
 3,75 seconden vervalt. De service worker gebruikt een coherent, versiegebonden
 app-pakket; nieuwe versies worden atomair geïnstalleerd en na activatie herladen.
