@@ -6,22 +6,12 @@
     --espresso:#e3d3bf;--aeropress:#dfdcc9;--v60:#e6d9cf;--chemex:#dcd9cc;--perculator:#e4d6cc;
     --radius:26px;
   }
-  /* espresso night — krijtbord-look via dezelfde variabelen */
-  html.night{
-    --paper:#262b28;--card:#2e3431;--card-2:#353c38;
-    --ink:#e9e4d4;--ink-soft:#9aa094;--line:#5a615c;--accent:#d9c9a8;
-    --cream:#1c211e;--desk:#181d1a;--accent-soft:#c2b191;
-    --espresso:#333932;--aeropress:#31382f;--v60:#2f3634;--chemex:#2e3532;--perculator:#343831;
-  }
-  html.night img[src$=".png"]{filter:invert(.92) hue-rotate(180deg);mix-blend-mode:screen!important;}
-  html.night .nav{background:rgba(30,36,32,.6);}
   .phone,body{transition:background .45s;}
   /* statische koffieboon-achtergrond (feature: bg) */
   #bg-bean{position:absolute;inset:0;pointer-events:none;z-index:0;display:none;overflow:hidden;}
   #bg-bean.on{display:block;}
   #bg-bean svg{position:absolute;right:-120px;top:22%;width:420px;height:520px;opacity:.055;
     fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;filter:url(#wobble);}
-  html.night #bg-bean svg{opacity:.09;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
   html,body{height:100%;overflow:hidden;}
   body{background:var(--desk);font-family:'Patrick Hand','Segoe Print',cursive;color:var(--ink);font-size:18px;display:flex;justify-content:center;}
@@ -462,7 +452,6 @@
   .e61-box svg{width:214px;height:210px;overflow:visible;}
   #e61-fill{fill:var(--accent-soft);stroke:none;transition:y .25s linear,height .25s linear;}
   #e61-crema{fill:#c8a577;stroke:none;transition:y .25s linear,height .25s linear;}
-  html.night #e61-crema{fill:#8a744f;}
   /* stroke/fill op de svg zelf: <use>-kopieen erven het (selectors bereiken de shadow-tree niet) */
   .e61-box svg{fill:none;stroke:var(--ink);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
   .e61-b{opacity:.62;stroke-width:1.35;}     /* de tweede, afwijkende pennestreek */
@@ -657,7 +646,6 @@
   .shelf-do .ll-arr{color:var(--ink-soft);font-size:20px;}
   /* ---- latte art ---- */
   :root{--la-coffee:#7d6650;--la-milk:#f6f0e2;}
-  html.night{--la-coffee:#6b5947;--la-milk:#e6e0cf;}
   .la-intro{font-size:18px;line-height:1.45;color:var(--ink-soft);margin:2px 2px 4px;}
   .la-draw{display:flex;justify-content:center;}
   .la-draw svg{width:100%;max-width:280px;height:auto;fill:none;stroke:var(--ink);
@@ -901,7 +889,6 @@
   .whatsnew.on{transform:translateY(0);pointer-events:auto;}
   .wn-card{background:var(--card);border:2px solid var(--ink);filter:url(#wobble);
     border-radius:22px;padding:12px 16px 13px;box-shadow:0 10px 30px rgba(58,48,42,.13);}
-  html.night .wn-card{box-shadow:0 10px 30px rgba(0,0,0,.35);}
   .wn-h{display:flex;align-items:center;justify-content:space-between;gap:10px;
     border-bottom:2px solid var(--line);filter:url(#wobble);padding-bottom:4px;margin-bottom:6px;}
   .wn-h .hand{font-size:23px;}
@@ -1152,7 +1139,6 @@
 
   /* ---- AI-budget: de kaart in instellingen en de twee meldingen ---- */
   :root{--aib-op:#a5673a;}
-  html.night{--aib-op:#d79a6a;}
   .aib{margin-top:16px;}
   .aib-groot{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:1;}
   .aib-groot .van{font-size:21px;color:var(--ink-soft);}
@@ -1162,7 +1148,6 @@
   .aib-lijn .as{stroke:var(--line);stroke-width:1;opacity:.55;}
   .aib-lijn .nul{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4;}
   .aib-lijn .band{fill:var(--aib-op);opacity:.14;}
-  html.night .aib-lijn .band{opacity:.09;}
   .aib-lijn .weg{stroke:var(--accent);stroke-width:2.4;fill:none;stroke-linejoin:round;
     stroke-linecap:round;filter:url(#wobble-rough);}
   .aib-lijn .weg.op{stroke:var(--aib-op);}

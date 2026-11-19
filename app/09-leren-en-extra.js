@@ -312,47 +312,6 @@ function restoreImages(){
   save();toast('✓ drawings restored');go('home');
 }
 
-/* ---------------- weekly brewsletter (canvas-kaart) ---------------- */
-async function brewsletter(){
-  const week=state.brews.filter(b=>Date.now()-b.ts<7*864e5);
-  if(!week.length){toast('no brews this week yet — go make one ☕');return;}
-  const scored=week.filter(b=>+b.score>0);
-  const avg=scored.length?(scored.reduce((a,b)=>a+(+b.score),0)/scored.length):0;
-  const perM={};week.forEach(b=>perM[b.method]=(perM[b.method]||0)+1);
-  const topM=methodById(Object.entries(perM).sort((a,b)=>b[1]-a[1])[0][0]);
-  const best=scored.slice().sort((a,b)=>b.score-a.score)[0];
-  const beansUsed=[...new Set(week.map(b=>b.beans).filter(Boolean))];
-  let line='';
-  if(aiReady()){try{line=(await askAI([{role:"user",content:
-    `Schrijf één warme, korte zin (Nederlands, max 14 woorden) als afsluiter van iemands koffieweek: ${week.length} brews, favoriete methode ${topM?topM.name:'?'}, gemiddeld ${avg.toFixed(1)}/10.`}],80,'recap')).trim();}catch(e){}}
-  try{await document.fonts.load('700 60px Caveat');await document.fonts.load('30px "Patrick Hand"');}catch(e){}
-  const W=900,H=1100,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const paper='#efe9dd',ink='#3a302a',soft='#7a6c5e',accent='#4a3b30';
-  x.fillStyle=paper;x.fillRect(0,0,W,H);
-  x.strokeStyle=ink;x.lineWidth=5;x.lineCap='round';x.beginPath();
-  const jig=(x0,y0,x1,y1)=>{const n=14;for(let i=0;i<=n;i++){const t=i/n;const px=x0+(x1-x0)*t+(Math.random()-.5)*5,py=y0+(y1-y0)*t+(Math.random()-.5)*5;i?x.lineTo(px,py):x.moveTo(px,py);}};
-  jig(46,46,W-46,46);jig(W-46,46,W-46,H-46);jig(W-46,H-46,46,H-46);jig(46,H-46,46,46);x.stroke();
-  x.textAlign='center';x.fillStyle=ink;x.font='700 84px Caveat';x.fillText('my week in coffee',W/2,170);
-  x.fillStyle=soft;x.font='34px "Patrick Hand"';
-  x.fillText(new Date(Date.now()-6*864e5).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' — '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'}),W/2,224);
-  const stats=[[String(week.length),'brews'],[avg?avg.toFixed(1)+'/10':'—','avg score'],[topM?topM.name:'—','top method'],[String(beansUsed.length),'beans']];
-  stats.forEach((st,i)=>{
-    const cx0=i%2?W*0.72:W*0.28,cy0=380+Math.floor(i/2)*190;
-    x.fillStyle=ink;x.font='700 96px Caveat';x.fillText(st[0],cx0,cy0);
-    x.fillStyle=soft;x.font='30px "Patrick Hand"';x.fillText(st[1],cx0,cy0+44);
-  });
-  if(best){x.fillStyle=soft;x.font='30px "Patrick Hand"';x.fillText('best cup',W/2,830);
-    x.fillStyle=accent;x.font='700 56px Caveat';x.fillText(((best.title&&best.title.trim())||methodById(best.method).name)+' · '+(+best.score).toFixed(1),W/2,886,W-160);}
-  if(line){x.fillStyle=ink;x.font='36px "Patrick Hand"';x.fillText(line,W/2,H-140,W-160);}
-  x.fillStyle=accent;x.font='700 40px Caveat';x.fillText('lets brew specialty ☕',W/2,H-70);
-  const blob=await new Promise(res=>c.toBlob(res,'image/png'));
-  const file=new File([blob],'brewsletter.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],title:'my week in coffee'});return;}catch(e){if(e.name==='AbortError')return;}
-  }
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='brewsletter.png';a.click();
-  URL.revokeObjectURL(url);toast('brewsletter saved');
-}
 /* ---------------- taste memory: wat je scores verraden ---------------- */
 async function tasteMemory(){
   const el=document.getElementById('tm-body');if(!el)return;

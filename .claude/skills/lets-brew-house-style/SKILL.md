@@ -22,8 +22,8 @@ method tints: --espresso #e3d3bf --aeropress #dfdcc9 --v60 #e6d9cf
               --chemex #dcd9cc --perculator #e4d6cc
 ```
 
-Night mode is the same app as a chalkboard: `html.night` redefines only these
-variables. Style through tokens so night mode keeps working for free.
+Night mode was removed at the user's request (2026-11-19); do not bring it back.
+Still style through tokens, never raw hex.
 
 ## The hand-drawn look
 
@@ -116,7 +116,7 @@ doubled line work.
 
 ### Liquid
 
-Coffee is `var(--accent-soft)` with a lighter crema band (`#c8a577`, night `#8a744f`).
+Coffee is `var(--accent-soft)` with a lighter crema band (`#c8a577`).
 A pouring stream is a thin stroked path with `stroke-dasharray:13 3` and an animated
 `stroke-dashoffset` — mostly solid, so it reads as flowing, not as dots. A cup fills
 via a `<rect>` clipped to the cup interior whose `y`/`height` you animate.

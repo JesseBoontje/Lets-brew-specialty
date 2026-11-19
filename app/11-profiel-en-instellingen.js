@@ -140,7 +140,6 @@ function brewNow(){
 /* ---------------- features: het schakelbord ---------------- */
 // alles wat nieuw bijgebouwd wordt staat hier, met eigen aan/uit-knop in profiel.
 const FEATURES=[
-  {id:'night', n:'espresso night mode',    d:'the whole app becomes a chalkboard', def:false, cat:'app'},
   {id:'shotclock', n:'E61 shot clock', d:'pull the lever on the dial-in screen — time fills in, stays editable', def:true, cat:'app'},
   {id:'journey', n:'dial-in journey', d:'your attempts drawn as a line walking into the target band', def:true, cat:'app'},
   {id:'pourcoach', n:'pour coach', d:'filter recipes that run with a clock while you pour', def:true, cat:'app'},
@@ -161,8 +160,7 @@ const FEATURES=[
   {id:'water', n:'water helper', d:'ppm targets & simple mineral recipes on the learn page', def:true, cat:'people'},
   {id:'cupping', n:'cupping session', d:'blind-taste two beans, score & reveal', def:true, cat:'people'},
   {id:'latteart', n:'pouring shapes & coach', d:'photos of your pours, in order — with AI feedback', def:true, cat:'people'},
-  {id:'brewsletter', n:'weekly brewsletter', d:'a hand-drawn recap card of your week, shareable', def:true, cat:'smart'},
-  {id:'tastememory', n:'taste memory', d:'what your scores say about your palate', def:true, cat:'smart'},
+  {id:'tastememory', n:'taste memory', d:'what your scores say about your palate', def:false, cat:'smart'},
   {id:'voice', n:'voice logging', d:'say "18 in, 36 out, 27 seconds" — hands stay on the machine', def:false, cat:'smart'},
   {id:'weather', n:'weather-aware suggestions', d:'iced on hot days, cozy moka when it rains (uses location)', def:false, cat:'smart'},
   {id:'pairing', n:'scale & machine pairing', d:'live weight via Bluetooth where the browser allows it', def:false, cat:'smart'},
@@ -181,8 +179,8 @@ function toggleFeature(id){
   toast((featOn(id)?'✓ ':'○ ')+f.n+(featOn(id)?' on':' off'));
 }
 function applyFeatures(){
-  const h=document.documentElement;
-  h.classList.toggle('night',featOn('night'));
+  // de nachtstand is weg (keuze 19-11-2026); een oude instelling mag niets meer doen
+  document.documentElement.classList.remove('night');
 }
 function renderFeatures(){
   const el=document.getElementById('feat-list');if(!el)return;
@@ -220,10 +218,9 @@ function renderProfile(){
   renderShortcuts();
   try{apiStat();}catch(e){}
   try{renderAiBudget();}catch(e){}
-  const bl=document.getElementById('bl-card');if(bl)bl.style.display=featOn('brewsletter')?'block':'none';
   const tm=document.getElementById('tm-card');if(tm)tm.style.display=featOn('tastememory')?'block':'none';
   const wk=document.getElementById('week-card');
-  if(wk)wk.style.display=(featOn('brewsletter')||featOn('tastememory'))?'block':'none';
+  if(wk)wk.style.display=featOn('tastememory')?'block':'none';
   renderPairing();
   const pu=document.getElementById('push-url');if(pu)pu.value=localStorage.getItem('scc_push_url')||'';
   const cr=document.getElementById('b-cost-row');if(cr)cr.style.display=featOn('cost')?'flex':'none';
