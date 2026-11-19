@@ -69,7 +69,14 @@ Claude. Nog ideeën?"
   bronloze 16 g/240 g-recept; omgekeerd recept toevoegen; pre-infusie en rust
   als recept-instelling). Featurevlaggen houden (pourcoach, shotclock).
 
+## Onderbreking 19-11
+- Om ongeveer 12:00 UTC stopte het natekenen van de Hario-ketel en -server door
+  de 5-uurslimiet van het abonnement (reset 12:40 UTC). Om 13:11 UTC hervat.
+  Shot clock-opzet (alleen volle druk telt) was al af en gepubliceerd (versie 2).
+
 ## Eerstvolgende stap
+0. Hario-tekening in de V60-opzet afmaken en opnieuw publiceren op
+   https://claude.ai/artifact/AXJ9DLfCgbvqt3sWB9UAN1
 1. Cloudflare-koppeling gebruiken: buildlogs van beide Workers Builds lezen,
    oorzaak oplossen, preview-link halen, Jesse testlink geven.
 2. Keuzes uitlezen, takenbord vullen, per keuze een klus (aannemers alleen waar
