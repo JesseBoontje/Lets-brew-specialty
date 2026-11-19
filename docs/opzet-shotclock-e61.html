@@ -2,23 +2,23 @@
 /* ---- opzet shot clock E61: één telefoonscherm, prototype dat echt loopt ---- */
 .mk-kop,.mk-sect{max-width:620px;}
 .sc-fig{width:100%;max-width:400px;margin:0 auto;}
-.sc-phone{width:100%;max-width:400px;height:800px;margin:0 auto;}
+.sc-phone{width:100%;max-width:400px;height:830px;margin:0 auto;}
 .sc-scr{flex:1;min-height:0;display:flex;flex-direction:column;padding:4px 14px 12px;position:relative;}
 .acic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
 
 /* kop: het recept waar de klok uit leest */
-.sc-head{flex:none;display:flex;align-items:center;gap:10px;min-height:52px;}
+.sc-head{flex:none;display:flex;align-items:center;gap:10px;min-height:48px;}
 .sc-head>div{min-width:0;}
 .sc-head .sc-rn{font-size:24px;line-height:1;}
 .sc-head .sc-rd{font-size:13px;color:var(--ink-soft);line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sc-recbtn{margin-left:auto;flex:none;display:flex;align-items:center;justify-content:center;width:50px;height:50px;padding:0;
+.sc-recbtn{margin-left:auto;flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;padding:0;
   border-radius:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:16px;
   filter:url(#wobble);cursor:pointer;}
 .sc-recbtn:disabled{opacity:.45;cursor:default;}
 .sc-recbtn svg{width:24px;height:24px;}
 
 /* tekening: 45% van het scherm */
-.sc-art{flex:0 0 45%;min-height:0;display:flex;justify-content:center;align-items:center;cursor:pointer;outline:none;}
+.sc-art{flex:0 0 43%;min-height:0;display:flex;justify-content:center;align-items:center;cursor:pointer;outline:none;}
 .sc-art:focus-visible{box-shadow:0 0 0 2px var(--line);border-radius:18px;}
 .sc-art svg{height:100%;width:100%;overflow:visible;fill:none;stroke:var(--ink);stroke-width:1.7;
   stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
@@ -103,12 +103,52 @@
 .sc-step:disabled{opacity:.4;cursor:default;}
 .sc-val{min-width:62px;text-align:center;font-family:'Caveat',cursive;font-weight:700;font-size:30px;}
 
+/* tarra: rekenen met je eigen onderdelen */
+.sc-tarerow{flex:none;display:flex;align-items:center;gap:9px;width:100%;min-height:46px;margin-top:3px;padding:0 12px;
+  border-radius:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;text-align:left;
+  filter:url(#wobble);cursor:pointer;}
+.sc-tarerow:disabled{opacity:.5;cursor:default;}
+.sc-tarerow .tk{flex:none;font-family:'Caveat',cursive;font-weight:700;font-size:23px;line-height:1;}
+.sc-tarerow .ts{flex:1;min-width:0;font-size:15px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-tarerow .ta{flex:none;color:var(--ink-soft);font-size:21px;transition:transform .15s;}
+.sc-tarerow[aria-expanded="true"]{border-color:var(--ink);}
+.sc-tarerow[aria-expanded="true"] .ta{transform:rotate(90deg);}
+.sc-tp{position:absolute;left:14px;right:14px;top:110px;background:var(--paper);border:2px solid var(--ink);
+  border-radius:22px;padding:11px 12px 12px;z-index:3;overflow:auto;display:none;}
+.sc-tp.open{display:block;}
+.sc-tl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;color:var(--ink-soft);margin:0 2px 6px;}
+.sc-tl .vb{font-size:13px;border:1.5px dashed var(--line);border-radius:10px;padding:1px 7px;white-space:nowrap;}
+.sc-parts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sc-part{min-height:58px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;
+  text-align:left;padding:5px 11px;filter:url(#wobble);cursor:pointer;display:flex;flex-direction:column;justify-content:center;}
+.sc-part .pn{font-size:15px;line-height:1.1;}
+.sc-part .pg{font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.05;}
+.sc-part[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--ink);color:var(--cream);}
+.sc-aim{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:7px 12px;
+  border-radius:16px;background:var(--card-2);}
+.sc-aim .al{font-size:14px;line-height:1.25;color:var(--ink-soft);}
+.sc-aim .av{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:1;white-space:nowrap;}
+.sc-chk{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.sc-chk label{flex:1;min-width:0;font-size:15px;line-height:1.2;}
+.sc-num{width:150px;height:58px;border-radius:16px;border:2px solid var(--ink);background:var(--card);color:var(--ink);
+  font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:34px;text-align:center;padding:0 8px;}
+.sc-num.klein{width:112px;height:52px;font-size:28px;}
+.sc-res{font-size:15px;line-height:1.3;margin-top:7px;min-height:40px;color:var(--ink-soft);}
+.sc-res b{font-family:'Caveat',cursive;font-weight:700;font-size:25px;color:var(--ink);}
+.sc-tbtns{display:flex;gap:9px;margin-top:8px;}
+.sc-grow{display:flex;align-items:center;gap:9px;margin-top:8px;}
+.sc-grow label{flex:1;min-width:0;font-size:16px;line-height:1.15;}
+.sc-grow .u{font-size:16px;color:var(--ink-soft);}
+.sc-crumb{font-size:13px;color:var(--ink-soft);margin-bottom:2px;}
+
 /* instelpaneel: hoort bij het recept */
 .sc-scrim{position:absolute;inset:0;background:rgba(58,48,42,.28);opacity:0;pointer-events:none;transition:opacity .3s;z-index:4;}
 .sc-scrim.open{opacity:1;pointer-events:auto;}
 .sc-sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper);border-top:2px solid var(--ink);
   border-radius:26px 26px 0 0;padding:14px 16px 14px;transform:translateY(105%);transition:transform .3s;z-index:5;}
 .sc-sheet.open{transform:none;}
+#sc-gear{z-index:7;}
+#sc-scrim.hoog{z-index:6;}
 .sc-sheet h3{font-family:'Caveat',cursive;font-size:30px;line-height:1;}
 .sc-sheet .zacht{margin:3px 0 9px;line-height:1.3;}
 .sc-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px;}
@@ -151,7 +191,8 @@
     Pre-infusie en rust komen uit het recept.</div>
   <div class="mk-let">Probeer het: tik op <b>pull the lever</b> of op de hendel in de tekening.
     Met <b>4x</b> loopt alles vier keer zo snel. Met de knop rechtsboven (de schuifjes) zet je pre-infusie aan of uit
-    en stel je de seconden in. Dit is een los prototype; de app zelf is niet aangepast.</div>
+    en stel je de seconden in. Het vak <b>tare</b> rekent je dosis na met het eigen gewicht van je
+    onderdelen. Dit is een los prototype; de app zelf is niet aangepast.</div>
 </div>
 
 <figure class="sc-fig">
@@ -166,6 +207,9 @@
     <button type="button" class="sc-recbtn" id="sc-recbtn" aria-label="recipe settings" onclick="scSheet(true)">
       <svg viewBox="0 0 24 24" class="acic" aria-hidden="true"><path d="M3.6 8.1 Q12 7.5 20.6 8.3"/><path d="M3.4 16 Q12 15.6 20.5 16.2"/><path d="M10.6 6 Q12.3 6.3 12.1 8.1 Q11.9 9.9 10.2 9.8 Q8.5 9.5 8.7 7.8 Q8.9 6.1 11 6.3"/><path d="M15.4 14.1 Q17.1 14.4 16.9 16.2 Q16.7 18 15 17.9 Q13.3 17.6 13.5 15.9 Q13.7 14.2 15.8 14.4"/></svg></button>
   </div>
+
+  <button type="button" class="sc-tarerow" id="sc-tarerow" aria-expanded="false" aria-controls="sc-tp" onclick="scTare()">
+    <span class="tk">tare</span><span class="ts" id="sc-tsum"></span><span class="ta">&rsaquo;</span></button>
 
   <div class="sc-art" id="sc-art" role="button" tabindex="0" aria-label="the lever: tap to start or stop the shot">
    <svg viewBox="36 -14 214 256" id="sc-svg" aria-hidden="true">
@@ -283,8 +327,22 @@
 
   <div class="sc-btns" id="sc-btns"></div>
 
-  <div class="sc-scrim" id="sc-scrim" onclick="scSheet(false)"></div>
+  <div class="sc-tp" id="sc-tp" role="region" aria-label="tare">
+    <div class="sc-tl"><span>on the scale — tap what's on it</span><span class="vb">example weights</span></div>
+    <div class="sc-parts" id="sc-parts"></div>
+    <div class="sc-aim"><div class="al" id="sc-aiml"></div><div class="av" id="sc-aim"></div></div>
+    <div class="sc-chk"><label for="sc-chkin">the scale reads<br><span class="zacht">type it, in g</span></label>
+      <input class="sc-num" id="sc-chkin" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" oninput="scCheck(this.value)"></div>
+    <div class="sc-res" id="sc-res"></div>
+    <div class="sc-tbtns">
+      <button type="button" class="sc-btn" onclick="scGear(true)">my gear</button>
+      <button type="button" class="sc-btn pri" id="sc-usedose" onclick="scUseDose()">use as dose</button>
+    </div>
+  </div>
+
+  <div class="sc-scrim" id="sc-scrim" onclick="scCloseSheets()"></div>
   <div class="sc-sheet" id="sc-sheet" aria-hidden="true"></div>
+  <div class="sc-sheet" id="sc-gear" aria-hidden="true"></div>
   <div class="sc-toast" id="sc-toast"></div>
  </div>
 </div>
@@ -304,6 +362,25 @@
     <li><b>lever down</b>: op het geschatte doelgewicht zegt de strook "lever down at 36 g". Jij stopt met de
       knop <b>stop</b> of door de hendel in de tekening aan te tikken. Daarna het advies, als tekst.</li>
   </ul>
+</div>
+
+<div class="mk-sect">
+  <h2>Tarra: rekenen met je eigen onderdelen</h2>
+  <p>Voor als het nullen van de weegschaal misgaat. Dicht is het vak <b>tare</b> één regel, bijvoorbeeld
+    "naked + ring: 551.0 g · aim 569.0 g". Open tik je aan wat er op de weegschaal staat (grote knoppen; naked
+    en double spout sluiten elkaar uit) en rekent hij twee kanten op:</p>
+  <ul>
+    <li><b>doel</b>: bij 18.0 g dosis moet de weegschaal de onderdelen plus 18.0 g tonen;</li>
+    <li><b>controle</b>: typ wat de weegschaal echt toont (komma of punt mag), dan zie je je echte dosis en
+      het verschil met het doel. <b>use as dose</b> neemt die dosis over voor deze shot; het doel uit (36 g)
+      blijft staan.</li>
+  </ul>
+  <p>Rekenvoorbeeld, zo staat het ook in de opzet: naked 512.4 + ring 38.6 + 18.0 = <b>569.0 g</b> op de
+    weegschaal. Toont hij 569.4, dan is de dosis <b>18.4 g (+0.4)</b>.</p>
+  <p>De gewichten zijn <b>voorbeelden</b> (naked 512.4 g, double spout 548.0 g, dosing ring 38.6 g, puck
+    screen 1 12.3 g, puck screen 2 9.8 g, dosing cup 61.2 g). Je eigen gewichten weeg je één keer op een lege,
+    genulde weegschaal en vul je in bij <b>profile → my gear</b>; de knop <b>my gear</b> in het vak laat zien
+    hoe dat scherm eruitziet. Bij inbouwen komen die zes gewichten bij je gear en in SCHEMA.md.</p>
 </div>
 
 <div class="mk-sect">
@@ -350,6 +427,7 @@
     <li>Een gekoppelde weegschaal (Bluetooth) kan de schatting vervangen en dan echt op 36 g stoppen, maar dat
       werkt alleen op Android met Chrome, niet op een iPhone.</li>
     <li>De app weet niet waar je hendel echt staat. De tekening wijst aan wat je moet doen.</li>
+    <li>De app ziet ook niet wat er op je weegschaal ligt: jij tikt de onderdelen aan.</li>
     <li>Hendelstanden: op een gewone E61 gaat de pomp pas aan met de hendel helemaal omhoog, en de middenstand
       opent de klep zonder pomp. Ik tekende het zoals Jesse het beschrijft (pre-infusie half omhoog, rust terug
       naar de middenstand). Werkt het op zijn machine anders, dan is dat één hoek in de tekening.</li>
@@ -381,7 +459,7 @@ const VEILIG=60;             // na een minuut stopt hij zelf
 const LEVER={down:0, rest:-46, pre:-66, full:-100};
 const MIN='<svg viewBox="0 0 24 24" class="acic" style="width:26px;height:26px;stroke-width:2.4"><path d="M5.2 12.4 Q12 11.5 18.9 12.1"/></svg>';
 const PLUS='<svg viewBox="0 0 24 24" class="acic" style="width:26px;height:26px;stroke-width:2.4"><path d="M5.2 12.4 Q12 11.5 18.9 12.1"/><path d="M12.3 5.1 Q11.7 12 12.1 19"/></svg>';
-const sc={rid:'e-classic',speed:1,run:false,t:0,last:0,stand:'ready',stopT:null,drop:null,yOut:null,
+const sc={dose:null,rid:'e-classic',speed:1,run:false,t:0,last:0,stand:'ready',stopT:null,drop:null,yOut:null,
           phase:null,sheet:false,raf:null};
 
 const $=id=>document.getElementById(id);
@@ -573,8 +651,9 @@ function renderBtns(){
 function renderHead(){
   const p=plan();
   $('sc-rn').textContent=p.r.naam;
-  $('sc-rd').textContent=p.r.dose+' → '+p.Y+' g · '+(p.on?('pre '+p.P+' s · rest '+p.R+' s'):'no pre-infusion')+' · full '+mss(p.F);
+  $('sc-rd').textContent=(sc.dose!=null?sc.dose.toFixed(1):p.r.dose)+' → '+p.Y+' g · '+(p.on?('pre '+p.P+' s · rest '+p.R+' s'):'no pre-infusion')+' · full '+mss(p.F);
   $('sc-recbtn').disabled=sc.stand==='run';
+  if(typeof renderTareRow==='function')renderTareRow();
 }
 function renderSheet(){
   const p=plan(),r=p.r,on=r.pre.on;
@@ -599,12 +678,13 @@ function renderSheet(){
 }
 function scSheet(open){
   if(open&&sc.stand==='run')return;
+  if(open&&tare.open)scTare(false);
   sc.sheet=open;
   if(open)renderSheet();
   $('sc-sheet').classList.toggle('open',open);$('sc-scrim').classList.toggle('open',open);
   $('sc-sheet').setAttribute('aria-hidden',String(!open));
 }
-function scPick(id){sc.rid=id;sc.yOut=null;afterSettings();}
+function scPick(id){sc.rid=id;sc.yOut=null;sc.dose=null;afterSettings();}
 function scPreOn(){const r=rec();r.pre.on=!r.pre.on;if(r.pre.on&&r.pre.s<1)r.pre.s=5;afterSettings();}
 function scSet(k,d){
   const r=rec();if(!r.pre.on)return;
@@ -685,6 +765,7 @@ function scStop(vanzelf){
 function scAgain(){
   sc.run=false;cancelAnimationFrame(sc.raf);
   sc.stand='ready';sc.t=0;sc.stopT=null;sc.drop=null;sc.yOut=null;sc.phase=null;
+  sc.dose=null;tare.check='';$('sc-chkin').value='';   // nieuwe shot: opnieuw afwegen
   setLever(LEVER.down);
   $('sc-svg').classList.remove('flow','water','slow','thin','drip');
   $('sc-read').classList.remove('wacht');
@@ -706,8 +787,95 @@ function toast(s){
   const el=$('sc-toast');el.textContent=s;el.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2600);
 }
+/* ---------- tarra ----------
+   Eigen gewicht van je onderdelen, één keer gewogen op een lege, genulde
+   weegschaal (in de app: profile -> my gear). Hier VOORBEELDGEWICHTEN.     */
+const GEAR=[
+  {id:'naked', n:'naked',         lang:'naked portafilter',        kort:'naked',    g:512.4, pf:true},
+  {id:'spout', n:'double spout',  lang:'double spout portafilter', kort:'spout',    g:548.0, pf:true},
+  {id:'ring',  n:'dosing ring',   lang:'dosing ring',              kort:'ring',     g:38.6},
+  {id:'ps1',   n:'puck screen 1', lang:'puck screen 1',            kort:'screen 1', g:12.3},
+  {id:'ps2',   n:'puck screen 2', lang:'puck screen 2',            kort:'screen 2', g:9.8},
+  {id:'cup',   n:'dosing cup',    lang:'dosing cup',               kort:'cup',      g:61.2},
+];
+const tare={on:{naked:true,ring:true},check:'',open:false};
+const g10=x=>Math.round(x*10)/10;
+function parseG(v){const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:null;}
+function partsSum(){return g10(GEAR.filter(x=>tare.on[x.id]).reduce((a,x)=>a+x.g,0));}
+function partsName(){const l=GEAR.filter(x=>tare.on[x.id]).map(x=>x.kort);return l.length?l.join(' + '):'nothing';}
+function aimG(){return g10(partsSum()+rec().dose);}
+function realDose(){const v=parseG(tare.check);return v==null?null:g10(v-partsSum());}
+function signed(d){return (d>0?'+':d<0?'−':'±')+Math.abs(d).toFixed(1)+' g';}
+function renderTareRow(){
+  $('sc-tsum').textContent=partsName()+': '+partsSum().toFixed(1)+' g · '+
+    (sc.dose!=null?'dose '+sc.dose.toFixed(1)+' g':'aim '+aimG().toFixed(1)+' g');
+  $('sc-tarerow').disabled=sc.stand==='run';
+}
+function renderTare(){
+  $('sc-parts').innerHTML=GEAR.map(x=>'<button type="button" class="sc-part" aria-pressed="'+!!tare.on[x.id]+
+    '" onclick="scPart(\''+x.id+'\')"><span class="pn">'+x.n+'</span><span class="pg">'+x.g.toFixed(1)+' g</span></button>').join('');
+  const dose=rec().dose;
+  $('sc-aiml').innerHTML='at '+dose.toFixed(1)+' g dose the scale should read<br>'+partsSum().toFixed(1)+' g parts + '+dose.toFixed(1)+' g coffee';
+  $('sc-aim').textContent=aimG().toFixed(1)+' g';
+  const d=realDose();let h,ok=false;
+  if(String(tare.check).trim()==='')h='type what the scale shows: the parts come off and you see your real dose.';
+  else if(d==null||d<=0||d>40)h='that doesn\'t add up — check what is on the scale.';
+  else{
+    const diff=g10(d-dose);ok=true;
+    const w=Math.abs(diff)<0.05?'spot on':diff>0?Math.abs(diff).toFixed(1)+' g too much':Math.abs(diff).toFixed(1)+' g short';
+    h='real dose <b id="sc-real">'+d.toFixed(1)+' g</b> · <b id="sc-diff">'+signed(diff)+'</b> — '+w;
+  }
+  $('sc-res').innerHTML=h;
+  $('sc-usedose').disabled=!ok;
+  renderTareRow();
+}
+function scTare(open){
+  if(open===undefined)open=!tare.open;
+  if(open&&sc.stand==='run')return;
+  if(open)scCloseSheets();
+  tare.open=open;
+  const row=$('sc-tarerow');
+  const top=row.offsetTop+row.offsetHeight+6;
+  $('sc-tp').style.top=top+'px';
+  $('sc-tp').style.maxHeight=($('sc-scr').clientHeight-top-12)+'px';
+  $('sc-tp').classList.toggle('open',open);
+  row.setAttribute('aria-expanded',String(open));
+  if(open)renderTare();
+}
+function scPart(id){
+  const x=GEAR.find(g=>g.id===id),aan=!tare.on[id];
+  if(aan&&x.pf)GEAR.filter(g=>g.pf).forEach(g=>{tare.on[g.id]=false;});   // één portafilter tegelijk
+  tare.on[id]=aan;renderTare();
+}
+function scCheck(v){tare.check=v;renderTare();}
+function scUseDose(){
+  const d=realDose();if(d==null||d<=0||d>40)return;
+  sc.dose=d;scTare(false);renderHead();renderTareRow();
+  toast('dose '+d.toFixed(1)+' g for this shot — target stays '+plan().Y+' g out');
+}
+/* my gear: waar je de gewichten invult (profiel) */
+function renderGear(){
+  let h='<div class="sc-crumb">profile → my gear → espresso</div><h3>my gear · weights</h3>'+
+    '<div class="zacht">Weigh each part once on an empty, zeroed scale. One decimal is enough. '+
+    '<span class="vb" style="border:1.5px dashed var(--line);border-radius:10px;padding:0 6px">example values</span></div>';
+  h+=GEAR.map((x,i)=>'<div class="sc-grow"><label for="sc-g'+i+'">'+x.lang+'</label>'+
+    '<input class="sc-num klein" id="sc-g'+i+'" type="text" inputmode="decimal" autocomplete="off" value="'+x.g.toFixed(1)+
+    '" oninput="scGearSet('+i+',this.value)" onblur="this.value=GEAR['+i+'].g.toFixed(1)"><span class="u">g</span></div>').join('');
+  h+='<button type="button" class="sc-btn pri" onclick="scGear(false)">done</button>';
+  $('sc-gear').innerHTML=h;
+}
+function scGearSet(i,v){const n=parseG(v);if(n!=null&&n>=0&&n<3000){GEAR[i].g=g10(n);if(tare.open)renderTare();else renderTareRow();}}
+function scGear(open){
+  if(open){renderGear();$('sc-scrim').classList.add('hoog');}
+  $('sc-gear').classList.toggle('open',open);
+  $('sc-gear').setAttribute('aria-hidden',String(!open));
+  $('sc-scrim').classList.toggle('open',open||sc.sheet);
+  if(!open){$('sc-scrim').classList.remove('hoog');if(tare.open)renderTare();}
+}
+function scCloseSheets(){if($('sc-gear').classList.contains('open'))scGear(false);if(sc.sheet)scSheet(false);}
+
 /* de hendel aantikken: klaar = overhalen, loopt = omlaag en stop */
-function leverTap(){if(sc.sheet)return;if(sc.stand==='ready')scStart();else if(sc.stand==='run')scStop();}
+function leverTap(){if(sc.sheet||tare.open)return;if(sc.stand==='ready')scStart();else if(sc.stand==='run')scStop();}
 $('sc-art').addEventListener('click',leverTap);
 $('sc-art').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();leverTap();}});
 
