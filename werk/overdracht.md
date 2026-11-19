@@ -74,6 +74,18 @@ Claude. Nog ideeën?"
   de 5-uurslimiet van het abonnement (reset 12:40 UTC). Om 13:11 UTC hervat.
   Shot clock-opzet (alleen volle druk telt) was al af en gepubliceerd (versie 2).
 
+## Besluit Jesse over volgorde en verbruik (19-11)
+- Eerst de kleinere klussen, het grote werk (Face ID + database, Claude-koppeling,
+  AI-coach centraal) later. Schatting hele verbouwing ±7 miljoen tokens, 2 tot 4
+  keer de 5-uurslimiet. Per klus een nieuwe sessie; één keuring per klus.
+- Kleinere klussen, in deze volgorde: brews aan bonen koppelen; gietcoach
+  V60/Switch inbouwen; AeroPress-recepten en -coach; shot clock met pre-infusie,
+  rust, alleen volle druk telt, tarra-vak en gewichten in my gear; daarna
+  versheidsmeter met piekmelding, surprise me, delen als pagina/PDF (brews en
+  bonen), AI-budget realistischer.
+- V60 en server in de opzet nagetekend naar Jesse's foto (Hario V60 wit
+  keramiek op glazen server met rond handvat).
+
 ## Eerstvolgende stap
 0. (klaar) Hario-tekening in de V60-opzet, opnieuw gepubliceerd op
    https://claude.ai/artifact/AXJ9DLfCgbvqt3sWB9UAN1
