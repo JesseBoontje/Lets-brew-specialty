@@ -72,6 +72,9 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
   transition:opacity .25s;}
 #tek .drip.druppel{stroke-dasharray:2.5 9;}
 #tek .lijn .mk{opacity:.55;stroke-width:1.2;}
+#tek .glas{stroke-width:1.2;}
+#tek .glas .b{stroke-width:.9;opacity:.5;}
+#tek #sv-fill{fill:var(--accent);}
 #tek .tag{font-family:'Caveat',cursive;font-weight:700;font-size:17px;fill:var(--ink-soft);
   stroke:none;}
 #tek .tag.open{fill:var(--accent-soft);}
@@ -225,7 +228,7 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
       <defs>
         <clipPath id="cl-kegel"><path d="M106 122 L238 122 L178 213 L166 213 Z"/></clipPath>
         <clipPath id="cl-bed"><rect id="bed-clip" x="90" y="172" width="170" height="60"/></clipPath>
-        <clipPath id="cl-server"><path d="M144 258 L200 258 Q210 268 216 278 Q226 294 224 314 Q222 336 207 344 Q172 351 137 344 Q122 336 120 314 Q118 294 128 278 Q134 268 144 258 Z"/></clipPath>
+        <clipPath id="cl-server"><path d="M118 250 L226 250 Q230 290 234 318 Q236 338 214 344 Q172 349 130 344 Q108 338 110 318 Q114 290 118 250 Z"/></clipPath>
       </defs>
 
       <!-- de server: eerst de koffie, dan het glas eroverheen -->
@@ -235,37 +238,24 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
         <g id="rimpel" class="rimpel"><path d="M-9 0 Q0 3 9 0"/><path d="M-15 1 Q0 5 15 1"/></g>
       </g>
       <path id="drip" class="drip" d="" opacity="0"/>
-      <!-- V60 Range Server (600 ml): ronde glazen buik, ongeveer even hoog als breed,
-           een smallere hals (77 mm op 121 mm) met deksel waar de V60 op staat,
-           een tuitje voorin, het handvat hoog aan de hals en maatstreepjes op het glas -->
-      <g class="lijn" id="sv-lijn">
-        <!-- deksel -->
-        <path d="M136 247 Q172 240 208 248"/>
-        <path class="b" d="M140 250 Q172 245 204 251"/>
-        <path d="M138 246 Q136 252 140 258"/>
-        <path d="M206 247 Q208 253 204 259"/>
-        <path d="M135 257 Q172 251 209 258"/>
+      <!-- de server naar de foto: glazen kan, bolle onderkant, naar boven iets smaller,
+           een klein schenktuitje links aan de rand en een groot rond glazen oor rechts.
+           Glas = dunne lijnen. -->
+      <g class="lijn glas" id="sv-lijn">
+        <path d="M112 247 Q172 241 233 248"/>
+        <path class="b" d="M116 250 Q172 245 229 251"/>
         <!-- tuitje -->
-        <path d="M141 251 Q128 247 115 252 Q123 258 140 259"/>
-        <path class="b" d="M139 253 Q128 250 119 253"/>
-        <!-- het deksel licht gearceerd, zodat het los van de V60-voet leest -->
-        <path class="z" d="M150 250 Q149 253 150 256 M162 249 Q161 252 162 255 M174 249 Q173 252 174 255 M186 249 Q185 252 186 255 M198 250 Q197 253 198 256"/>
-        <!-- de buik, elke kant twee keer -->
-        <path d="M143 255 Q137 266 128 276 Q115 292 117 314 Q119 339 136 347"/>
-        <path class="b" d="M146 259 Q140 268 131 278 Q121 294 122 314 Q124 335 139 343"/>
-        <path d="M201 255 Q207 266 216 276 Q229 292 227 314 Q225 339 208 347"/>
-        <path class="b" d="M198 259 Q204 268 213 278 Q223 294 222 314 Q220 335 205 343"/>
-        <path d="M129 346 Q172 354 215 346"/>
-        <path class="b" d="M137 349 Q172 353 207 349"/>
-        <!-- handvat: hoog aan de hals, buigt naar buiten en terug naar de buik -->
-        <path d="M205 251 Q236 249 241 273 Q245 298 222 308"/>
-        <path class="b" d="M206 259 Q230 258 233 276 Q236 294 220 300"/>
-        <!-- maatstreepjes -->
-        <path class="mk" d="M128 334 Q134 333.4 140 334"/>
-        <path class="mk" d="M126 322 Q131 321.4 136 322"/>
-        <path class="mk" d="M125 310 Q132 309.4 139 310"/>
-        <path class="mk" d="M126 298 Q131 297.4 136 298"/>
-        <path class="mk" d="M129 286 Q134 285.4 140 286"/>
+        <path d="M115 247 Q106 244 101 248 Q107 251 116 253"/>
+        <!-- zijkanten: recht omlaag, onderaan bol -->
+        <path d="M116 245 Q110 290 106 318 Q103 340 128 346"/>
+        <path class="b" d="M120 250 Q114 292 111 318 Q109 336 130 342"/>
+        <path d="M229 245 Q235 290 238 318 Q241 340 216 346"/>
+        <path class="b" d="M225 250 Q231 292 233 318 Q235 336 214 342"/>
+        <path d="M122 345 Q172 352 222 345"/>
+        <path class="b" d="M130 348 Q172 351 214 348"/>
+        <!-- het grote ronde oor -->
+        <path d="M228 254 Q272 250 274 286 Q275 320 236 330"/>
+        <path class="b" d="M229 261 Q264 258 265 287 Q266 314 237 322"/>
         <!-- tafel -->
         <path class="z" d="M50 353 Q172 357 296 352"/>
       </g>
@@ -299,20 +289,18 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
           <path d="M242 121 Q210 168 177 218"/>
           <path class="b" d="M237 124 Q206 170 175 214"/>
           <path d="M162 212 Q172 218 183 212"/>
-          <path d="M166 213 Q165 220 167 228"/>
-          <path d="M178 213 Q179 220 177 228"/>
-          <path class="b" d="M164 226 Q172 230 180 226"/>
-          <!-- voet: de ring waarmee hij op de server staat -->
-          <path d="M120 227 Q172 218 226 228"/>
-          <path class="b" d="M125 231 Q172 223 221 232"/>
-          <path d="M133 228 Q130 236 134 246"/>
-          <path class="b" d="M137 230 Q135 237 138 244"/>
-          <path d="M211 228 Q214 236 210 246"/>
-          <path class="b" d="M207 230 Q209 237 206 244"/>
-          <path d="M128 244 Q172 237 216 245"/>
+          <path d="M166 213 Q164 226 166 239"/>
+          <path d="M178 213 Q180 226 178 239"/>
+          <path class="b" d="M169 215 Q168 226 169 237"/>
+          <!-- voet: een platte ronde schijf die op de server rust -->
+          <path d="M114 239 Q172 232 230 240"/>
+          <path class="b" d="M119 241 Q172 235 225 242"/>
+          <path d="M116 238 Q112 242 119 245"/>
+          <path d="M228 239 Q232 243 225 246"/>
+          <path d="M117 245 Q172 240 227 246"/>
           <!-- oor -->
-          <path d="M227 134 Q263 133 259 158 Q255 181 213 178"/>
-          <path class="b" d="M224 140 Q253 140 251 159 Q248 174 216 172"/>
+          <path d="M230 128 Q268 124 266 152 Q263 182 214 180"/>
+          <path class="b" d="M226 135 Q258 133 257 153 Q255 174 217 173"/>
           <!-- spiraalribbels, zacht -->
           <path class="z" d="M121 128 Q138 160 160 204"/>
           <path class="z" d="M146 128 Q154 164 166 206"/>
@@ -537,7 +525,7 @@ var STEM_UIT='<svg viewBox="0 0 24 24" aria-hidden="true">'+STEM_LIJF+'<path d="
 
 /* ---- de tekening: maten ---- */
 var CX=172, RIM=122, APEX=213, HK=APEX-RIM, VCAP=300, VBED=24;
-var SV_BODEM=347, SV_PER_G=0.13;
+var SV_BODEM=346, SV_PER_G=0.17;
 // de ketel draait om het handvat (waar je hand zit) en komt bij het gieten iets omhoog
 var KRUST=[0,-14], KGIET=[2,-40], KHOEK=32, PIV=[12,45], TIP=[187,24];
 function xL(y){return 106+0.659*(y-RIM);}
