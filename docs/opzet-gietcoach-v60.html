@@ -71,8 +71,7 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
 #tek .drip{fill:none;stroke:var(--accent-soft);stroke-linecap:round;stroke-dasharray:13 3;
   transition:opacity .25s;}
 #tek .drip.druppel{stroke-dasharray:2.5 9;}
-#tek .k-temp{font-family:'Caveat',cursive;font-weight:700;font-size:10.5px;fill:var(--ink);
-  stroke:none;text-anchor:middle;}
+#tek .lijn .mk{opacity:.55;stroke-width:1.2;}
 #tek .tag{font-family:'Caveat',cursive;font-weight:700;font-size:17px;fill:var(--ink-soft);
   stroke:none;}
 #tek .tag.open{fill:var(--accent-soft);}
@@ -221,37 +220,54 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
   <div class="gc-info"><span id="info-l"></span><span class="r" id="info-r"></span></div>
 
   <div class="gc-tek">
-    <svg id="tek" viewBox="0 0 300 350" preserveAspectRatio="xMidYMid meet" role="img"
+    <svg id="tek" viewBox="-28 -16 328 370" preserveAspectRatio="xMidYMid meet" role="img"
          aria-label="kettle pours into the dripper, the dripper drips into the server">
       <defs>
         <clipPath id="cl-kegel"><path d="M106 122 L238 122 L178 213 L166 213 Z"/></clipPath>
         <clipPath id="cl-bed"><rect id="bed-clip" x="90" y="172" width="170" height="60"/></clipPath>
-        <clipPath id="cl-server"><path d="M139 252 Q114 268 116 298 Q118 320 136 330 Q172 338 208 330 Q226 320 228 298 Q230 268 205 252 Z"/></clipPath>
+        <clipPath id="cl-server"><path d="M144 258 L200 258 Q210 268 216 278 Q226 294 224 314 Q222 336 207 344 Q172 351 137 344 Q122 336 120 314 Q118 294 128 278 Q134 268 144 258 Z"/></clipPath>
       </defs>
 
       <!-- de server: eerst de koffie, dan het glas eroverheen -->
       <g clip-path="url(#cl-server)">
-        <rect id="sv-fill" class="koffie" x="100" y="346" width="150" height="0" opacity=".9"/>
-        <rect id="sv-crema" class="crema" x="100" y="346" width="150" height="0"/>
+        <rect id="sv-fill" class="koffie" x="100" y="360" width="150" height="0" opacity=".9"/>
+        <rect id="sv-crema" class="crema" x="100" y="360" width="150" height="0"/>
         <g id="rimpel" class="rimpel"><path d="M-9 0 Q0 3 9 0"/><path d="M-15 1 Q0 5 15 1"/></g>
       </g>
       <path id="drip" class="drip" d="" opacity="0"/>
+      <!-- V60 Range Server (600 ml): ronde glazen buik, ongeveer even hoog als breed,
+           een smallere hals (77 mm op 121 mm) met deksel waar de V60 op staat,
+           een tuitje voorin, het handvat hoog aan de hals en maatstreepjes op het glas -->
       <g class="lijn" id="sv-lijn">
-        <path d="M126 248 Q172 240 218 249"/>
-        <path class="b" d="M131 251 Q172 244 213 251"/>
-        <path d="M121 250 Q117 245 127 246"/>
-        <path d="M134 249 Q107 266 110 298 Q112 325 133 334"/>
-        <path class="b" d="M139 252 Q113 268 115 298 Q117 321 136 331"/>
-        <path d="M210 249 Q237 266 234 298 Q232 325 211 334"/>
-        <path class="b" d="M205 252 Q231 268 229 298 Q227 321 208 331"/>
-        <path d="M125 333 Q172 343 219 333"/>
-        <path class="b" d="M133 336 Q172 341 211 336"/>
-        <path d="M229 266 Q254 266 253 290 Q252 312 228 313"/>
-        <path class="b" d="M231 273 Q246 273 246 290 Q245 305 231 306"/>
-        <path class="z" d="M117 284 Q124 283 129 284"/>
-        <path class="z" d="M118 298 Q125 297 130 298"/>
-        <path class="z" d="M119 312 Q126 311 131 312"/>
-        <path class="z" d="M60 344 Q172 348 290 343"/>
+        <!-- deksel -->
+        <path d="M136 247 Q172 240 208 248"/>
+        <path class="b" d="M140 250 Q172 245 204 251"/>
+        <path d="M138 246 Q136 252 140 258"/>
+        <path d="M206 247 Q208 253 204 259"/>
+        <path d="M135 257 Q172 251 209 258"/>
+        <!-- tuitje -->
+        <path d="M141 251 Q128 247 115 252 Q123 258 140 259"/>
+        <path class="b" d="M139 253 Q128 250 119 253"/>
+        <!-- het deksel licht gearceerd, zodat het los van de V60-voet leest -->
+        <path class="z" d="M150 250 Q149 253 150 256 M162 249 Q161 252 162 255 M174 249 Q173 252 174 255 M186 249 Q185 252 186 255 M198 250 Q197 253 198 256"/>
+        <!-- de buik, elke kant twee keer -->
+        <path d="M143 255 Q137 266 128 276 Q115 292 117 314 Q119 339 136 347"/>
+        <path class="b" d="M146 259 Q140 268 131 278 Q121 294 122 314 Q124 335 139 343"/>
+        <path d="M201 255 Q207 266 216 276 Q229 292 227 314 Q225 339 208 347"/>
+        <path class="b" d="M198 259 Q204 268 213 278 Q223 294 222 314 Q220 335 205 343"/>
+        <path d="M129 346 Q172 354 215 346"/>
+        <path class="b" d="M137 349 Q172 353 207 349"/>
+        <!-- handvat: hoog aan de hals, buigt naar buiten en terug naar de buik -->
+        <path d="M205 251 Q236 249 241 273 Q245 298 222 308"/>
+        <path class="b" d="M206 259 Q230 258 233 276 Q236 294 220 300"/>
+        <!-- maatstreepjes -->
+        <path class="mk" d="M128 334 Q134 333.4 140 334"/>
+        <path class="mk" d="M126 322 Q131 321.4 136 322"/>
+        <path class="mk" d="M125 310 Q132 309.4 139 310"/>
+        <path class="mk" d="M126 298 Q131 297.4 136 298"/>
+        <path class="mk" d="M129 286 Q134 285.4 140 286"/>
+        <!-- tafel -->
+        <path class="z" d="M50 353 Q172 357 296 352"/>
       </g>
 
       <!-- de zetter: één groep, zodat hij als geheel kan swirlen -->
@@ -350,34 +366,43 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
       <path id="straal" class="straal" d=""/>
       <path id="straal-b" class="straal b" d=""/>
 
-      <g id="damp" class="damp"><path d="M142 26 Q137 19 142 12 Q147 5 142 -2"/><path d="M150 28 Q146 22 150 16 Q154 10 151 4"/></g>
+      <g id="damp" class="damp"><path d="M150 11 Q145 4 150 -3 Q155 -10 150 -16"/><path d="M158 13 Q154 7 158 1 Q162 -5 159 -11"/></g>
 
+      <!-- V60 Buono: bolle bijenkorfvorm met ribbels onderin, een klein dekseltje
+           met plat knopje, het handvat hoog aan de achterkant, en een lange dunne
+           S-tuit die op het laagste punt van de buik begint -->
       <g id="k-groep">
         <g class="lijn">
-          <path d="M25 109 Q66 117 107 108"/>
-          <path class="b" d="M30 112 Q66 118 102 111"/>
-          <path d="M29 111 Q21 88 33 63"/>
-          <path class="b" d="M33 107 Q26 87 36 66"/>
-          <path d="M103 111 Q111 88 99 63"/>
-          <path class="b" d="M99 107 Q106 87 96 66"/>
-          <path d="M29 67 Q66 55 103 66"/>
-          <path class="b" d="M34 64 Q66 58 98 64"/>
-          <path d="M41 63 Q66 43 91 62"/>
-          <path class="b" d="M46 61 Q66 48 86 60"/>
-          <path d="M61 50 Q58 41 66 40 Q74 41 71 50 Q66 53 59 51"/>
-          <!-- handvat -->
-          <path d="M34 71 Q5 69 7 89 Q9 105 31 101"/>
-          <path class="b" d="M33 78 Q16 77 15 89 Q15 98 30 96"/>
-          <!-- zwanenhals -->
-          <path d="M100 101 Q124 102 128 80 Q132 56 153 44"/>
-          <path class="b" d="M103 98 Q121 98 125 79 Q129 58 150 47"/>
-          <path d="M99 90 Q115 91 118 76 Q122 52 146 39"/>
-          <path class="b" d="M98 93 Q117 94 121 77 Q124 57 144 43"/>
-          <path d="M144 38 Q151 38 155 45"/>
-          <path class="z" d="M30 99 Q66 106 103 99"/>
-          <!-- thermometer op de ketel -->
-          <path d="M76 81 Q79 90 71 94 Q62 96 57 89 Q55 80 63 76 Q72 74 77 83"/>
-          <text id="k-temp" class="k-temp" x="66.5" y="89">95&deg;</text>
+          <!-- bodem -->
+          <path d="M25 101 Q74 108 123 100"/>
+          <path class="b" d="M30 104 Q74 109 118 103"/>
+          <!-- de buik -->
+          <path d="M31 103 Q22 76 39 55 Q46 46 57 42"/>
+          <path class="b" d="M35 100 Q27 76 42 57 Q49 48 59 45"/>
+          <path d="M117 103 Q126 76 109 55 Q102 46 91 42"/>
+          <path class="b" d="M113 100 Q121 76 106 57 Q99 48 89 45"/>
+          <!-- ribbels -->
+          <path class="z" d="M27 92 Q74 99 121 92"/>
+          <path class="z" d="M26 83 Q74 89 122 83"/>
+          <!-- dekseltje met plat knopje -->
+          <path d="M50 44 Q74 38 98 44"/>
+          <path class="b" d="M54 46 Q74 41 94 46"/>
+          <path d="M56 42 Q74 31 92 42"/>
+          <path class="b" d="M59 41 Q74 34 89 41"/>
+          <path d="M68 35 Q66 30 69 28"/>
+          <path d="M80 35 Q82 30 79 28"/>
+          <path d="M63 28 Q74 25 85 28"/>
+          <path class="b" d="M66 30 Q74 27.5 82 30"/>
+          <!-- handvat, hoog aan de achterkant -->
+          <path d="M55 46 Q34 27 14 38 Q2 46 6 62 Q11 78 32 87"/>
+          <path class="b" d="M52 44 Q33 31 16 41 Q6 48 9 62 Q14 75 31 83"/>
+          <path d="M52 54 Q35 40 22 47 Q14 53 17 64 Q21 73 33 78"/>
+          <!-- de tuit: begint onderaan de buik, lange dunne S omhoog -->
+          <path d="M114 99 Q134 99 139 84 Q144 60 158 42 Q165 33 176 34"/>
+          <path class="b" d="M117 96 Q132 97 136 83 Q141 60 155 42 Q161 36 170 36"/>
+          <path d="M116 91 Q128 92 132 79 Q137 54 151 37 Q158 29 171 29"/>
+          <path class="b" d="M113 94 Q129 94 134 81 Q139 57 153 39 Q160 31 172 31"/>
+          <path d="M170 28 Q177 29 177 35 Q176 38 172 36"/>
         </g>
       </g>
     </svg>
@@ -508,8 +533,8 @@ var STEM_UIT='<svg viewBox="0 0 24 24" aria-hidden="true">'+STEM_LIJF+'<path d="
 
 /* ---- de tekening: maten ---- */
 var CX=172, RIM=122, APEX=213, HK=APEX-RIM, VCAP=300, VBED=24;
-var SV_BODEM=334;
-var KX=-10, KY=-14, PIV=[66,108], TIP=[154,44];
+var SV_BODEM=347, SV_PER_G=0.13;
+var KX=-25, KY=-19, PIV=[74,104], TIP=[176,36];
 function xL(y){return 106+0.659*(y-RIM);}
 function xR(y){return 238-0.659*(y-RIM);}
 // een kegel: de hoogte groeit met de derdemachtswortel van het volume
@@ -546,7 +571,6 @@ function bouw(id){
   $('v60-lijn').style.display=sw?'none':'';
   $('sw-lijn').style.display=sw?'':'none';
   $('klep-tag').style.display=sw?'':'none';
-  $('k-temp').textContent=R.temp+'°';
   document.querySelectorAll('.seg button').forEach(function(b){
     var aan=b.dataset.r===id; b.classList.toggle('sel',aan); b.setAttribute('aria-pressed',aan?'true':'false');
   });
@@ -854,7 +878,9 @@ function teken(dtR){
   }
   var P=[CX+dx+sx,(nat2?yL:yBed)+1];
   if(anim.kop>0){
-    var c1=[tip[0]+7,tip[1]+3], c2=[P[0],tip[1]+(P[1]-tip[1])*0.45];
+    // eerst een stukje in de richting van het tuiteinde, dan valt hij recht omlaag
+    var c1=rot([TIP[0]+7,TIP[1]+4],PIV,anim.hoek); c1[0]+=kx; c1[1]+=KY;
+    var c2=[P[0],tip[1]+(P[1]-tip[1])*0.45];
     $('straal').setAttribute('d',pad(deel([tip,c1,c2,P],anim.staart,anim.kop)));
     $('straal-b').setAttribute('d',pad(deel([[tip[0]+1.2,tip[1]+0.6],[c1[0]+1.4,c1[1]],[c2[0]+1.3,c2[1]],[P[0]+1,P[1]]],anim.staart,anim.kop)));
   }else{$('straal').setAttribute('d','');$('straal-b').setAttribute('d','');}
@@ -863,7 +889,7 @@ function teken(dtR){
 
   // druppels of een straaltje naar de server
   var q=sim.q, outY=R.zetter==='switch'?240:229;
-  var yS=SV_BODEM-sim.S*0.22;
+  var yS=SV_BODEM-sim.S*SV_PER_G;
   var drup=q>0.04&&fase!=='klaar';
   var drip=$('drip');
   if(drup){

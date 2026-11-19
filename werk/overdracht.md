@@ -75,7 +75,7 @@ Claude. Nog ideeën?"
   Shot clock-opzet (alleen volle druk telt) was al af en gepubliceerd (versie 2).
 
 ## Eerstvolgende stap
-0. Hario-tekening in de V60-opzet afmaken en opnieuw publiceren op
+0. (klaar) Hario-tekening in de V60-opzet, opnieuw gepubliceerd op
    https://claude.ai/artifact/AXJ9DLfCgbvqt3sWB9UAN1
 1. Cloudflare-koppeling gebruiken: buildlogs van beide Workers Builds lezen,
    oorzaak oplossen, preview-link halen, Jesse testlink geven.
