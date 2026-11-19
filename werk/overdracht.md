@@ -55,6 +55,20 @@ Claude. Nog ideeën?"
   verhouding), goedgekeurd. Advies keurmeester verwerkt: een nieuw of bewerkt
   formulier begint weer op de verhouding van het recept.
 
+## Stand 19-11 middag
+- Keuzes van Jesse staan in werk/keuzes-2026-11-19.md (inlog: Face ID).
+- Gedaan en goedgekeurd: weekoverzicht en nachtstand weg, smaakgeheugen
+  standaard uit (commit ec44b71 e.v.).
+- Drie opzetten gepubliceerd, wachten op Jesse's oordeel:
+  - gietcoach V60/Switch https://claude.ai/artifact/AXJ9DLfCgbvqt3sWB9UAN1 (docs/opzet-gietcoach-v60.html)
+  - AeroPress normaal/omgekeerd https://claude.ai/artifact/TVMyY3yJt45oMQw58mtToP (docs/opzet-aeropress.html)
+  - shot clock E61 https://claude.ai/artifact/STNHN6rDgvJXxiHnJcLmNQ (docs/opzet-shotclock-e61.html)
+  Open vraag shot clock: telt de rust mee in de doeltijd (nu ja: 5+3+28 = 0:31)?
+- Inbouwen van de opzetten: app/04 (filter, gietcoach), app/05 (espresso, shot
+  clock), recepten in app/01 (AeroPress-recepten van de opzet vervangen het
+  bronloze 16 g/240 g-recept; omgekeerd recept toevoegen; pre-infusie en rust
+  als recept-instelling). Featurevlaggen houden (pourcoach, shotclock).
+
 ## Eerstvolgende stap
 1. Cloudflare-koppeling gebruiken: buildlogs van beide Workers Builds lezen,
    oorzaak oplossen, preview-link halen, Jesse testlink geven.

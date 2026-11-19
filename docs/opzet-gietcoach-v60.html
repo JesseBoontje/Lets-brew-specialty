@@ -36,18 +36,18 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
 .rand::before{content:'';position:absolute;inset:0;border:2px solid var(--rk,var(--line));
   border-radius:inherit;background:var(--rb,var(--card));filter:url(#wobble);z-index:-1;}
 
-.gc-top{flex:none;display:flex;align-items:center;gap:8px;padding:12px 14px 0;}
+.gc-top{flex:none;display:flex;align-items:center;gap:8px;padding:10px 14px 0;}
 .seg{flex:1;min-width:0;display:flex;gap:6px;}
-.seg button{flex:1;min-width:0;min-height:46px;border-radius:15px;padding:4px 6px;
+.seg button{flex:1;min-width:0;min-height:44px;border-radius:15px;padding:4px 6px;
   font-family:'Caveat',cursive;font-weight:700;font-size:21px;line-height:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .seg button.sel{--rb:var(--accent-soft);--rk:var(--accent-soft);color:var(--cream);}
-.ik{flex:none;width:46px;height:46px;border-radius:15px;display:flex;align-items:center;
+.ik{flex:none;width:44px;height:44px;border-radius:15px;display:flex;align-items:center;
   justify-content:center;font-family:'Caveat',cursive;font-weight:700;font-size:22px;}
 .ik svg{width:22px;height:22px;fill:none;stroke:var(--ink);stroke-width:1.8;
   stroke-linecap:round;stroke-linejoin:round;}
 .ik.aan{--rb:var(--accent-soft);--rk:var(--accent-soft);color:var(--cream);}
-.gc-info{flex:none;display:flex;justify-content:space-between;gap:10px;padding:6px 16px 0;
+.gc-info{flex:none;display:flex;justify-content:space-between;gap:10px;padding:4px 16px 0;
   font-size:14px;color:var(--ink-soft);white-space:nowrap;}
 .gc-info span{overflow:hidden;text-overflow:ellipsis;}
 .gc-info .r{flex:none;}
@@ -107,13 +107,13 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
 
 /* ---- de grote teller ---- */
 .gc-klok{flex:none;padding:0 16px;}
-.gc-tijd{font-family:'Caveat',cursive;font-weight:700;font-size:min(106px,27vw);line-height:.84;
+.gc-tijd{font-family:'Caveat',cursive;font-weight:700;font-size:min(98px,25vw);line-height:.84;
   text-align:center;color:var(--ink);white-space:nowrap;}
 .gc-tijd .c{display:inline-block;width:.47em;text-align:center;}
 .gc-tijd .dp{display:inline-block;width:.2em;text-align:center;position:relative;top:-.05em;}
 .gc-tijd.tel{color:var(--accent-soft);}
 .lin-rij{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-soft);
-  margin-top:3px;}
+  margin-top:2px;}
 .lin-rij span{flex:none;min-width:30px;}
 .lin-rij span:last-child{text-align:right;}
 .lin{position:relative;flex:1;height:20px;}
@@ -130,20 +130,20 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
   background:var(--ink);}
 
 /* ---- de strook: vorige, nu, straks ---- */
-.gc-strook{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px 14px 0;}
-.r-vorige{display:flex;align-items:center;gap:7px;min-height:24px;padding:0 6px;font-size:15.5px;
+.gc-strook{flex:none;display:flex;flex-direction:column;gap:5px;padding:6px 14px 0;}
+.r-vorige{display:flex;align-items:center;gap:7px;min-height:22px;padding:0 6px;font-size:15.5px;
   color:var(--ink-soft);white-space:nowrap;overflow:hidden;}
 .r-vorige .tt{flex:none;width:44px;}
 .r-vorige svg{width:16px;height:16px;flex:none;fill:none;stroke:var(--ink-soft);stroke-width:2;
   stroke-linecap:round;stroke-linejoin:round;}
 .r-vorige s,.r-vorige .v-wat{overflow:hidden;text-overflow:ellipsis;}
 .r-vorige s{text-decoration-thickness:1.5px;}
-.r-nu{--rk:var(--ink);--rb:var(--card);border-radius:20px;padding:9px 15px 9px;}
+.r-nu{--rk:var(--ink);--rb:var(--card);border-radius:20px;padding:8px 15px 7px;}
 .r-nu.land{animation:land .45s ease-out;}
 @keyframes land{from{transform:translateY(5px) rotate(-.7deg);opacity:.5;}to{transform:none;opacity:1;}}
 .nu-kop{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
 .nu-wat{font-family:'Caveat',cursive;font-weight:700;font-size:32px;line-height:1;white-space:nowrap;}
-.nu-doel{font-family:'Caveat',cursive;font-weight:700;font-size:48px;line-height:.86;white-space:nowrap;}
+.nu-doel{font-family:'Caveat',cursive;font-weight:700;font-size:46px;line-height:.86;white-space:nowrap;}
 .nu-doel.lang{font-size:35px;}
 .nu-doel.stil{color:var(--ink-soft);font-size:34px;}
 .nu-d{font-size:15.5px;line-height:1.3;margin-top:4px;min-height:2.6em;display:-webkit-box;
@@ -153,12 +153,12 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
   font-family:'Caveat',cursive;font-weight:700;font-size:17px;line-height:1.3;vertical-align:1px;}
 .klep-chip svg{width:14px;height:14px;fill:none;stroke:var(--cream);stroke-width:2;
   stroke-linecap:round;stroke-linejoin:round;}
-.nu-balk{position:relative;height:7px;margin-top:6px;border-radius:4px;background:var(--card-2);
+.nu-balk{position:relative;height:7px;margin-top:5px;border-radius:4px;background:var(--card-2);
   overflow:hidden;}
 .nu-balk i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent-soft);}
 .nu-tempo{display:flex;justify-content:space-between;gap:8px;min-height:19px;margin-top:3px;
   font-size:14.5px;color:var(--ink-soft);white-space:nowrap;}
-.r-volg{display:flex;align-items:center;gap:9px;min-height:42px;padding:3px 13px;border-radius:16px;
+.r-volg{display:flex;align-items:center;gap:9px;min-height:40px;padding:3px 13px;border-radius:16px;
   --rk:var(--line);--rb:transparent;font-size:16px;color:var(--ink-soft);}
 .r-volg .n-lbl{flex:none;font-size:13px;letter-spacing:.7px;text-transform:uppercase;}
 .r-volg .n-wat{flex:1;min-width:0;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -167,8 +167,8 @@ button{color:var(--ink);font:inherit;background:none;border:none;cursor:pointer;
 .r-volg.bijna .n-in{font-size:36px;}
 
 /* ---- de knoppen: groot genoeg voor handschoenen ---- */
-.gc-knoppen{flex:none;display:flex;gap:10px;padding:10px 14px max(14px,env(safe-area-inset-bottom));}
-.kn{min-height:62px;border-radius:19px;padding:6px 10px;display:flex;align-items:center;
+.gc-knoppen{flex:none;display:flex;gap:10px;padding:8px 14px max(12px,env(safe-area-inset-bottom));}
+.kn{min-height:60px;border-radius:19px;padding:6px 10px;display:flex;align-items:center;
   justify-content:center;gap:8px;font-family:'Caveat',cursive;font-weight:700;font-size:28px;line-height:1;}
 .kn:active{transform:translateY(1px);}
 .kn[disabled]{opacity:.4;cursor:default;}
