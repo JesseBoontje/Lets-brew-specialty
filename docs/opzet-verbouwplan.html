@@ -1,0 +1,242 @@
+<style>
+.ink svg,svg.ink{fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.b2{opacity:.6;stroke-width:1.3;}
+.fig{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:10px;filter:url(#wobble);margin:12px 0;}
+.fig svg{display:block;width:100%;height:auto;}
+.fig text{font-family:'Patrick Hand',cursive;fill:var(--ink);stroke:none;font-size:15px;}
+.fig text.h{font-family:'Caveat',cursive;font-weight:700;font-size:21px;}
+.fig text.s{fill:var(--ink-soft);font-size:13px;}
+.reis{stroke-dasharray:6 7;animation:loop 2.4s linear infinite;stroke:var(--ink-soft);}
+@keyframes loop{to{stroke-dashoffset:-26;}}
+.boon{fill:var(--accent-soft);stroke:none;}
+.la{animation:la 6s ease-in-out infinite;}
+@keyframes la{0%,8%{transform:translateX(0)}18%,40%{transform:translateX(14px)}50%,100%{transform:translateX(0)}}
+.pakje{fill:var(--accent-soft);stroke:none;}
+.slot{animation:slot 3s ease-in-out infinite;transform-origin:center;transform-box:fill-box;}
+@keyframes slot{0%,60%,100%{transform:translateY(0)}70%{transform:translateY(-3px)}}
+.kopvul{animation:vul 4s ease-in-out infinite;}
+@keyframes vul{0%{transform:translateY(34px)}70%,100%{transform:translateY(0)}}
+.straal{stroke:var(--accent-soft);stroke-width:2.4;stroke-dasharray:13 3;animation:loop 0.6s linear infinite;}
+.optie{display:grid;gap:12px;margin:12px 0;}
+.optie .sketch{padding:12px 15px;}
+.optie h3{font-family:'Caveat',cursive;font-size:26px;line-height:1.05;}
+.optie .aan{border-color:var(--accent-soft);border-width:3px;}
+.label{display:inline-block;font-size:14px;color:var(--cream);background:var(--accent-soft);border-radius:10px;padding:1px 9px;margin-left:6px;vertical-align:middle;}
+.pv{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:16px;margin-top:6px;}
+.pv b{font-weight:normal;color:var(--ink-soft);}
+.idee{padding:12px 15px;margin:12px 0;}
+.idee h3{font-family:'Caveat',cursive;font-size:28px;line-height:1.05;margin-bottom:2px;}
+.maat{font-size:14px;color:var(--ink-soft);}
+.fase{display:grid;grid-template-columns:42px 1fr;gap:4px 10px;align-items:start;margin:8px 0;}
+.fase .nr{font-family:'Caveat',cursive;font-size:32px;line-height:1;text-align:center;border:2px solid var(--ink);border-radius:50%;width:40px;height:40px;filter:url(#wobble);}
+.fase .nr.klaar{background:var(--accent-soft);color:var(--cream);border-color:var(--accent-soft);}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+
+<header class="mk-kop">
+  <h1>Lets Brew verbouwplan</h1>
+  <p class="mk-onder">Wat de app is, wat ik heb opgeruimd en hoe hij met inlog, eigen database en een Claude-koppeling verder kan.</p>
+</header>
+
+<section class="mk-sect">
+  <h2>Wat de app is</h2>
+  <p>Een koffie-werkplek op je telefoon. Je legt je bonen vast, zet koffie met een recept, meet het resultaat en de coach helpt je bij de volgende kop. Alles staat nu alleen op je eigen telefoon.</p>
+  <div class="fig ink" role="img" aria-label="Rondje: bonen, zetten, logboek, coach en terug naar bonen">
+    <svg viewBox="0 0 360 200">
+      <path class="reis" d="M70 60 Q180 10 290 60 Q330 100 290 140 Q180 190 70 140 Q30 100 70 60"/>
+      <!-- zak bonen -->
+      <path d="M48 40 L45 82"/><path d="M45 82 Q70 88 94 82"/><path d="M94 82 L90 40"/><path d="M43 41 Q69 35 95 40"/>
+      <path class="b2" d="M50 38 L47.5 84"/><path class="b2" d="M88 42 L92 84"/>
+      <ellipse class="boon" cx="69" cy="62" rx="6" ry="9"/>
+      <text class="h" x="40" y="104">bonen</text>
+      <!-- kop -->
+      <path d="M268 40 L272 80"/><path d="M272 80 Q290 88 308 80"/><path d="M308 80 L312 40"/><path d="M266 40 Q290 36 314 40"/>
+      <path d="M312 50 Q328 52 326 64 Q324 74 309 72"/>
+      <path class="straal" d="M290 14 L290 38"/>
+      <text class="h" x="268" y="104">zetten</text>
+      <!-- logboek -->
+      <path d="M262 128 L320 125"/><path d="M320 125 L322 172"/><path d="M322 172 L264 175"/><path d="M264 175 L262 126"/>
+      <path class="b2" d="M272 140 L310 139"/><path class="b2" d="M272 150 L306 149"/><path class="b2" d="M272 160 L300 160"/>
+      <text class="h" x="252" y="195">logboek</text>
+      <!-- coach -->
+      <path d="M50 130 Q50 118 70 118 Q92 118 92 132 Q92 148 72 148 L60 158 L62 147 Q50 144 50 130"/>
+      <path class="b2" d="M62 130 L82 130"/><path class="b2" d="M62 137 L76 137"/>
+      <text class="h" x="44" y="182">coach</text>
+      <circle class="pakje" r="5"><animateMotion dur="7s" repeatCount="indefinite" path="M70 60 Q180 10 290 60 Q330 100 290 140 Q180 190 70 140 Q30 100 70 60"/></circle>
+    </svg>
+  </div>
+  <p class="zacht">Er zit veel in: dial-in voor espresso, gietcoach, recepten, coffee finder, latte art, cupping, smaakwiel, AI-budget, spraakcoach en dagelijkse suggestie.</p>
+</section>
+
+<section class="mk-sect">
+  <h2>Opgeruimd, niets weggegooid</h2>
+  <p>De hele app zat in één la van ruim 8000 regels. Ik heb dat over twaalf laden verdeeld, per onderwerp en in dezelfde volgorde. Er is geen letter veranderd. Daardoor kunnen bouwers straks tegelijk aan verschillende laden werken zonder elkaar te raken.</p>
+  <div class="fig ink" role="img" aria-label="Eén volle la links, rechts een kast met twaalf laden">
+    <svg viewBox="0 0 360 210">
+      <path d="M18 40 L120 38"/><path d="M120 38 L122 180"/><path d="M122 180 L20 182"/><path d="M20 182 L18 39"/>
+      <path class="b2" d="M21 37 L118 41"/><path class="b2" d="M117 40 L124 178"/>
+      <g stroke="var(--ink-soft)" stroke-width="1.2">
+        <path d="M28 55 L110 54"/><path d="M28 63 L104 62"/><path d="M28 71 L112 70"/><path d="M28 79 L98 79"/><path d="M28 87 L108 86"/><path d="M28 95 L102 95"/><path d="M28 103 L111 102"/><path d="M28 111 L96 111"/><path d="M28 119 L109 118"/><path d="M28 127 L100 127"/><path d="M28 135 L112 134"/><path d="M28 143 L104 143"/><path d="M28 151 L108 150"/><path d="M28 159 L99 159"/><path d="M28 167 L110 166"/>
+      </g>
+      <text class="h" x="22" y="204">vroeger: één la</text>
+      <path d="M138 110 L168 110"/><path d="M160 102 L169 110 L160 118"/>
+      <path d="M186 22 L338 20"/><path d="M338 20 L341 186"/><path d="M341 186 L188 188"/><path d="M188 188 L186 21"/>
+      <path class="b2" d="M189 19 L335 23"/>
+      <path d="M262 24 L264 184"/>
+      <g id="laden"></g>
+      <text class="h" x="200" y="204">nu: kast met 12 laden</text>
+    </svg>
+  </div>
+  <p class="zacht">Alle bestaande tests slaan nog steeds aan. Je data blijft op dezelfde plek staan, dus niemand raakt iets kwijt.</p>
+</section>
+
+<section class="mk-sect">
+  <h2>Het plan: inlog, eigen database, Claude</h2>
+  <p>Je data blijft eerst op je telefoon staan, zodat de app ook zonder bereik werkt. Na het inloggen gaat er een kopie naar je eigen database bij Cloudflare. Claude krijgt een eigen ingang met hetzelfde slot.</p>
+  <div class="fig ink" role="img" aria-label="Telefoon en Claude gaan allebei door het slot naar de kluis">
+    <svg viewBox="0 0 360 230">
+      <!-- telefoon -->
+      <path d="M22 30 L70 28"/><path d="M70 28 L72 112"/><path d="M72 112 L24 114"/><path d="M24 114 L22 29"/><path class="b2" d="M38 104 L56 104"/>
+      <text class="h" x="16" y="134">telefoon</text>
+      <!-- claude -->
+      <path d="M22 160 L72 158"/><path d="M72 158 L73 204"/><path d="M73 204 L23 206"/><path d="M23 206 L22 159"/>
+      <path class="b2" d="M32 174 L62 173"/><path class="b2" d="M32 184 L56 184"/>
+      <text class="h" x="20" y="226">Claude</text>
+      <!-- slot -->
+      <g class="slot">
+        <path d="M158 96 L202 94"/><path d="M202 94 L204 140"/><path d="M204 140 L160 142"/><path d="M160 142 L158 95"/>
+        <path d="M166 95 Q166 70 181 70 Q196 70 196 94"/>
+        <path d="M181 112 L181 124"/>
+      </g>
+      <text class="h" x="148" y="164">slot</text>
+      <text class="s" x="132" y="180">wie ben jij?</text>
+      <!-- kluis -->
+      <path d="M266 64 L338 62"/><path d="M338 62 L340 160"/><path d="M340 160 L268 162"/><path d="M268 162 L266 63"/>
+      <path class="b2" d="M269 61 L335 66"/>
+      <path d="M296 104 Q296 92 304 92 Q314 92 314 104 Q314 116 304 116 Q294 116 296 102"/>
+      <path d="M304 104 L311 98"/>
+      <text class="h" x="262" y="184">kluis (D1)</text>
+      <text class="s" x="258" y="200">alleen jouw rijen</text>
+      <path class="reis" d="M74 70 Q120 70 156 112"/>
+      <path class="reis" d="M75 182 Q120 180 156 128"/>
+      <path class="reis" d="M206 118 L264 112"/>
+      <circle class="pakje" r="4.5"><animateMotion dur="3.2s" repeatCount="indefinite" path="M74 70 Q120 70 156 112 L206 118 L264 112"/></circle>
+      <circle class="pakje" r="4.5"><animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" path="M75 182 Q120 180 156 128 L206 118 L264 112"/></circle>
+    </svg>
+  </div>
+  <ul>
+    <li><b>Database:</b> Cloudflare D1. Foto's gaan naar een afgesloten bak (R2).</li>
+    <li><b>Wat je in Claude kunt:</b> "wat zette ik gisteren met de Ethiopië?", "log mijn shot: 18 in, 36 uit, 28 seconden", "welk recept past bij deze zak?". Claude mag alleen lezen en een brew toevoegen, en vraagt eerst of hij iets mag opslaan.</li>
+    <li><b>Veiligheid:</b> D1 heeft geen ingebouwd rij-slot. Daarom controleert de Worker bij elke vraag wie je bent en geeft hij alleen jouw rijen terug. De keurmeester controleert dat bij elke ronde.</li>
+    <li><b>Je API-sleutels</b> blijven waar ze nu staan, op je telefoon. Die gaan nooit naar de database.</li>
+  </ul>
+</section>
+
+<section class="mk-sect">
+  <h2>Hoe log je in? Jij kiest</h2>
+  <div class="optie">
+    <div class="sketch card aan">
+      <h3>Face ID (passkey) <span class="label">advies</span></h3>
+      <p>Eén keer je gezicht laten zien, ook met handschoenen aan. Er is geen wachtwoord en geen mailtje nodig. De sleutel staat in je iCloud-sleutelhanger, dus op een nieuwe iPhone werkt hij ook.</p>
+      <div class="pv"><b>voor</b><b>tegen</b><span>snelst, werkt in de geïnstalleerde app</span><span>meer eigen code die streng gekeurd moet worden</span></div>
+    </div>
+    <div class="sketch soft card">
+      <h3>Cloudflare Access (code per mail)</h3>
+      <p>Cloudflare doet de inlog. Je typt je e-mailadres in en krijgt een code.</p>
+      <div class="pv"><b>voor</b><b>tegen</b><span>Cloudflare bewaakt het slot</span><span>steeds een mailcode, en het doorsturen naar de inlogpagina kan haperen in een geïnstalleerde app op de iPhone</span></div>
+    </div>
+    <div class="sketch soft card">
+      <h3>Koppelcode, geen account</h3>
+      <p>De app krijgt een geheime code waarmee je telefoons aan elkaar koppelt.</p>
+      <div class="pv"><b>voor</b><b>tegen</b><span>simpelst</span><span>code kwijt is data kwijt; zwak voor de Claude-koppeling</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="mk-sect">
+  <h2>Drie nieuwe ideeën</h2>
+  <p>Bedacht door de creatieve agent, gecontroleerd op wat de app al kan. Kies er zoveel als je wilt.</p>
+
+  <div class="sketch soft idee">
+    <h3>Handsfree gietcoach</h3>
+    <p class="maat">klein · kan nu meteen, wacht niet op de inlog</p>
+    <p>Een schermvullende stand van de gietcoach die de volgende giet hardop zegt ("over drie tellen naar 150 gram"). Het scherm blijft aan en de cijfers zijn op een meter afstand te lezen. Zo giet je met de ketel in je hand en zonder natte vingers op je scherm.</p>
+    <div class="fig ink" role="img" aria-label="Ring die volloopt tot 150 gram">
+      <svg viewBox="0 0 300 170">
+        <path d="M150 24 Q206 24 208 82 Q208 140 150 142 Q92 142 92 84 Q93 28 156 25" stroke="var(--line)" stroke-width="7"/>
+        <path id="ring" d="M150 24 Q206 24 208 82 Q208 140 150 142 Q92 142 92 84 Q93 28 150 24" stroke="var(--accent-soft)" stroke-width="7" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100">
+          <animate attributeName="stroke-dashoffset" values="100;0;0" keyTimes="0;0.8;1" dur="5s" repeatCount="indefinite"/>
+        </path>
+        <text class="h" x="150" y="92" text-anchor="middle" font-size="40" style="font-size:40px">150 g</text>
+        <text class="s" x="150" y="114" text-anchor="middle">next pour in 3</text>
+        <text class="s" x="238" y="60">"naar</text><text class="s" x="238" y="76">150 gram"</text>
+        <path class="b2" d="M226 84 Q232 80 226 74"/><path class="b2" d="M220 90 Q232 80 220 68"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="sketch soft idee">
+    <h3>Zak-teller met piekmelding</h3>
+    <p class="maat">middel · kan nu, de melding heeft de push-server nodig</p>
+    <p>Elke brew trekt zijn dosis van de zak af, dus de bonenkaart zegt "nog ±4 koppen". De dagmelding zegt "Kenia vanaf vandaag op z'n best" of "nog 2 koppen, bestel een nieuwe zak". Die beste dag leert de app uit je eigen cijfers.</p>
+    <div class="fig ink" role="img" aria-label="Zak die steeds leger wordt">
+      <svg viewBox="0 0 300 160">
+        <defs><clipPath id="zakbinnen"><path d="M104 34 L196 34 L200 136 L100 136 Z"/></clipPath></defs>
+        <g clip-path="url(#zakbinnen)"><rect x="96" width="110" fill="var(--accent-soft)" opacity=".55" stroke="none">
+          <animate attributeName="y" values="44;70;96;118;118" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite" calcMode="discrete"/>
+          <animate attributeName="height" values="96;70;44;22;22" keyTimes="0;0.25;0.5;0.75;1" dur="6s" repeatCount="indefinite" calcMode="discrete"/>
+        </rect></g>
+        <path d="M104 30 L100 138"/><path d="M98 137 Q150 144 202 137"/><path d="M200 138 L196 30"/><path d="M101 32 Q150 24 199 31"/>
+        <path class="b2" d="M107 28 L103 140"/><path class="b2" d="M193 32 L198 140"/>
+        <text class="h" x="216" y="70">4 cups left</text>
+        <text class="s" x="216" y="90">best from today</text>
+        <text class="s" x="10" y="70">250 g zak</text><text class="s" x="10" y="88">−18 g per kop</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="sketch soft idee">
+    <h3>Claude zet klaar</h3>
+    <p class="maat">middel · na inlog en Claude-koppeling</p>
+    <p>Je plant 's avonds in Claude ("morgen V60, 15 gram, maling 22, 94 graden"). Claude kent je hele geschiedenis en je hebt geen API-tegoed nodig. 's Ochtends staat het plan bovenaan home en met één tik start de gietcoach, al ingevuld. Pas jouw tik maakt er een brew van.</p>
+    <div class="fig ink" role="img" aria-label="Kaartje van Claude schuift bovenaan het startscherm">
+      <svg viewBox="0 0 300 170">
+        <path d="M84 10 L216 8"/><path d="M216 8 L218 166"/><path d="M86 168 L84 11"/>
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0 -60;0 -60;0 0;0 0" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/>
+          <path d="M96 26 L206 24"/><path d="M206 24 L207 84"/><path d="M207 84 L97 86"/><path d="M97 86 L96 25"/>
+          <text class="s" x="104" y="42">set up by Claude</text>
+          <text class="h" x="104" y="62" style="font-size:17px">V60 · 15 g · 94°</text>
+          <text class="s" x="104" y="78">grind 22 · tap to brew</text>
+        </g>
+        <path class="b2" d="M98 104 L204 103"/><path class="b2" d="M98 118 L190 118"/><path class="b2" d="M98 132 L198 131"/>
+      </svg>
+    </div>
+  </div>
+  <p class="zacht">Advies van de creatieve agent: begin met de handsfree gietcoach. Die is klein, helpt bij elke filterkop en wacht niet op de inlogkeuze.</p>
+</section>
+
+
+<section class="mk-sect">
+  <h2>Volgorde</h2>
+  <div class="fase"><div class="nr klaar">1</div><div><b>Opruimen</b> · klaar, wacht op jouw akkoord</div></div>
+  <div class="fase"><div class="nr">2</div><div><b>Inlog en database</b> · groot. Twee bouwers tegelijk: één aan de Worker en de database, één aan het scherm in de app.</div></div>
+  <div class="fase"><div class="nr">3</div><div><b>Claude-koppeling</b> · middel. Komt na de inlog, want hij gebruikt hetzelfde slot.</div></div>
+  <div class="fase"><div class="nr">4</div><div><b>Ideeën hierboven</b> · de idee&euml;n die jij kiest.</div></div>
+  <p class="zacht">Er gaat niets live zonder jouw akkoord. Bij elke stap keurt een aparte keurmeester voordat je een testlink krijgt.</p>
+</section>
+
+<script>
+(function(){
+  var g=document.getElementById('laden');if(!g)return;
+  var namen=['kennis','opslag','home','zetten','espresso','details','bonen','AI','leren','finder','profiel','start'];
+  var svgns='http://www.w3.org/2000/svg';
+  for(var i=0;i<12;i++){
+    var col=i<6?0:1,row=i%6,x=col?268:192,y=28+row*26.5,w=66;
+    var gr=document.createElementNS(svgns,'g');gr.setAttribute('class','la');gr.style.animationDelay=(i*0.35)+'s';
+    var p=document.createElementNS(svgns,'path');p.setAttribute('d','M'+x+' '+(y+1)+' L'+(x+w)+' '+y+' L'+(x+w+1)+' '+(y+21)+' L'+(x+1)+' '+(y+22)+' L'+x+' '+y);
+    var t=document.createElementNS(svgns,'text');t.setAttribute('x',x+7);t.setAttribute('y',y+16);t.setAttribute('class','s');t.textContent=(i+1)+' '+namen[i];
+    gr.appendChild(p);gr.appendChild(t);g.appendChild(gr);
+  }
+})();
+</script>

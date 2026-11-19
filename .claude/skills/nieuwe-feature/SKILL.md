@@ -14,7 +14,7 @@ Twijfel je? Dan is het deel A. Bouwen doe je nooit uit jezelf.
 
 ## De regel waar het op staat of valt
 
-**In deel A raak je `index.html` niet aan.** Geen edit, geen commit aan de app,
+**In deel A raak je de app (`index.html`, `app/`, `styles.css`) niet aan.** Geen edit, geen commit aan de app,
 geen service-worker-bump, en al helemaal geen merge naar `main`. Een opzet is
 een artifact plus een stuk tekst — meer niet. Dit is eerder misgegaan; de
 gebruiker vertrouwt erop dat zijn draaiende app blijft staan zolang hij nog
@@ -24,9 +24,9 @@ nadenkt.
 
 | | |
 |---|---|
-| de app | `index.html` in de repo-root (één bestand, vanilla JS) |
+| de app | `index.html` (schermen), `styles.css`, `app/01..12-*.js` (logica, zie CLAUDE.md) |
 | mockup-bouwer | `.claude/skills/nieuwe-feature/scripts/bouw-mockup.py` |
-| werkbranch | `claude/app-customization-x6qg4o` |
+| werkbranch | de branch van de huidige sessie (zie skill functie-bouwen en architect) |
 | naar `main` | alleen als de gebruiker letterlijk zegt dat het live mag |
 | taal | Nederlands tegen de gebruiker, Engels in de app zelf |
 
@@ -42,8 +42,8 @@ Voor je iets verzint: kijk wat er al staat. Bijna elk goed idee voor deze app
 is "de app weet dit al, dus vraag het niet nog een keer".
 
 ```sh
-grep -n "const FEATURES" -A 30 index.html    # wat er al aan/uit kan
-grep -n "^function render\|^function open" index.html | head -40
+grep -rn "const FEATURES" -A 30 app/    # wat er al aan/uit kan
+grep -rn "^function render\|^function open" app/ | head -40
 ```
 
 Kijk ook in `SCHEMA.md`: daar staat welke gegevens de app van de gebruiker

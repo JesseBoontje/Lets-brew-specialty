@@ -5,7 +5,8 @@ description: Build and change the Lets Brew Specialty coffee app in its hand-dra
 
 # Lets Brew Specialty — house style & build rules
 
-A single-file PWA (`index.html`, vanilla JS, no build step) that tracks coffee brews.
+A PWA (vanilla JS) that tracks coffee brews: screens in `index.html`, styling in
+`styles.css`, logic in `app/01..12-*.js` (load order, see CLAUDE.md).
 Its whole identity is a hand-drawn pencil-on-paper look. Match it exactly; never
 introduce a different visual language.
 
@@ -144,8 +145,9 @@ via a `<rect>` clipped to the cup interior whose `y`/`height` you animate.
 
 ## Workflow for every change
 
-1. Edit `index.html` (it is ~350 KB; read ranges, never the whole file at once —
-   one base64 line is 99 k chars).
+1. Edit the right file: screens in `index.html`, styling in `styles.css`, logic in
+   the matching `app/NN-*.js` (CLAUDE.md lists what lives where). Read ranges,
+   not whole files.
 2. **Verify with Playwright before claiming anything works:**
    ```sh
    npm install playwright --no-save
