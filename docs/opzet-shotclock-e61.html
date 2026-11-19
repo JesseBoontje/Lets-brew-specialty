@@ -299,7 +299,8 @@
       stroom. De puck trekt verder in. De klok loopt door, maar de cijfers worden grijs en de strook telt af:
       "full pressure in 0:02". Een eigen stap in vorige / nu / volgende.</li>
     <li><b>full pressure</b>: hendel helemaal omhoog, twee straaltjes in het kopje, het kopje vult met de
-      crèmeband. Vlak voor het doel worden de straaltjes dunner.</li>
+      crèmeband. De grote klok begint hier opnieuw bij 0:00 en telt de seconden volle druk; de totale tijd
+      vanaf de hendel staat er klein onder. Vlak voor het doel worden de straaltjes dunner.</li>
     <li><b>lever down</b>: op het geschatte doelgewicht zegt de strook "lever down at 36 g". Jij stopt met de
       knop <b>stop</b> of door de hendel in de tekening aan te tikken. Daarna het advies, als tekst.</li>
   </ul>
@@ -311,8 +312,8 @@
     <li>De E61-tekening van de huidige shot clock: dezelfde lijnen, dezelfde hendel, het kopje dat vult
       met de crèmeband, de straaltjes als stromende streepjeslijn.</li>
     <li>De vaste opbouw van de V60- en AeroPress-coach: tekening, klok, vorige / nu / volgende, knoppen.</li>
-    <li>De doelwaarden uit het recept <b>classic 1:2</b>: 18 g in, 36 g uit, 0:28. De band is 3 s naar elke
-      kant, dezelfde marge die de dial-in nu al gebruikt. De andere vijf espressorecepten staan er ook in,
+    <li>De doelwaarden uit het recept <b>classic 1:2</b>: 18 g in, 36 g uit, 0:28 volle druk. De band is
+      0:25 tot 0:31: 3 s naar elke kant, dezelfde marge die de dial-in nu al gebruikt. De andere vijf espressorecepten staan er ook in,
       met hun eigen doel.</li>
     <li>Jesse's eigen manier als standaard: 5 s pre-infusie, 3 s rust (zijn bereik is 2 tot 5 s).</li>
     <li>De maalregel uit ESPRESSO_RULES, niet omgedraaid: te snel is fijner malen, te traag is grover.
@@ -323,12 +324,11 @@
 <div class="mk-sect">
   <h2>Wat ik anders deed, en waarom</h2>
   <ul>
-    <li><b>De tijd telt vanaf het overhalen van de hendel.</b> Bij een E61 met pre-infusie is dat gebruikelijk,
-      en het is het enige moment dat de app zeker weet, want jij tikt dan. De eerste druppel ziet de app niet.
-      Daarom is er tijdens de shot een knop <b>first drop</b>: tik als hij valt, dan staat die tijd er apart bij.</li>
-    <li><b>De rust telt op bij de doeltijd.</b> In de rust stroomt er geen water, dus classic wordt 0:28 + 3 s =
-      0:31 op de klok, band 0:28 tot 0:34. Pre-infusie telt wel mee, want daar loopt water door de puck.
-      Het paneel laat die som zien. Dit is een aanname: zie de open vragen.</li>
+    <li><b>Alleen de volle druk telt voor de doeltijd</b> (zo wil Jesse het): band en oordeel gaan over de
+      seconden volle druk, pre-infusie en rust komen erbovenop, en de totale tijd vanaf de hendel staat er klein
+      bij (classic: 0:28 volle druk, totaal ongeveer 0:36).</li>
+    <li><b>De eerste druppel ziet de app niet.</b> Daarom is er tijdens de shot een knop <b>first drop</b>:
+      tik als hij valt, dan staat die tijd er apart bij.</li>
     <li><b>Hij stopt niet vanzelf op 36 g.</b> De app kan niet wegen. Stopte de klok vanzelf op het geschatte
       gewicht, dan stond er elke keer precies de doeltijd en was elke shot "good". Hij waarschuwt op het doel en
       jij stopt. Na 60 s stopt hij zelf.</li>
@@ -360,7 +360,6 @@
 <div class="mk-sect">
   <h2>Open vragen voor Jesse</h2>
   <ul>
-    <li>Telt de rust mee in je doeltijd, of mik je op 25 tot 30 s vanaf de hendel, rust inbegrepen?</li>
     <li>Klopt 3 s als standaard voor de rust, of liever 2?</li>
   </ul>
 </div>
@@ -396,13 +395,14 @@ function tenth(sec){return mss(sec)+'.'+Math.floor((sec*10)%10);}
 function plan(){
   const r=rec(),on=r.pre.on,P=on?r.pre.s:0,R=on?r.pre.rust:0,fs=P+R;
   const Y=Math.round(r.dose*r.ratio);
-  const Tc=Math.max(r.tijd+R,fs+6);          // in de rust stroomt niets: die seconden komen erbij
+  const F=r.tijd;                            // doel: seconden onder volle druk (keuze Jesse)
+  const Tc=fs+F;                             // geschat moment van het doelgewicht, vanaf de hendel
   const ts=on?fs+1.5:5.5;                    // eerste straal: natte puck snel, droge puck traag
   const ph=[];
   if(on){ph.push({id:'pre',a:0,b:P});if(R>0)ph.push({id:'rest',a:P,b:P+R});}
   ph.push({id:'full',a:fs,b:Tc});
   ph.push({id:'stop',a:Tc,b:Infinity});
-  return {r,on,P,R,fs,Y,Tc,ts,lo:Tc-TOL,hi:Tc+TOL,ph};
+  return {r,on,P,R,fs,Y,F,Tc,ts,lo:F-TOL,hi:F+TOL,ph};
 }
 /* geschat gewicht op doeltempo -- géén meting */
 function weight(t,p){
@@ -425,7 +425,9 @@ function dripAt(t,p){
 }
 function phaseAt(t,p){let i=0;p.ph.forEach((x,k)=>{if(t>=x.a)i=k;});return i;}
 function naam(id,p){return {pre:'pre-infusion',rest:'rest',full:'full pressure',stop:'lever down at '+p.Y+' g'}[id];}
-function zone(t,p){return t<p.lo?'fast':t>p.hi?'slow':'good';}
+function zone(f,p){return f<p.lo?'fast':f>p.hi?'slow':'good';}   // f = seconden volle druk
+function fullS(t,p){return Math.max(0,t-p.fs);}
+function shotTime(p){return sc.stopT>p.fs?sc.stopT-p.fs:sc.stopT;}
 
 /* ---------- tekening ---------- */
 function setLever(a){$('sc-lever').style.transform='rotate('+a+'deg)';}
@@ -454,10 +456,6 @@ function renderBand(){
   const p=plan(),S=bandMax(p),W=Math.round($('sc-band').clientWidth)||330,X=t=>4/100*W+cl(t/S)*(W*0.92);
   let s='<svg viewBox="0 0 '+W+' 26">';
   s+='<rect x="'+X(p.lo)+'" y="3" width="'+(X(p.hi)-X(p.lo))+'" height="18" fill="var(--card-2)" stroke="none"/>';
-  if(p.on){                                             // pre-infusie gearceerd, rust gestippeld
-    for(let t=0.6;t<p.P;t+=0.9){s+='<path d="M'+X(t)+' 19 l3.2 -13" stroke="var(--ink-soft)" stroke-width="1.1" opacity=".6"/>';}
-    for(let t=p.P+0.5;t<p.fs;t+=0.9){s+='<path d="M'+X(t)+' 12 l.6 .2" stroke="var(--ink-soft)" stroke-width="1.6"/>';}
-  }
   s+='<path d="M'+(X(0)-5)+' 3.5 Q'+W/2+' 1.6 '+(X(S)+6)+' 3"  stroke-width="1.7"/>';
   s+='<path d="M'+(X(0)-6)+' 21 Q'+W/2+' 22.6 '+(X(S)+5)+' 20.6" stroke-width="1.7"/>';
   s+='<path d="M'+(X(0)-3)+' 2.4 Q'+W/2+' 4.4 '+(X(S)+3)+' 4.2" stroke-width="1.2" opacity=".55"/>';
@@ -468,6 +466,7 @@ function renderBand(){
   s+='<g id="sc-mark" style="display:none"><path d="M0 -5 Q.8 12 -.4 30" stroke-width="2.8"/><path d="M-4.5 -6.5 Q0 -4 4.6 -6.8" stroke-width="2.2"/></g>';
   s+='</svg>';
   const L=(t)=>(X(t)/W*100).toFixed(1)+'%';
+  s+='<span class="sc-bn" style="left:2px;top:-3px;transform:none;font-size:13px">full pressure</span>';
   s+='<span class="sc-bn" style="left:'+L(p.lo)+'">'+mss(p.lo)+'</span>';
   s+='<span class="sc-bn" style="left:'+L(p.hi)+'">'+mss(p.hi)+'</span>';
   s+='<span class="sc-bl" data-z="fast" style="left:0">too fast</span>';
@@ -476,12 +475,12 @@ function renderBand(){
   $('sc-band').innerHTML=s;
   $('sc-band').dataset.w=W;
 }
-function paintBand(t,p,show){
+function paintBand(t,p,show,oordeel){
   const m=$('sc-mark');if(!m)return;
   const S=bandMax(p),W=+$('sc-band').dataset.w||330,x=4/100*W+cl(t/S)*(W*0.92);
   m.style.display=show?'':'none';
   m.setAttribute('transform','translate('+x.toFixed(1)+' 0)');
-  const z=show?zone(t,p):null;
+  const z=(show&&oordeel)?zone(t,p):null;
   document.querySelectorAll('#sc-band .sc-bl').forEach(el=>el.classList.toggle('on',el.dataset.z===z));
 }
 
@@ -513,10 +512,10 @@ function renderStrip(t,p){
     c=cur('rest — wait','lever back to the middle · no pump · the puck soaks it up',mssUp(x.b-t),'left','rust');
     n='<span>next</span><b>full pressure in '+mssUp(x.b-t)+'</b>';nc=' sterk';
   }else if(id==='full'){
-    c=cur('full pressure','lever all the way up · two streams into the cup',mss(t-x.a),'at full');
+    c=cur('full pressure','lever all the way up · two streams into the cup',mss(p.F),'target');
     n='<span>next</span><b>lever down at '+p.Y+' g in ≈ '+mssUp(p.Tc-t)+'</b>';
   }else{
-    c=cur('lever down','when your scale says '+p.Y+' g — the estimate is there','+'+mss(t-x.a),'past it');
+    c=cur('lever down','when your scale says '+p.Y+' g — the estimate is there','+'+mss(t-x.a),'past target');
     n='<span>next</span><b>done — as soon as you stop</b>';
   }
   setStrip('<div class="sc-prev">'+prev+'</div>'+c+'<div class="sc-next'+nc+'">'+n+'</div>');
@@ -525,12 +524,13 @@ function verdict(p){
   const t=sc.stopT;
   if(t<p.fs+1)return {k:'stopped early',d:'before full pressure — no read on the grind'};
   const drop=sc.drop!=null?'first drop '+tenth(sc.drop)+' · ':'';
+  const F=t-p.fs;
   if(sc.yOut==null){
-    const z=zone(t,p);
+    const z=zone(F,p);
     const k=z==='fast'?'too fast — grind finer':z==='slow'?'too slow — grind coarser':'good — keep this grind';
-    return {k,d:drop+'judged on time only'};
+    return {k,d:drop+'judged on full-pressure time'};
   }
-  const f=sc.yOut/t,ft=p.Y/p.Tc;
+  const f=sc.yOut/F,ft=p.Y/p.F;
   let k;
   if(f<ft*0.85)k='too slow — grind coarser';
   else if(f>ft*1.15)k='too fast — grind finer';
@@ -542,7 +542,7 @@ function renderResult(p){
   const y=sc.yOut==null?p.Y:sc.yOut;
   const full=(sc.stopT-p.fs).toFixed(1);
   const prev=sc.stopT<=p.fs?'lever down before full pressure':
-    (p.on?(p.P+' s pre + '+p.R+' s rest + '+full+' s full = '+tenth(sc.stopT)):(full+' s full pressure = '+tenth(sc.stopT)));
+    (p.on?(p.P+' s pre + '+p.R+' s rest + '+full+' s full · total '+mss(sc.stopT)):(full+' s full pressure'));
   setStrip('<div class="sc-prev">'+prev+'</div>'+
     '<div class="sc-cur uitslag"><div><div class="k">'+v.k+'</div><div class="d">'+v.d+'</div></div></div>'+
     '<div class="sc-next gewicht"><span>on your scale</span>'+
@@ -565,7 +565,7 @@ function renderBtns(){
       (sc.drop!=null?'drop '+tenth(sc.drop):'first drop')+'</button>'+
     '<button type="button" class="sc-btn pri" onclick="scStop()">stop</button>';
   else h='<button type="button" class="sc-btn" onclick="scAgain()">again</button>'+
-    '<button type="button" class="sc-btn pri" onclick="scUse()">use '+mss(sc.stopT)+'</button>';
+    '<button type="button" class="sc-btn pri" onclick="scUse()">use '+mss(shotTime(plan()))+'</button>';
   $('sc-btns').innerHTML=h;
 }
 
@@ -573,7 +573,7 @@ function renderBtns(){
 function renderHead(){
   const p=plan();
   $('sc-rn').textContent=p.r.naam;
-  $('sc-rd').textContent=p.r.dose+' → '+p.Y+' g · '+(p.on?('pre '+p.P+' s · rest '+p.R+' s'):'no pre-infusion')+' · target '+mss(p.Tc);
+  $('sc-rd').textContent=p.r.dose+' → '+p.Y+' g · '+(p.on?('pre '+p.P+' s · rest '+p.R+' s'):'no pre-infusion')+' · full '+mss(p.F);
   $('sc-recbtn').disabled=sc.stand==='run';
 }
 function renderSheet(){
@@ -592,9 +592,8 @@ function renderSheet(){
     '<button type="button" class="sc-step" aria-label="shorter rest" '+(on?'':'disabled')+' onclick="scSet(\'rust\',-1)">'+MIN+'</button>'+
     '<span class="sc-val">'+mss(r.pre.rust)+'</span>'+
     '<button type="button" class="sc-step" aria-label="longer rest" '+(on?'':'disabled')+' onclick="scSet(\'rust\',1)">'+PLUS+'</button></div>';
-  h+='<div class="sc-op">on the clock: <b>'+mss(p.Tc)+'</b> '+
-    (p.on&&p.R?'('+mss(r.tijd)+' + '+p.R+' s rest — no water flows in the rest)':'('+mss(r.tijd)+' from the recipe)')+
-    ' · good '+mss(p.lo)+'–'+mss(p.hi)+'</div>';
+  h+='<div class="sc-op">target: <b>'+mss(p.F)+'</b> of full pressure, good '+mss(p.lo)+'–'+mss(p.hi)+
+    (p.on?' · pre-infusion and rest come on top, total about '+mss(p.Tc):'')+'</div>';
   h+='<button type="button" class="sc-btn pri" onclick="scSheet(false)">done</button>';
   $('sc-sheet').innerHTML=h;
 }
@@ -640,10 +639,13 @@ function frame(p){
       setLever(id==='pre'?LEVER.pre:id==='rest'?LEVER.rest:LEVER.full);
     }
     $('sc-read').classList.toggle('wacht',id==='rest');
-    $('sc-tlbl').textContent=id==='rest'?'waiting · clock keeps running':'from the lever';
+    if(id==='rest')$('sc-tlbl').textContent='waiting · from the lever';
   }
   const tt=sc.stand==='done'?sc.stopT:t;
-  setClock(tt);
+  const vol=sc.stand!=='ready'&&tt>=p.fs&&!(sc.stand==='done'&&sc.stopT<=p.fs);
+  setClock(vol?tt-p.fs:tt);
+  if(vol)$('sc-tlbl').textContent=p.on?'full pressure · total '+mss(tt):'full pressure · from the lever';
+  else if(sc.stand!=='run'||sc.phase!=='rest')$('sc-tlbl').textContent='from the lever';
   const w=paintArt(t,p,running);
   if(sc.stand==='done'){
     $('sc-w').textContent=(sc.yOut==null?p.Y:sc.yOut)+' g';
@@ -652,7 +654,8 @@ function frame(p){
     $('sc-w').textContent=sc.stand==='ready'?'0 g':'≈ '+Math.round(w)+' g';
     $('sc-wlbl').textContent='of '+p.Y+' g · estimate';
   }
-  paintBand(tt,p,sc.stand!=='ready');
+  const inFull=sc.stand==='done'?sc.stopT>p.fs+1:tt>=p.fs;
+  paintBand(fullS(tt,p),p,sc.stand!=='ready',inFull);
   renderStrip(t,p);
   renderBtns();
 }
@@ -676,7 +679,6 @@ function scStop(vanzelf){
   svg.classList.add('drip');                                // nog een paar laatste druppels
   setTimeout(()=>{if(sc.stand==='done')svg.classList.remove('drip');},1800/Math.max(1,sc.speed/2));
   $('sc-read').classList.remove('wacht');
-  $('sc-tlbl').textContent='from the lever';
   renderHead();frame(plan());
   if(vanzelf===true)toast('stopped by itself after a minute — you stop the shot at your weight');
 }
@@ -697,7 +699,7 @@ function scWeight(d){
 }
 function scUse(){
   const p=plan();
-  toast(mss(sc.stopT)+' and '+(sc.yOut==null?p.Y:sc.yOut)+' g filled in — still editable on the dial-in screen');
+  toast(mss(shotTime(p))+(p.on&&sc.stopT>p.fs?' full pressure (total '+mss(sc.stopT)+')':'')+' and '+(sc.yOut==null?p.Y:sc.yOut)+' g filled in — still editable');
 }
 let toastT=null;
 function toast(s){
