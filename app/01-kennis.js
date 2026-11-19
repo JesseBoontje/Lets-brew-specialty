@@ -498,9 +498,10 @@ function schaalGrammen(t,s){
   return String(t).replace(/(\d+(?:[.,]\d+)?)\s*(gram\b|g\b)/gi,(m,n,e)=>
     Math.round(parseFloat(String(n).replace(',','.'))*s)+' '+e);
 }
-function recipeSteps(r,dose,hendels){
+// ratio: optioneel, de verhouding die je zelf in het formulier zette; anders die van het recept
+function recipeSteps(r,dose,hendels,ratio){
   if(!r)return [];
-  const water=Math.round((dose||r.dose)*r.ratio);
+  const water=Math.round((dose||r.dose)*(ratio>0?ratio:r.ratio));
   const basis=Math.round((r.dose||dose||1)*r.ratio);   // waar de tekst voor geschreven is
   const schaal=basis?water/basis:1;
   let st=r.stappen.map(x=>Object.assign({},x,{d:schaalGrammen(x.d,schaal)}));

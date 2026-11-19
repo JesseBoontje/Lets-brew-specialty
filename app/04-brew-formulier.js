@@ -1055,22 +1055,40 @@ function pourVulUitRecept(id,overschrijf){
   // de molen waarop het recept geschreven is, als je er nog geen koos
   if(r.molen&&(overschrijf||!formMolen)){formMolen=r.molen;renderFormMolens();}
 }
-// het schema opnieuw uitrekenen voor de huidige dose en hendelstand
-function pourBuild(){
+// het schema opnieuw uitrekenen voor de huidige dose en hendelstand.
+// Zette je zelf een verhouding of eindgewicht (pc.ratio), dan rekent het
+// schema daarmee, anders met die van het recept. bron = het veld waarin je nu
+// typt: dat wordt niet overschreven, anders springt "16" naar "16.0".
+function pourBuild(bron){
   const r=recipeById(pc.rid);
   const dose=parseFloat(document.getElementById('f-dose').value)||(r?r.dose:15);
-  pc.steps=recipeSteps(r,dose,pc.hendels);
-  // het water uit het recept is meteen je doelgewicht in het formulier
+  pc.steps=recipeSteps(r,dose,pc.hendels,pc.ratio);
+  // het water uit het schema is meteen je doelgewicht in het formulier
   const w=pc.steps.length?pc.steps[pc.steps.length-1].water:'';
-  if(w){setVal('f-yield',w);if(dose)setVal('f-ratio',(w/dose).toFixed(1));}
+  if(w){if(bron!=='yield')setVal('f-yield',w);if(dose&&bron!=='ratio')setVal('f-ratio',(w/dose).toFixed(1));}
   renderPour();
+  cardSummaries();
 }
-function pourRecalc(){
+function pourRecalc(bron){
   const stack=document.getElementById('pc-stack');
   if(!stack||stack.style.display==='none')return;
   cardSummaries();
   if(pc.run)return;
-  pourBuild();
+  pourBuild(bron);
+}
+/* Verhouding of eindgewicht zelf aangepast terwijl er een recept loopt: dan
+   moet het gietschema meeschalen. Eerder bleef het schema op de verhouding van
+   het recept staan (15 g op 1:16 = 240 g in het veld, maar 251 g in het schema)
+   en sprong de verhouding terug zodra je de dose aanpaste.                  */
+function pourEigenRatio(bron){
+  if(!pc||!pc.rid||pc.mid!==formMethod)return;
+  const dose=parseFloat(document.getElementById('f-dose').value);
+  const ratio=parseFloat(document.getElementById('f-ratio').value);
+  const yld=parseFloat(document.getElementById('f-yield').value);
+  const nieuw=bron==='yield'?(dose>0&&yld>0?yld/dose:0):(ratio>0?ratio:0);
+  if(!(nieuw>0))return;
+  pc.ratio=nieuw;
+  pourRecalc(bron);
 }
 function renderPour(){
   pourRecipes();pourLevers();renderBrewerArt();pourBloom();pourSteps();pourSchema();
@@ -1113,7 +1131,7 @@ function pourRecipes(){
 }
 function pourPickRecipe(id){
   if(pc.run){toast('the clock is running \u2014 stop it first');return;}
-  pc.rid=id;
+  pc.rid=id;pc.ratio=null;          // een ander recept: zijn eigen verhouding
   if(!state.lastRecipe)state.lastRecipe={};
   state.lastRecipe[pc.mid]=id;save();
   pourVulUitRecept(id,true);
@@ -1138,7 +1156,7 @@ function pourLever(k,v){
   pc.hendels[k]=parseFloat(v);
   const r=recipeById(pc.rid);
   const dose=parseFloat(document.getElementById('f-dose').value)||(r?r.dose:15);
-  pc.steps=recipeSteps(r,dose,pc.hendels);
+  pc.steps=recipeSteps(r,dose,pc.hendels,pc.ratio);
   pourSteps();
 }
 // versheid -> bloom (de filterkant van de versheidsmeter)

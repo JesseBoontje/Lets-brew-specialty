@@ -152,11 +152,11 @@
 
       <div class="field-row" id="fb-doserow">
         <div class="field"><label>dose (g)</label><input id="f-dose" type="number" inputmode="decimal" step="0.1" oninput="calc('dose');vulBloomAuto();pourRecalc()"></div>
-        <div class="field"><label id="f-yield-label">yield (g)</label><input id="f-yield" type="number" inputmode="decimal" step="0.1" oninput="calc('yield')"></div>
+        <div class="field"><label id="f-yield-label">yield (g)</label><input id="f-yield" type="number" inputmode="decimal" step="0.1" oninput="calc('yield');pourEigenRatio('yield')"></div>
       </div>
       <div class="ratio-row" id="fb-ratio">
         <span class="ratio-lbl">ratio 1:</span>
-        <input id="f-ratio" class="ratio-input" type="number" inputmode="decimal" step="0.1" oninput="calc('ratio')">
+        <input id="f-ratio" class="ratio-input" type="number" inputmode="decimal" step="0.1" oninput="calc('ratio');pourEigenRatio('ratio')">
         <span class="ratio-hint" id="f-ratio-hint">auto-calculates from dose + yield</span>
       </div>
 
