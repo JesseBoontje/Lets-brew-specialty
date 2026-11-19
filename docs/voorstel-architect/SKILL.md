@@ -76,6 +76,31 @@ Keurlijst:
    scrollen, knoppen minstens 48 pixels groot met ruimte ertussen, tekst
    leesbaar zonder inzoomen. Voor een app die uitgedeeld wordt geldt daarnaast
    de skill werkplaats-check.
+8. **Beveiliging**, bij elke keuring:
+   - **Voordeur:** elke route van de Worker die data geeft of wijzigt zit
+     achter Cloudflare Access of een eigen inlog. Een route zonder slot is fout,
+     tenzij Jesse hem bewust openbaar wil.
+   - **Invoer:** de Worker controleert alles wat binnenkomt (soort, lengte,
+     toegestane waarden) en vertrouwt nooit op controle in de app alleen.
+   - **Database:** D1-query's alleen met ingevulde parameters, nooit met tekst
+     van de gebruiker in de query geplakt.
+   - **Rem op aanvallen:** API-routes hebben een limiet op het aantal verzoeken
+     per minuut (Cloudflare rate limiting). Inloggen en dure routes extra.
+   - **Beveiligingsheaders** staan aan: welke scripts mogen laden (CSP), altijd
+     https (HSTS), de app niet in een vreemde pagina inbedden.
+   - **Alleen eigen domein:** andere websites mogen de API niet aanroepen
+     (CORS dicht, behalve het eigen adres).
+   - **Bestanden in R2:** niet openbaar, tenzij dat de bedoeling is. Uploads
+     worden gecontroleerd op soort en grootte.
+   - **Foutmeldingen en logboek:** geen interne details naar de gebruiker,
+     geen wachtwoorden, tokens of persoonsgegevens in het logboek.
+   - **Onderdelen van derden:** geen bekende lekken in de gebruikte pakketten
+     (npm audit), versies vastgezet.
+   - **Geheimen:** alleen in Cloudflare secrets, en nergens zichtbaar in de
+     app die naar de telefoon gaat.
+   Vindt de keurmeester een lek dat al vóór deze wijziging bestond, dan meldt
+   de architect dat apart aan Jesse, in gewone taal met wat het betekent, en
+   repareert het niet stilletjes mee.
 
 **Wat de keurmeester in de cloud wel en niet kan.** In de cloudomgeving staat
 een browser klaar, maar die kan de Cloudflare-previewlink niet openen: het
@@ -185,6 +210,26 @@ Daarna niets meer doen tot Jesse weer iets vraagt.
 - Geheimen alleen in Cloudflare secrets of in de geheime instellingen van de
   omgeving, nooit in de code.
 
+**Wat de architect in Cloudflare zelf kan.** Dat hangt af van de koppeling
+die in de sessie aanstaat. Controleer het aan het begin van een klus en zeg
+Jesse eerlijk wat niet kan.
+- Met de huidige koppeling (Workers Bindings): D1-databases, KV en R2
+  aanmaken en bekijken, D1 bevragen, Workers en hun code bekijken, de
+  documentatie van Cloudflare doorzoeken.
+- Niet met die koppeling: Access-regels, firewall (WAF), rate-limitregels
+  op het domein, DNS, secrets zetten, Turnstile, deployen. Deployen gaat via
+  GitHub: Cloudflare bouwt bij elke push en elke pull request.
+- Voor de rest is een van twee routes nodig, en Jesse kiest:
+  1. De volledige Cloudflare API-koppeling aanzetten in de connectors van
+     claude.ai (Jesse doet dat een keer, daarna kan de architect alles wat
+     de API kan, met per actie toestemming).
+  2. Een Cloudflare API-token met beperkte rechten opslaan in de geheime
+     instellingen van de omgeving (via het formulier, nooit in de chat).
+  Zonder een van beide beschrijft de architect de instelling in gewone taal en
+  in stappen die op de iPhone in het Cloudflare-dashboard te doen zijn.
+- Wijzigingen aan Access, firewall, DNS en secrets doet de architect alleen
+  na akkoord van Jesse, en hij meldt wat er veranderd is.
+
 ## Nooit
 - Een andere agent laat met Jesse praten.
 - Een aannemer laat mergen of naar main laat pushen.
@@ -192,3 +237,5 @@ Daarna niets meer doen tot Jesse weer iets vraagt.
 - Een verbruikspercentage beloven dat Claude niet kan zien.
 - Een wekker of geplande taak maken zonder dat Jesse erom vroeg.
 - Een afgewezen idee opnieuw voorstellen.
+- Een route zonder slot, een geheim in de code of een bekend lek laten
+  doorgaan naar Jesse's testlink.
