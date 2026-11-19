@@ -19,7 +19,17 @@ Claude. Nog ideeën?"
   Service worker cache verhoogd naar de volgende versie.
 
 ## Wat half is / wacht
-- Keuring door de keurmeester van de opsplitsing.
+- Keurmeester: opsplitsing GOEDGEKEURD (alle 10 punten, webkit alleen via GitHub-check).
+- Pull request #12 staat open. GitHub-check (incl. webkit) slaagt. Beide
+  Cloudflare Workers Builds falen direct (0 seconden, voor het bouwen); lokaal
+  slaagt `wrangler deploy --dry-run`. Oorzaak zit in Cloudflare, logs alleen in
+  het dashboard. Geen testlink, dus niet mergen voordat dit is opgelost.
+- Twee Cloudflare-accounts aan de repo: 7d5fa36f... (Worker letsbrewspecialty,
+  de live app, staat in wrangler.jsonc) en 237620b0... (Worker
+  lets-brew-specialty, leeg, aangemaakt 7 nov; dit account ziet de
+  Cloudflare-koppeling van Claude). Jesse moet zeggen welke het hoofdaccount is.
+- Al bestaand, niet door de opsplitsing: V60 15 g op 1:16 geeft waterveld 240 g,
+  maar receptregel en gietschema zeggen 251 g (recept rekent met 1:16,7).
 - Inlog + D1 + MCP: wacht op Jesse's keuze voor de inlogmanier.
 
 ## Valkuilen
@@ -31,5 +41,5 @@ Claude. Nog ideeën?"
   Code die bij het laden draait mag geen naam uit een later bestand gebruiken.
 
 ## Eerstvolgende stap
-Keurrapport lezen, pull request openen, Cloudflare-check afwachten, Jesse de
-testlink geven.
+Wachten op Jesse: hoofdaccount Cloudflare, oorzaak build (dashboard of volledige
+Cloudflare-koppeling), inlogmanier, welke ideeën. Daarna mergen na akkoord.
