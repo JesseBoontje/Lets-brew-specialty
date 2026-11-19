@@ -52,7 +52,8 @@ Claude. Nog ideeën?"
   docs/keuzelijst.html (inwikkelen met de mockup-bouwer van nieuwe-feature).
   Werkt bewaren niet, dan plakt hij een tekst die begint met "Keuzes voor Lets Brew".
 - Verschil 240/251 g: opgelost in commit c71b071 (gietschema volgt eigen
-  verhouding). Keuring daarvan liep bij het schrijven van deze bon.
+  verhouding), goedgekeurd. Advies keurmeester verwerkt: een nieuw of bewerkt
+  formulier begint weer op de verhouding van het recept.
 
 ## Eerstvolgende stap
 1. Cloudflare-koppeling gebruiken: buildlogs van beide Workers Builds lezen,

@@ -153,6 +153,7 @@ async function updateDialIn(beanId,method){
   }catch(e){/* stil: volgende keer weer proberen */}
 }
 function openForm(methodId){
+  pc.ratio=null;      // een eigen verhouding geldt alleen voor de brew waarin je hem typte
   editingId=null;formRecipeSnapshot=null;const valid=methodId&&state.methods.find(m=>m.id===methodId&&m.on);formMethod=valid?methodId:(state.methods.filter(m=>m.on)[0]?.id||'espresso');
   document.getElementById('form-title').textContent='new brew';
   ['f-title','f-dose','f-yield','f-ratio','f-time','f-temp','f-grind','f-notes','f-tagnew','f-bloom-g','f-bloom-s','f-draw','f-brewer'].forEach(i=>setVal(i,''));
@@ -170,6 +171,7 @@ function openForm(methodId){
 }
 function openEdit(b){
   if(!b)return;
+  pc.ratio=null;
   editingId=b.id;formMethod=b.method;
   document.getElementById('form-title').textContent='edit brew';
   setVal('f-title',b.title||'');
@@ -1022,7 +1024,9 @@ function pourInit(){
   const stack=document.getElementById('pc-stack');if(!stack)return;
   const aan=(methodFamily(formMethod)==='filter')&&!['perculator','senseo'].includes(formMethod)&&featOn('pourcoach')&&recipesFor(formMethod).length>0;
   if(!aan){pourStop(true);return;}
-  if(pc.mid===formMethod&&pc.steps.length){renderPour();renderCards();return;}   // niet resetten bij hertekenen
+  if(pc.mid===formMethod&&pc.steps.length){   // niet resetten bij hertekenen
+    if(!pc.run){const r=recipeById(pc.rid);const dose=parseFloat(document.getElementById('f-dose').value)||(r?r.dose:15);pc.steps=recipeSteps(r,dose,pc.hendels,pc.ratio);}
+    renderPour();renderCards();return;}
   pourStop(true);
   const lijst=recipesFor(formMethod);
   const bewaard=(state.lastRecipe||{})[formMethod];
