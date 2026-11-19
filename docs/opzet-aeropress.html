@@ -1,0 +1,737 @@
+<style>
+/* Werkend prototype: de gietcoach voor de AeroPress, normaal en omgekeerd.
+   Eén telefoonscherm in de vaste opbouw van de gietcoach: tekening (~45 %),
+   grote klok, strook vorige / nu / volgende, twee grote knoppen. */
+:root{--crema:#c8a577;}
+body{padding:18px 16px 60px;}
+.mk-wrap{max-width:640px;}
+.mk-kop{margin:0 auto 16px;}
+.mk-kop h1{font-size:40px;}
+.mk-kop .mk-onder{font-size:17px;}
+.mk-sect{max-width:620px;}
+.mk-sect code{font-family:inherit;background:var(--card-2);border-radius:6px;padding:0 5px;}
+.mk-sect .bron{word-break:break-all;color:var(--ink-soft);font-size:16px;}
+.mk-sect table{border-collapse:collapse;width:100%;font-size:15.5px;margin:6px 0 12px;}
+.mk-sect td,.mk-sect th{border-bottom:1.5px solid var(--line);padding:5px 6px 5px 0;
+  text-align:left;vertical-align:top;}
+.mk-sect th{font-family:'Caveat',cursive;font-size:20px;font-weight:700;}
+
+/* ---- het telefoonscherm ---- */
+.phone{width:calc(100% + 32px);max-width:none;margin:0 -16px;height:100vh;height:100dvh;
+  min-height:560px;border:none;border-radius:0;filter:none;background:var(--paper);
+  display:flex;flex-direction:column;overflow:hidden;position:relative;}
+@media (min-width:560px){
+  .phone{width:400px;margin:0 auto;height:min(860px,calc(100dvh - 30px));
+    border:2px solid var(--ink);border-radius:30px;}
+}
+.ap-top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:12px 16px 0;}
+.seg{display:flex;background:var(--card);border:2px solid var(--line);border-radius:17px;
+  filter:url(#wobble);padding:2px;}
+.seg button{min-width:88px;height:44px;border:none;background:none;border-radius:14px;
+  color:var(--ink);font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:22px;
+  cursor:pointer;padding:0 10px;}
+.seg button.on{background:var(--accent-soft);color:var(--cream);}
+.tools{display:flex;gap:6px;}
+.tool{width:46px;height:46px;flex:none;border:2px solid var(--line);background:var(--card);
+  border-radius:15px;filter:url(#wobble);color:var(--ink);font:inherit;cursor:pointer;
+  font-family:'Caveat',cursive;font-weight:700;font-size:22px;display:flex;
+  align-items:center;justify-content:center;padding:0;}
+.tool svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;}
+.tool[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+.tool:disabled{opacity:.4;cursor:default;}
+.tool .uit{display:none;}
+.tool[aria-pressed="false"] .aan{display:none;}
+.tool[aria-pressed="false"] .uit{display:inline;}
+.ap-meta{flex:none;padding:7px 18px 0;font-size:14.5px;line-height:1.3;color:var(--ink-soft);}
+.ap-meta b{color:var(--ink);font-weight:400;}
+
+.stage{flex:1 1 45%;min-height:160px;position:relative;margin:2px 0 0;}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--ink);
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
+.stage svg .b{opacity:.58;stroke-width:1.3;}
+.stage svg .soft2{opacity:.34;}
+.stage svg .bed{stroke:var(--accent-soft);stroke-width:2.2;opacity:.8;}
+.stage svg .seal{stroke-width:2.3;}
+.stage svg .liq{fill:var(--accent-soft);opacity:.5;stroke:none;}
+.stage svg .crema{fill:var(--crema);stroke:none;opacity:.9;}
+.stage svg .nr{fill:var(--ink-soft);stroke:none;font-family:'Patrick Hand',cursive;font-size:9px;}
+.stage svg .stream{stroke:var(--accent-soft);stroke-width:2.6;stroke-dasharray:13 3;
+  animation:apflow 1s linear infinite;}
+.stage svg .stream.b2{stroke-width:1.4;opacity:.7;}
+.stage svg .korrel{stroke:var(--accent-soft);stroke-width:2;}
+.stage svg .stream{animation-duration:calc(1s / var(--snel,1));}
+.stage svg.paused .stream{animation-play-state:paused;}
+@keyframes apflow{to{stroke-dashoffset:-32;}}
+@media (prefers-reduced-motion:reduce){.stage svg .stream{animation:none;}}
+
+.clock{flex:none;position:relative;text-align:center;line-height:.95;}
+.clock .tijd{font-family:'Caveat',cursive;font-weight:700;font-size:min(104px,12dvh);
+  font-variant-numeric:tabular-nums;letter-spacing:1px;}
+.clock .van{position:absolute;right:18px;bottom:10px;font-size:15px;color:var(--ink-soft);}
+
+.strip{flex:none;padding:0 16px;display:flex;flex-direction:column;gap:5px;}
+.prev,.next{font-size:15.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;min-height:22px;padding:0 6px;}
+.prev .k{text-decoration:line-through;}
+.next b{color:var(--ink);font-weight:400;}
+.cur{background:var(--card-2);border:2px solid var(--ink);border-radius:20px;filter:url(#wobble);
+  padding:8px 14px 10px;min-height:106px;}
+.cur.keer{background:var(--accent-soft);color:var(--cream);}
+.cur.keer .cur-d{color:var(--cream);}
+.cur-r{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.cur-k{font-family:'Caveat',cursive;font-weight:700;font-size:32px;line-height:1.05;}
+.cur-g{font-family:'Caveat',cursive;font-weight:700;font-size:40px;line-height:1;flex:none;}
+.cur-d{font-size:16px;line-height:1.3;color:var(--ink);margin-top:2px;}
+
+.btns{flex:none;display:flex;gap:10px;padding:10px 16px 16px;}
+.btns button{height:60px;border-radius:18px;font:inherit;font-family:'Caveat',cursive;
+  font-weight:700;font-size:28px;cursor:pointer;filter:url(#wobble);}
+.btns .go{flex:1.25;background:var(--accent-soft);border:2px solid var(--accent-soft);color:var(--cream);}
+.btns .nx{flex:1;background:var(--card);border:2px solid var(--line);color:var(--ink);}
+.btns button:disabled{opacity:.45;cursor:default;}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+</style>
+
+<div class="mk-kop">
+  <h1>AeroPress-coach, normaal en omgekeerd</h1>
+  <div class="mk-onder">Werkend prototype van de gietcoach voor de AeroPress. Kies bovenin
+  <b>regular</b> of <b>inverted</b> en druk op start. Met <b>4&times;</b> zie je het hele recept
+  in een minuut. Onder het scherm staan de twee recepten met hun bron, en wat ik overnam en anders deed.</div>
+</div>
+
+<div class="phone" id="coach">
+  <div class="ap-top">
+    <div class="seg" role="group" aria-label="which way up">
+      <button type="button" id="m-normaal" class="on" aria-pressed="true">regular</button>
+      <button type="button" id="m-omgekeerd" aria-pressed="false">inverted</button>
+    </div>
+    <div class="tools">
+      <button type="button" class="tool" id="b-voice" aria-pressed="false" aria-label="read the steps aloud">
+        <svg class="aan" viewBox="0 0 24 24"><path d="M3.6 9.2 Q3.2 12 3.8 15"/><path d="M3 9.4 Q5.4 8.9 8.2 9.5"/><path d="M3.4 14.8 Q5.8 15.3 8.4 14.6"/><path d="M7.6 9.9 Q10.6 7.2 13.6 4.4 Q14.3 12 13.4 19.8 Q10.4 16.9 7.8 14.3"/><path d="M16.4 9 Q18.3 12 16.6 15.2"/><path d="M18.9 6.6 Q22.3 12 19.1 17.6"/></svg>
+        <svg class="uit" viewBox="0 0 24 24"><path d="M3.6 9.2 Q3.2 12 3.8 15"/><path d="M3 9.4 Q5.4 8.9 8.2 9.5"/><path d="M3.4 14.8 Q5.8 15.3 8.4 14.6"/><path d="M7.6 9.9 Q10.6 7.2 13.6 4.4 Q14.3 12 13.4 19.8 Q10.4 16.9 7.8 14.3"/><path d="M16.2 9.4 Q18.6 11.8 21.2 14.8"/><path d="M21 9.2 Q18.4 12 16.4 14.9"/></svg>
+      </button>
+      <button type="button" class="tool" id="b-speed" aria-pressed="false" aria-label="speed up four times">4&times;</button>
+      <button type="button" class="tool" id="b-reset" aria-label="start over">
+        <svg viewBox="0 0 24 24"><path d="M18.8 8.6 Q16.6 4.5 12 4.6 Q6 4.9 4.9 11 Q4.4 17.2 10.4 19.3 Q16.6 20.5 19.2 15"/><path d="M19.6 3.6 Q19.4 6.6 18.9 9.2 Q16.2 9 13.6 8.5"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="ap-meta" id="meta"></div>
+
+  <div class="stage">
+    <svg id="art" class="paused" viewBox="-6 0 272 344" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <clipPath id="ap-clip-ch"><rect x="102.6" y="141" width="54.8" height="121.4"/></clipPath>
+        <clipPath id="ap-clip-cup"><path d="M88 275 L172 275 L166.5 333 L93.5 333"/></clipPath>
+      </defs>
+      <!-- aanrecht -->
+      <path class="soft2" d="M8 337.4 Q130 341.6 252 336.4"/>
+      <path class="soft2" d="M20 339.8 Q131 343.2 240 338.8"/>
+
+      <!-- alles wat bij het omdraaien meedraait: kop, dop, kamer, plunjer -->
+      <g id="G">
+        <g id="cupG">
+          <g clip-path="url(#ap-clip-cup)">
+            <rect id="cupLiq" class="liq" x="80" y="333" width="100" height="0"/>
+            <rect id="cupCr" class="crema" x="80" y="333" width="100" height="0"/>
+          </g>
+          <path d="M82 271.5 Q130 265 178 271"/><path class="b" d="M86 273.5 Q131 268.2 175 272.6"/>
+          <path d="M83 273 Q130 280.5 177 272.4"/><path class="b" d="M88 275.6 Q129 281.4 173 274.8"/>
+          <path d="M85 268 Q87.5 300 93.5 336.4"/><path class="b" d="M88.6 272 Q90.4 302 95.8 333.4"/>
+          <path d="M175.5 268 Q173 300 167 336.4"/><path class="b" d="M172.4 271.5 Q170.8 302 164.6 333.4"/>
+          <path d="M88 332.6 Q130 338.6 172 331.6"/><path class="b" d="M93 334.8 Q129 339.2 168 333.4"/>
+          <path d="M175 284 Q199 283 198.5 300 Q198 317 171 318.4"/><path class="b" d="M173.5 289.5 Q192 289.6 191.6 301 Q191 312 170.6 312.4"/>
+        </g>
+
+        <g id="pressG">
+          <!-- het maalsel: een heuveltje op de basislijn 0 -->
+          <g id="bedG">
+            <path class="bed" d="M104 0.6 Q114 -6.4 124 -4.2 Q134 -8.6 144 -4 Q151 -2.4 156.4 0.8"/>
+            <path class="bed b" d="M106.6 -1 Q117 -4.6 127 -3 Q137 -6.4 146 -2.6 Q152 -1.4 155 -0.4"/>
+            <path class="soft2" d="M113 -2.6 l2.4 -1.6"/><path class="soft2" d="M121 -3 l2 1.4"/>
+            <path class="soft2" d="M133 -5 l2.4 -1"/><path class="soft2" d="M141 -3.4 l1.8 1.6"/>
+            <path class="soft2" d="M148 -1.8 l2.2 -1.2"/>
+          </g>
+
+          <g id="chM">
+            <g clip-path="url(#ap-clip-ch)">
+              <g id="liqT">
+                <rect id="chLiq" class="liq" x="70" y="262" width="120" height="0"/>
+                <rect id="chCr" class="crema" x="70" y="262" width="120" height="0"/>
+              </g>
+            </g>
+            <!-- de lip bovenaan -->
+            <path d="M94.5 139.6 Q130 134.6 165.8 139.2"/><path class="b" d="M97.6 141.6 Q131 137.6 162.8 141.4"/>
+            <path class="soft2" d="M99 142.4 Q130 147 161.4 142"/>
+            <!-- de wanden -->
+            <path d="M99.6 134.6 Q97.4 196 100.8 257.6"/><path class="b" d="M102.8 140.4 Q100.6 197 103.4 254.6"/>
+            <path d="M160.8 134.4 Q163 196 159.4 257.8"/><path class="b" d="M157.6 140.6 Q159.8 197 156.6 254.4"/>
+            <!-- de kraag -->
+            <path d="M74 254.4 Q130 249.4 186.6 255"/><path class="b" d="M78.4 256.4 Q129 252 182.4 256.8"/>
+            <path d="M73.4 261.4 Q130 265.6 187 260.6"/><path class="b" d="M77.6 262.6 Q131 266.4 183.6 262.2"/>
+            <path d="M77 251.8 Q71.6 257.8 76.6 264.2"/><path d="M183.4 251.6 Q189 257.6 184 264"/>
+            <!-- de cijfers 4 tot 1 -->
+            <path class="soft2" d="M104 166 Q111 165 117 166.4"/><text class="nr" x="120" y="169">4</text>
+            <path class="soft2" d="M104 188 Q111 187.2 117 188.4"/><text class="nr" x="120" y="191">3</text>
+            <path class="soft2" d="M104 210 Q111 209 117 210.4"/><text class="nr" x="120" y="213">2</text>
+            <path class="soft2" d="M104 232 Q111 231.2 117 232.4"/><text class="nr" x="120" y="235">1</text>
+          </g>
+
+          <g id="capG">
+            <path class="soft2" d="M101 261 Q130 263.4 159 260.6"/>
+            <path d="M95 262.4 Q130 258.8 165.6 262"/><path class="b" d="M98.6 264.2 Q131 261.4 162.4 263.8"/>
+            <path d="M97 270.4 Q130 273.4 163.4 269.8"/><path class="b" d="M100.4 271.8 Q129 274.4 160.6 271.2"/>
+            <path d="M97.4 259.6 Q95.6 266 98.2 273"/><path d="M163 259.4 Q165 266 162 272.8"/>
+            <path class="soft2" d="M106 264.5 Q106.5 267.5 106 270.5"/><path class="soft2" d="M114 264.6 Q114.4 267.6 114 270.8"/>
+            <path class="soft2" d="M122 264.4 Q122.6 267.6 122 270.9"/><path class="soft2" d="M130 264.3 Q130.4 267.6 130 271"/>
+            <path class="soft2" d="M138 264.4 Q138.5 267.6 138 270.9"/><path class="soft2" d="M146 264.5 Q146.4 267.6 146 270.8"/>
+            <path class="soft2" d="M154 264.6 Q154.5 267.5 154 270.5"/>
+          </g>
+
+          <!-- de plunjer, met de rubber onderkant op y=0 -->
+          <g id="plG">
+            <path d="M100.6 -8.6 Q130 -11.8 159.6 -8.2"/><path class="b" d="M103 -6.8 Q130 -9.4 157.4 -6.4"/>
+            <path class="seal" d="M101 0.6 Q130 3.4 159.2 0.2"/><path class="b" d="M103.4 -1.8 Q130 0.8 157 -2"/>
+            <path d="M101.4 -11 Q99.8 -4.4 102 2.6"/><path d="M158.8 -11.2 Q160.6 -4.6 158.2 2.4"/>
+            <path d="M106 -7 Q104 -62 106.8 -119.4"/><path class="b" d="M108.8 -9.6 Q107 -62 109.4 -116.8"/>
+            <path d="M154.2 -7.2 Q156.4 -62 153.4 -119.6"/><path class="b" d="M151.6 -9.4 Q153.6 -62 150.8 -117"/>
+            <path class="soft2" d="M118 -14 Q117 -62 118.6 -110"/>
+            <path d="M88.4 -115.4 Q130 -119.6 171.4 -114.8"/><path class="b" d="M92.6 -113.6 Q131 -117.4 167.6 -113.2"/>
+            <path d="M89.6 -123.4 Q130 -128.2 170.6 -122.8"/><path class="b" d="M93.4 -125.4 Q129 -129.4 166.8 -124.8"/>
+            <path d="M91.2 -126.6 Q86.2 -120 90.8 -111.8"/><path d="M168.6 -126.4 Q173.6 -119.8 169.2 -111.6"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- wat er bij het drukken in de kop loopt -->
+      <path id="drip" class="stream" d=""/>
+
+      <!-- de ketel, kantelt rond (206,58) -->
+      <g id="kettle">
+        <path d="M176.6 40.4 Q206 34.2 236 40.8"/><path class="b" d="M180 42.6 Q207 37.4 232.6 42.4"/>
+        <path d="M179.6 36.6 Q173.4 62 180.4 89.4"/><path class="b" d="M182.8 41.4 Q177.4 63 183.2 86.6"/>
+        <path d="M233 36.4 Q239.6 62 232.6 89.6"/><path class="b" d="M229.8 41.2 Q235.4 63 229.6 86.4"/>
+        <path d="M176 86.4 Q206 92.6 236.6 86"/><path class="b" d="M180.6 88.6 Q206 93.6 232 88"/>
+        <path d="M196.6 37.4 Q206 26 215.6 37.6"/><path class="b" d="M199.4 36.4 Q206.4 29.4 213 36.8"/>
+        <path d="M233.6 45.4 Q254 46.6 252.4 64 Q250.8 81.4 232.4 80.6"/><path class="b" d="M233 50.6 Q246.6 51.6 245.8 64.4 Q245 76 232.2 75.6"/>
+        <path d="M181.4 80.6 Q161 86.6 156.6 66 Q152.4 45.4 137.4 35.4"/><path class="b" d="M181.6 75 Q165.4 79.6 162 64.6 Q158.6 48.4 141.2 38.4"/>
+        <path d="M140.6 34.2 Q135.6 31.8 133 35.2"/>
+      </g>
+      <g id="streamG">
+        <path id="st1" class="stream" d=""/>
+        <path id="st2" class="stream b2" d=""/>
+      </g>
+
+      <!-- het eetstokje: punt op 0,0 -->
+      <g id="rodG" opacity="0">
+        <path d="M-1 -176 Q1.2 -88 0.2 2"/><path class="b" d="M2.4 -172 Q2.8 -86 1.4 -1"/>
+        <path d="M-3.4 -175 Q0.8 -178.4 4.6 -174.6"/>
+      </g>
+      <path id="ripple" class="soft2" d="M114 0 Q122 4 130 0 Q138 -4 146 0" opacity="0"/>
+
+      <!-- het schepje voor de laatste 2 g -->
+      <g id="scoopG" opacity="0">
+        <path d="M-24 3.6 Q-14 15 -1.4 6"/><path class="b" d="M-22 6 Q-13 12.6 -3 6.8"/>
+        <path d="M-25 2.4 Q-13 -0.6 0.4 5"/>
+        <path d="M-0.6 4.6 Q22 -5.6 45 -16.4"/><path class="b" d="M1.4 7.4 Q23 -2.6 45.6 -13"/>
+      </g>
+      <g id="grounds" opacity="0">
+        <path class="korrel" d="M0 0 l1.2 2.4"/><path class="korrel" d="M0 0 l-1 2.2"/>
+        <path class="korrel" d="M0 0 l1.4 2"/><path class="korrel" d="M0 0 l-1.2 2.4"/>
+        <path class="korrel" d="M0 0 l1 2.2"/><path class="korrel" d="M0 0 l-1.4 2"/>
+      </g>
+
+      <!-- bij minder beweging: een pijl in plaats van draaien en swirlen -->
+      <g id="rmFlip" opacity="0" transform="translate(188 176) scale(2.6)" style="stroke-width:.85">
+        <path d="M5.2 9.4 Q6.4 4.6 11.6 4.1 Q17 3.9 18.7 8.6"/><path d="M18.9 4.6 Q19 7.6 18.8 8.9 Q16.6 9 14.4 8.7"/>
+        <path d="M18.8 14.6 Q17.6 19.4 12.4 19.9 Q7 20.1 5.3 15.4"/><path d="M5.1 19.4 Q5 16.4 5.2 15.1 Q7.4 15 9.6 15.3"/>
+      </g>
+      <g id="rmSwirl" opacity="0" transform="translate(170 150) scale(1.7)" style="stroke-width:1.1">
+        <path d="M5.2 9.4 Q6.4 4.6 11.6 4.1 Q17 3.9 18.7 8.6"/><path d="M18.9 4.6 Q19 7.6 18.8 8.9 Q16.6 9 14.4 8.7"/>
+        <path d="M18.8 14.6 Q17.6 19.4 12.4 19.9 Q7 20.1 5.3 15.4"/><path d="M5.1 19.4 Q5 16.4 5.2 15.1 Q7.4 15 9.6 15.3"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="clock"><span class="tijd" id="clock">0:00</span><span class="van" id="van"></span></div>
+
+  <div class="strip">
+    <div class="prev" id="prev"></div>
+    <div class="cur" id="cur">
+      <div class="cur-r"><span class="cur-k" id="curK"></span><span class="cur-g" id="curG"></span></div>
+      <div class="cur-d" id="curD"></div>
+    </div>
+    <div class="next" id="next"></div>
+  </div>
+  <div class="sr" id="sr" aria-live="polite"></div>
+
+  <div class="btns">
+    <button type="button" class="go" id="b-go">start</button>
+    <button type="button" class="nx" id="b-next">next step</button>
+  </div>
+</div>
+
+<div class="mk-sect">
+  <h2>De twee recepten</h2>
+  <p><b>Normaal: James Hoffmann, "The Ultimate AeroPress Technique"</b> (video, 2021).<br>
+  <span class="bron">bron: https://youtu.be/j6VlT_jUVPc &middot; uitgeschreven stappen gelezen op
+  https://gist.github.com/fluency03/a494eed7504c8f2b3a162a84f3941168</span></p>
+  <table>
+    <tr><th>wat</th><th>hoeveel</th></tr>
+    <tr><td>koffie</td><td>11 g, aan de fijne kant van medium (lichte branding; donkerder = meer koffie en grover)</td></tr>
+    <tr><td>water</td><td>200 g, net van de kook en meteen gebruiken (heel donkere branding: omlaag tot 90 &deg;C)</td></tr>
+    <tr><td>voorbereiden</td><td>filter in de dop, niet spoelen en niet voorverwarmen; dop erop, op de kop; koffie erin en vlak schudden</td></tr>
+    <tr><td>0:00</td><td>klok aan, alle 200 g erop, al het maalsel nat</td></tr>
+    <tr><td>meteen daarna</td><td>plunjer zo'n 1 cm erin (houdt het druppelen tegen)</td></tr>
+    <tr><td>2:00</td><td>kamer en plunjer samen vasthouden en rustig swirlen</td></tr>
+    <tr><td>+30 s</td><td>rustig helemaal doordrukken, in ongeveer 30 seconden</td></tr>
+  </table>
+  <p><b>Omgekeerd: Tay Wipvasutt (Thailand), wereldkampioen AeroPress 2023.</b><br>
+  <span class="bron">bron: https://worldaeropresschampionship.com/pages/1st-tay-wipvasutt-thailand-2023 &middot;
+  ook: https://themagicroast.substack.com/p/introducing-2023-world-aeropress</span></p>
+  <table>
+    <tr><th>wat</th><th>hoeveel</th></tr>
+    <tr><td>koffie</td><td>18 g: 16 g bij de start, 2 g later; 1ZPresso ZP6 op 65 klikken (de bron noemt het fijn tot medium)</td></tr>
+    <tr><td>water</td><td>100 g van 89 &deg;C om te zetten, daarna aanvullen tot 155 g</td></tr>
+    <tr><td>filter</td><td>&eacute;&eacute;n papierfilter, gespoeld</td></tr>
+    <tr><td>0:00</td><td>16 g koffie erin, 100 g water erop</td></tr>
+    <tr><td>0:30</td><td>5 seconden roeren met &eacute;&eacute;n kant van een eetstokje</td></tr>
+    <tr><td>0:45</td><td>de laatste 2 g koffie erbij</td></tr>
+    <tr><td>0:55</td><td>nog 5 seconden roeren, lucht eruit duwen, dop erop</td></tr>
+    <tr><td>1:35</td><td>voorzichtig omdraaien en ongeveer 30 seconden drukken; er komt zo'n 75 g uit</td></tr>
+    <tr><td>daarna</td><td>aanvullen met water op kamertemperatuur tot 115 g, dan met heet water tot 155 g; proeven</td></tr>
+  </table>
+  <p class="zacht">Tay zette met wedstrijdwater (Perfect Coffee Water op 81,5 % sterkte). Dat laat ik weg: thuis
+  gebruik je je eigen water.</p>
+
+  <h2>Wat ik overnam van de app</h2>
+  <ul>
+    <li>De tekeningen in <code>BREWER_ART</code>: dezelfde AeroPress met de cijferstreepjes, het koffiebed als
+    bruine lijn, het water als geclipte rechthoek die stijgt, en de straal als lijn met <code>13 3</code>
+    streepjes die beweegt. De omgekeerde stand staat net als <code>aeropress_om</code> op de plunjer, open kant boven.</li>
+    <li>De keer-stap: in de app krijgt omkeren een eigen donkere kaart, en kantelt de tekening. Hier ook.</li>
+    <li>De namen <b>regular</b> en <b>inverted</b> uit <code>HOUDINGEN</code>, en de soorten stappen uit
+    <code>STAP_SOORTEN</code> (giet, roer, swirl, wacht, keer, pers).</li>
+    <li>De stapteksten in het Nederlands, zoals in <code>FILTER_RECIPES</code>; de knoppen en kopjes in het Engels.</li>
+  </ul>
+
+  <h2>Wat ik anders deed, en waarom</h2>
+  <ul>
+    <li><b>De tekening bestaat uit losse delen.</b> Kop, dop, kamer, plunjer en ketel bewegen elk apart. Daardoor
+    zakt de plunjer echt, loopt de kamer leeg en vult de kop zich. In de app stijgt alleen het water.</li>
+    <li><b>Omdraaien in twee bewegingen.</b> In de app wisselt het plaatje en draait het in 0,65 s rond. Hier daalt
+    eerst de kop omgekeerd op de dop, en daarna draait de hele stapel als &eacute;&eacute;n stuk om, in ongeveer
+    2 seconden. Zo zie je wat je handen moeten doen: kop erop, alles samen vasthouden, draaien.</li>
+    <li><b>Hoffmann roert niet, hij swirlt.</b> Bij normaal zie je daarom geen roerstaaf maar een AeroPress die
+    rustig wiegt, en het wateroppervlak kantelt mee. De roerstaaf zit bij omgekeerd: Tay roert twee keer met een eetstokje.</li>
+    <li><b>Na het drukken gaat het door.</b> Tay vult zijn kop aan tot 115 g en daarna tot 155 g. De app kent geen
+    stap na het persen; bij inbouwen is dat een giet-stap na de pers-stap.</li>
+    <li><b>Een klok die je van een meter afstand leest</b>, en twee knoppen van 60 px hoog voor natte handen.
+    Hardop voorlezen gaat alleen aan als je op het luidsprekertje tikt.</li>
+  </ul>
+
+  <h2>Wijkt de app af van wat ik vond?</h2>
+  <p>Ja. Het recept in de app (<code>FILTER_RECIPES</code>, "AeroPress standaard") en de zetgids
+  (<code>BREW_GUIDES.aeropress</code>) zijn een algemeen recept zonder bron, en ze lijken niet op Hoffmann:</p>
+  <table>
+    <tr><th></th><th>app nu</th><th>Hoffmann</th></tr>
+    <tr><td>koffie / water</td><td>16 g / 240 g (1:15)</td><td>11 g / 200 g (ongeveer 1:18)</td></tr>
+    <tr><td>temperatuur</td><td>88 &deg;C</td><td>net van de kook</td></tr>
+    <tr><td>begin</td><td>bloom en 10 s roeren</td><td>alles in &eacute;&eacute;n keer erop, niet roeren</td></tr>
+    <tr><td>drukken</td><td>op 1:15, stoppen bij het sissen</td><td>op 2:30, helemaal door</td></tr>
+  </table>
+  <p>Een omgekeerd recept staat er niet in. Omgekeerd bestaat alleen als keuze in de recepteditor, die dan een
+  keer-stap invoegt. Tay's recept zou het eerste ingebouwde omgekeerde recept zijn.</p>
+
+  <h2>Wat ik aannam, en wat niet kan</h2>
+  <ul>
+    <li>Sommige tijden staan niet in de bronnen, die heb ik zelf gekozen: het schenken duurt ongeveer 10 s, de
+    swirl 5 s, lucht eruit en dop erop samen 10 s (1:00 tot 1:10), en het aanvullen staat op 2:05 en 2:18.</li>
+    <li>Bij Tay staat het drukken op "1:35, ongeveer 30 seconden". Het omdraaien duurt hier 3 s, dus het drukken loopt van 1:38 tot 2:05.</li>
+    <li>De coach weet niet wat je weegschaal zegt. Hij laat het doelgewicht zien; je leest het af en tikt op
+    <b>next step</b> als je eerder of later klaar bent.</li>
+    <li>Of hardop voorlezen werkt, hangt af van het toestel: een Nederlandse stem moet erop staan. Zonder stem
+    werkt alles gewoon, het knopje wordt dan grijs.</li>
+    <li>Bij "minder beweging" (een instelling in iOS) draait de tekening niet en wiebelt er niets. Dan verschijnt
+    er een pijl die laat zien dat je moet omdraaien of swirlen.</li>
+    <li>De ZP6-stand van Tay omrekenen naar jouw molen kan dit prototype niet. In de app kan dat later met de
+    maalstand-kennis die er al is.</li>
+  </ul>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ---------------- de twee recepten ----------------
+   t = seconden vanaf start, label = Engelse kop op de kaart, doel = wat je
+   haalt, d = de stap zelf (inhoud, dus Nederlands, zoals FILTER_RECIPES),
+   say = wat de stem zegt, pre = wat hij vijf seconden eerder zegt.        */
+const RECEPTEN={
+  normaal:{
+    meta:'<b>James Hoffmann</b> &middot; 11 g &middot; 200 g water &middot; just off the boil &middot; medium-fine',
+    klaar:'Papierfilter in de dop (niet spoelen), dop erop en op je kop. 11 g koffie erin en vlak schudden.',
+    eind:180,
+    stappen:[
+      {t:0,   k:'pour',    label:'pour',       doel:'200 g',      d:'Giet alle 200 g water erop en maak al het maalsel nat.', say:'Gieten. Alle tweehonderd gram erop.'},
+      {t:10,  k:'plunger', label:'plunger in', doel:'~1 cm',      d:'Zet de plunjer er zo’n 1 cm in. Dat houdt het druppelen tegen.', say:'Plunjer erop, een centimeter diep.'},
+      {t:14,  k:'wait',    label:'steep',      doel:'until 2:00', d:'Laten trekken.', say:'Laten trekken tot twee minuten.'},
+      {t:120, k:'swirl',   label:'swirl',      doel:'gently',     d:'Houd kamer en plunjer samen vast en swirl hem rustig rond.', say:'Rustig swirlen.', pre:'Zo meteen swirlen.'},
+      {t:125, k:'wait',    label:'settle',     doel:'until 2:30', d:'Dertig seconden laten zakken.', say:'Dertig seconden laten zakken.'},
+      {t:150, k:'press',   label:'press',      doel:'~30 s',      d:'Druk rustig helemaal door, in ongeveer 30 seconden.', say:'Drukken. Rustig, ongeveer dertig seconden.', pre:'Over vijf seconden drukken.'},
+      {t:180, k:'done',    label:'done',       doel:'3:00',       d:'Klaar. Haal de AeroPress eraf en proef.', say:'Klaar.'}
+    ]},
+  omgekeerd:{
+    meta:'<b>Tay Wipvasutt, world champion 2023</b> &middot; 16 + 2 g &middot; 100 g at 89°C, topped up to 155 g &middot; ZP6, 65 clicks',
+    klaar:'Spoel het papierfilter in de dop. AeroPress omgekeerd op de plunjer, 16 g koffie erin, 2 g apart.',
+    eind:148,
+    stappen:[
+      {t:0,   k:'pour',   label:'pour',              doel:'100 g',      d:'Giet 100 g water van 89 °C op de 16 g koffie.', say:'Gieten tot honderd gram.'},
+      {t:10,  k:'wait',   label:'steep',             doel:'until 0:30', d:'Even laten staan.', say:'Laten staan.'},
+      {t:30,  k:'stir',   label:'stir',              doel:'5 s',        d:'Roer 5 seconden met één kant van een eetstokje.', say:'Roeren, vijf seconden.'},
+      {t:35,  k:'wait',   label:'wait',              doel:'until 0:45', d:'Laten staan.', say:''},
+      {t:45,  k:'add',    label:'add coffee',        doel:'2 g',        d:'Strooi de laatste 2 g koffie erbij.', say:'De laatste twee gram koffie erbij.'},
+      {t:50,  k:'wait',   label:'wait',              doel:'until 0:55', d:'Laten staan.', say:''},
+      {t:55,  k:'stir',   label:'stir again',        doel:'5 s',        d:'Roer nog 5 seconden.', say:'Nog vijf seconden roeren.'},
+      {t:60,  k:'air',    label:'push out air',      doel:'',           d:'Duw de plunjer omhoog tot de lucht eruit is.', say:'Lucht eruit duwen.'},
+      {t:66,  k:'cap',    label:'cap on',            doel:'',           d:'Draai de dop met het gespoelde filter erop.', say:'Dop erop.'},
+      {t:70,  k:'wait',   label:'steep',             doel:'until 1:35', d:'Laten trekken. Zet je kop alvast klaar.', say:'Laten trekken. Zet je kop klaar.'},
+      {t:95,  k:'flip',   label:'flip',              doel:'now',        d:'Kop op de dop, alles samen vasthouden en in één beweging omdraaien.', say:'Kop erop, en omdraaien.', pre:'Over vijf seconden omdraaien.'},
+      {t:98,  k:'press',  label:'press',             doel:'~75 g',      d:'Druk rustig, ongeveer 30 seconden. Er komt zo’n 75 g uit.', say:'Drukken, rustig.'},
+      {t:125, k:'bypass', label:'top up · room temp', doel:'115 g', d:'Haal de AeroPress eraf en vul aan met water op kamertemperatuur tot 115 g.', say:'AeroPress eraf. Aanvullen met water op kamertemperatuur tot honderdvijftien gram.'},
+      {t:138, k:'bypass', label:'top up · hot',  doel:'155 g',      d:'Vul aan met heet water tot 155 g.', say:'Aanvullen met heet water tot honderdvijfenvijftig gram.'},
+      {t:148, k:'done',   label:'done',              doel:'2:28',       d:'Klaar. Proef voor je hem schenkt.', say:'Klaar. Proeven.'}
+    ]}
+};
+
+/* ---------------- hulpjes ---------------- */
+const $=id=>document.getElementById(id);
+const rmp=(t,a,b)=>t<=a?0:t>=b?1:(t-a)/(b-a);
+const ez=x=>x*x*(3-2*x);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const env=(t,a,b,f)=>Math.min(rmp(t,a,a+f),1-rmp(t,b-f,b));   // in- en uitfaden
+const fmt=s=>{s=Math.max(0,Math.floor(s+1e-6));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+function rot(px,py,cx,cy,deg){
+  const a=deg*Math.PI/180,dx=px-cx,dy=py-cy;
+  return [cx+dx*Math.cos(a)-dy*Math.sin(a), cy+dx*Math.sin(a)+dy*Math.cos(a)];
+}
+const mq=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null;
+let RM=!!(mq&&mq.matches);
+if(mq&&mq.addEventListener)mq.addEventListener('change',e=>{RM=e.matches;render();});
+
+/* ---------------- de stand van de tekening op tijd t ----------------
+   Assenstelsel: de AeroPress rechtop op de kop. Omgekeerd is datzelfde
+   plaatje 180 graden gedraaid rond (130, 212.5) -- dan staat de plunjer
+   precies op het aanrecht. Omdraaien is dus gewoon die hoek naar 360.    */
+const CX=130, CY=212.5, FILTER=262, CUPBODEM=333, CUPG=0.3, PERG=0.5;
+
+function sceneNormaal(t){
+  const S=basis();
+  S.kShow=1-ez(rmp(t,10.4,11.2));
+  S.kTilt=ez(rmp(t,0.05,0.6))*(1-ez(rmp(t,10,10.5)));
+  const gegoten=200*rmp(t,0.6,10);
+  const L=gegoten*PERG;
+  if(t>0.6&&t<10){S.pour=true;S.pourY=FILTER-L;}
+  // plunjer: zakt er 1 cm in, later helemaal door
+  const ins=ez(rmp(t,10.6,13.6));
+  const p=rmp(t,150,180), pe=0.7*p+0.3*ez(p);
+  S.plA=RM?(ins>0?1:0):ins;
+  S.seal=t<150?(RM?151:lerp(91,151,ins)):lerp(151,250,pe);
+  const niveau=FILTER-L;
+  S.top=Math.max(niveau,S.seal); S.bot=FILTER;
+  if(L<=0)S.top=S.bot;
+  S.crTop=(L>4&&S.seal<niveau);
+  // de kop vult zodra de plunjer het water raakt
+  const g=178*Math.max(0,Math.min(1,(S.seal-162)/(250-162)));
+  S.cupG=t>=150?g:0;
+  S.drip=t>150&&t<181&&S.seal>162;
+  // swirl
+  const e=Math.sin(Math.PI*rmp(t,120,125));
+  if(!RM){
+    S.swA=e*3.2*Math.sin(2*Math.PI*(t-120)/1.3);
+    S.swX=e*2*Math.cos(2*Math.PI*(t-120)/1.3);
+    S.tilt=-S.swA*1.9;
+  }else S.rmSwirl=(t>=120&&t<125)?1:0;
+  S.bedY=261; S.bedS=1-0.45*p;
+  return S;
+}
+function sceneOmgekeerd(t){
+  const S=basis();
+  // omdraaien: eerst daalt de kop, dan draait alles
+  if(RM){
+    S.theta=t<96.6?180:360;
+    S.cupD=0; S.cupA=t>=95?1:0;
+    S.rmFlip=(t>=95&&t<98)?1:0;
+  }else{
+    S.theta=180+180*ez(rmp(t,96,97.8));
+    S.cupD=70*(1-ez(rmp(t,95,95.9)));
+    S.cupA=t<95?0:rmp(t,95,95.5);
+  }
+  // ketel: eerst in de kamer, later in de kop
+  if(t<20){
+    S.kShow=1-ez(rmp(t,10.4,11.2));
+    S.kTilt=ez(rmp(t,0.05,0.6))*(1-ez(rmp(t,10,10.5)));
+  }else{
+    S.kShow=ez(rmp(t,125.5,126.3))*(1-ez(rmp(t,147,147.8)));
+    S.kTilt=ez(rmp(t,126.3,126.9))*(1-ez(rmp(t,135.5,136)))+ez(rmp(t,138,138.5))*(1-ez(rmp(t,146,146.5)));
+  }
+  const gegoten=100*rmp(t,0.6,10);
+  const L=gegoten*PERG;
+  if(t>0.6&&t<10){S.pour=true;S.pourY=2*CY-(212+L);}
+  // de kamer zakt over de plunjer tot de lucht eruit is
+  S.off=58*(1-ez(rmp(t,60,66)));
+  // de dop daalt en draait vast
+  S.capOff=RM?0:46*(1-ez(rmp(t,66,68.4)));
+  S.capA=t<66?0:(RM?1:rmp(t,66,66.8));
+  if(!RM&&t>68.4&&t<70)S.capW=5*Math.sin(2*Math.PI*(t-68.4)/0.8)*(1-rmp(t,68.4,70));
+  // drukken na het omdraaien
+  const p=rmp(t,98,125), pe=0.7*p+0.3*ez(p);
+  S.seal=lerp(212,250,pe);
+  S.top=S.seal; S.bot=212+L;
+  if(L<=0)S.bot=S.top;
+  S.crBot=(L>4&&S.off>2);
+  // het maalsel: eerst op de plunjer, na het draaien zakt het op het filter
+  const z=ez(rmp(t,97.9,99.4));
+  S.bedY=RM?(t<96.6?212:261):lerp(212,261,z);
+  S.bedS=(RM?(t<96.6?-1:1):lerp(-1,1,z))*(1-0.45*p);
+  // de kop
+  let g=75*p;
+  if(t>=126.9)g=75+40*rmp(t,126.9,135.5)+40*rmp(t,138.5,146);
+  S.cupG=t>=98?g:0;
+  S.drip=t>98.5&&t<125;
+  if(t>126.9&&t<135.5||t>138.5&&t<146){S.pour=true;S.pourY=CUPBODEM-g*CUPG;}
+  // de AeroPress gaat eraf voor het aanvullen
+  S.lift=RM?0:150*ez(rmp(t,125,126.5));
+  S.pressA=1-rmp(t,125.4,126.5);
+  // roeren, twee keer
+  for(const [a,b] of [[30,35],[55,60]]){
+    if(t>=a&&t<b){
+      const ph=2*Math.PI*(t-a)/0.9;
+      S.rodA=RM?1:env(t,a,b,0.4);
+      S.rodX=RM?130:130+13*Math.sin(ph);
+      S.rodR=RM?8:7+3*Math.sin(ph+0.8);
+      S.rodY=195;
+      S.rip=RM?0:S.rodA; S.ripX=RM?0:4*Math.sin(ph); S.ripY=2*CY-(212+L);
+    }
+  }
+  // het schepje
+  if(t>=45&&t<50){
+    S.scA=env(t,45,50,0.5);
+    S.scR=RM?-38:-38*ez(rmp(t,45.6,46.6));
+    S.grA=(t>46.4&&t<49)?1:0;
+    S.grPh=(t-46.4)/0.9;
+  }
+  return S;
+}
+function basis(){
+  return {theta:0,cupD:0,cupA:1,lift:0,pressA:1,swA:0,swX:0,tilt:0,off:0,capOff:0,capA:1,capW:0,
+    seal:151,plA:1,top:FILTER,bot:FILTER,crTop:false,crBot:false,bedY:261,bedS:1,cupG:0,
+    kShow:0,kTilt:0,pour:false,pourY:0,drip:false,rodA:0,rodX:130,rodY:195,rodR:7,rip:0,ripX:0,ripY:0,
+    scA:0,scR:0,grA:0,grPh:0,rmFlip:0,rmSwirl:0};
+}
+
+/* ---------------- tekenen ---------------- */
+const el={};
+['G','cupG','cupLiq','cupCr','pressG','bedG','chM','liqT','chLiq','chCr','capG','plG','drip',
+ 'kettle','st1','st2','rodG','ripple','scoopG','grounds','rmFlip','rmSwirl','art'].forEach(k=>el[k]=$(k));
+const korrels=[...el.grounds.querySelectorAll('path')];
+
+function teken(S){
+  el.G.setAttribute('transform','rotate('+S.theta.toFixed(2)+' '+CX+' '+CY+')');
+  el.cupG.setAttribute('transform','translate(0 '+S.cupD.toFixed(2)+')');
+  el.cupG.setAttribute('opacity',S.cupA);
+  el.pressG.setAttribute('transform','translate('+S.swX.toFixed(2)+' '+(-S.lift).toFixed(2)+') rotate('+S.swA.toFixed(2)+' 130 262)');
+  el.pressG.setAttribute('opacity',S.pressA);
+  el.chM.setAttribute('transform','translate(0 '+S.off.toFixed(2)+')');
+  // water in de kamer, in de coordinaten van de kamer
+  const h=Math.max(0,S.bot-S.top);
+  el.chLiq.setAttribute('y',(S.top-S.off).toFixed(2));
+  el.chLiq.setAttribute('height',h.toFixed(2));
+  if(S.crTop){el.chCr.setAttribute('y',(S.top-S.off).toFixed(2));el.chCr.setAttribute('height',3);}
+  else if(S.crBot){el.chCr.setAttribute('y',(S.bot-S.off-3).toFixed(2));el.chCr.setAttribute('height',3);}
+  else el.chCr.setAttribute('height',0);
+  el.liqT.setAttribute('transform','rotate('+S.tilt.toFixed(2)+' 130 '+(S.top-S.off).toFixed(2)+')');
+  el.capG.setAttribute('transform','translate(0 '+S.capOff.toFixed(2)+') rotate('+S.capW.toFixed(2)+' 130 266)');
+  el.capG.setAttribute('opacity',S.capA);
+  el.plG.setAttribute('transform','translate(0 '+S.seal.toFixed(2)+')');
+  el.plG.setAttribute('opacity',S.plA);
+  el.bedG.setAttribute('transform','translate(0 '+S.bedY.toFixed(2)+') scale(1 '+S.bedS.toFixed(3)+')');
+  // de kop
+  const ch=S.cupG*CUPG, cy=CUPBODEM-ch;
+  el.cupLiq.setAttribute('y',cy.toFixed(2));el.cupLiq.setAttribute('height',ch.toFixed(2));
+  el.cupCr.setAttribute('y',cy.toFixed(2));el.cupCr.setAttribute('height',S.cupG>3?2.6:0);
+  // ketel en straal
+  const kt=-22*S.kTilt, kx=(RM?(S.kShow>0.5?0:70):(1-S.kShow)*70);
+  el.kettle.setAttribute('transform','translate('+kx.toFixed(2)+' 0) rotate('+kt.toFixed(2)+' 206 58)');
+  el.kettle.setAttribute('opacity',RM?(S.kShow>0.5?1:0):S.kShow);
+  if(S.pour){
+    const [tx,ty]=rot(134,35,206,58,kt);
+    const x=tx+kx, my=(ty+S.pourY)/2;
+    el.st1.setAttribute('d','M'+x.toFixed(1)+' '+ty.toFixed(1)+' Q'+(x-0.6).toFixed(1)+' '+my.toFixed(1)+' 130 '+S.pourY.toFixed(1));
+    el.st2.setAttribute('d','M'+(x+2.2).toFixed(1)+' '+(ty+3).toFixed(1)+' Q'+(x+1.6).toFixed(1)+' '+my.toFixed(1)+' 131.4 '+(S.pourY-2).toFixed(1));
+  }else{el.st1.setAttribute('d','');el.st2.setAttribute('d','');}
+  el.drip.setAttribute('d',S.drip?('M130 272 Q130.8 '+((272+cy)/2).toFixed(1)+' 130 '+cy.toFixed(1)):'');
+  // roerstokje
+  el.rodG.setAttribute('opacity',S.rodA);
+  el.rodG.setAttribute('transform','translate('+S.rodX.toFixed(2)+' '+S.rodY+') rotate('+S.rodR.toFixed(2)+')');
+  el.ripple.setAttribute('opacity',S.rip*0.9);
+  el.ripple.setAttribute('transform','translate('+S.ripX.toFixed(2)+' '+S.ripY.toFixed(2)+')');
+  // schepje en korrels
+  el.scoopG.setAttribute('opacity',S.scA);
+  el.scoopG.setAttribute('transform','translate(156 70) rotate('+S.scR.toFixed(2)+')');
+  el.grounds.setAttribute('opacity',S.grA);
+  korrels.forEach((k,i)=>{
+    const f=((S.grPh+i/6)%1+1)%1;
+    k.setAttribute('transform','translate('+(126+(i%3)*4)+' '+(88+f*70).toFixed(1)+')');
+  });
+  el.rmFlip.setAttribute('opacity',S.rmFlip);
+  el.rmSwirl.setAttribute('opacity',S.rmSwirl);
+}
+
+/* ---------------- de klok ---------------- */
+let modus='normaal', R=RECEPTEN.normaal;
+let loopt=false, begonnen=false, klaar=false, tStil=0, t0=0, p0=0, snel=1;
+let stem=false, gezegd=-1, voorGezegd=-1, nlStem=null;
+
+function nu(){return loopt?t0+(performance.now()-p0)/1000*snel:tStil;}
+function zet(t){ if(loopt){t0=t;p0=performance.now();} else tStil=t; }
+function stapOp(t){
+  const st=R.stappen;let i=0;
+  for(let j=0;j<st.length;j++)if(st[j].t<=t+1e-6)i=j;
+  return i;
+}
+
+let laatsteTekst='';
+function render(){
+  let t=nu();
+  if(t>=R.eind){
+    t=R.eind;
+    if(loopt){tStil=t;loopt=false;}
+    klaar=true;
+  }
+  teken(modus==='normaal'?sceneNormaal(t):sceneOmgekeerd(t));
+  el.art.classList.toggle('paused',!loopt);
+  el.art.style.setProperty('--snel',snel);
+  $('clock').textContent=fmt(t);
+  // de strook: vorige / nu / volgende
+  const st=R.stappen, i=stapOp(t);
+  let prev='',k,g,d,next='',keer=false;
+  if(!begonnen){
+    k='get ready';g='';d=R.klaar;
+    next='next: <b>'+st[0].label+'</b> · when you press start';
+  }else{
+    const s=st[i];
+    k=s.label;g=s.doel;d=s.d;keer=(s.k==='flip');
+    prev=i>0?('<span>'+fmt(st[i-1].t)+'</span> &nbsp;<span class="k">'+st[i-1].label+'</span>')
+            :('<span class="k">get ready</span>');
+    if(i<st.length-1){
+      const n=st[i+1];
+      next='next: <b>'+n.label+(n.doel&&n.k!=='wait'&&n.k!=='done'?' · '+n.doel:'')+'</b> · in '+fmt(Math.ceil(n.t-t-1e-6));
+    }else next='enjoy it';
+  }
+  const tekst=prev+'|'+k+'|'+g+'|'+d+'|'+next+'|'+keer;
+  if(tekst!==laatsteTekst){
+    laatsteTekst=tekst;
+    $('prev').innerHTML=prev||'&nbsp;';
+    $('curK').textContent=k;$('curG').textContent=g;$('curD').textContent=d;
+    $('next').innerHTML=next;
+    $('cur').classList.toggle('keer',keer);
+  }
+  // hardop: de nieuwe stap, en vijf seconden van tevoren bij omdraaien en drukken
+  if(begonnen&&stem){
+    if(i!==gezegd){gezegd=i;if(st[i].say)spreek(st[i].say);}
+    const n=st[i+1];
+    if(n&&n.pre&&snel===1&&voorGezegd!==i+1&&t>=n.t-5&&t<n.t){voorGezegd=i+1;spreek(n.pre);}
+  }else gezegd=begonnen?i:-1;
+  // knoppen
+  $('b-go').textContent=klaar?'again':(loopt?'pause':(begonnen?'resume':'start'));
+  $('b-next').disabled=klaar;
+  $('van').textContent='of '+fmt(R.eind);
+}
+function lus(){ render(); if(loopt)requestAnimationFrame(lus); }
+// ook als het scherm even weg is: de klok rekent met de echte tijd, dit houdt de stem bij
+setInterval(()=>{if(loopt)render();},400);
+
+function start(){
+  if(klaar){opnieuw();}
+  begonnen=true;loopt=true;t0=tStil;p0=performance.now();
+  requestAnimationFrame(lus);
+}
+function pauze(){tStil=nu();loopt=false;render();}
+function opnieuw(){
+  loopt=false;begonnen=false;klaar=false;tStil=0;gezegd=-1;voorGezegd=-1;
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  render();
+}
+function volgende(){
+  if(klaar)return;
+  const t=nu(), i=stapOp(t), st=R.stappen;
+  const doel=(!begonnen)?st[Math.min(1,st.length-1)].t:(i<st.length-1?st[i+1].t:R.eind);
+  begonnen=true;zet(doel);
+  if(doel>=R.eind)klaar=true;
+  render();
+}
+function kiesModus(m){
+  if(m===modus)return;
+  modus=m;R=RECEPTEN[m];
+  $('m-normaal').classList.toggle('on',m==='normaal');
+  $('m-omgekeerd').classList.toggle('on',m==='omgekeerd');
+  $('m-normaal').setAttribute('aria-pressed',m==='normaal');
+  $('m-omgekeerd').setAttribute('aria-pressed',m==='omgekeerd');
+  $('meta').innerHTML=R.meta;
+  opnieuw();
+}
+
+/* ---------------- de stem ----------------
+   Alleen na een tik aan, en zonder stem werkt alles hetzelfde.           */
+function zoekStem(){
+  if(!window.speechSynthesis)return;
+  const v=speechSynthesis.getVoices();
+  nlStem=v.find(x=>/^nl[-_]NL/i.test(x.lang))||v.find(x=>/^nl/i.test(x.lang))||null;
+}
+function spreek(tekst){
+  if(!stem||!window.speechSynthesis)return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(tekst);
+    u.lang='nl-NL';if(nlStem)u.voice=nlStem;u.rate=1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+  $('sr').textContent=tekst;
+}
+if(window.speechSynthesis){
+  zoekStem();
+  if('onvoiceschanged' in speechSynthesis)speechSynthesis.onvoiceschanged=zoekStem;
+}else{
+  $('b-voice').disabled=true;$('b-voice').setAttribute('aria-label','no voice on this device');
+}
+
+/* ---------------- knoppen ---------------- */
+$('b-go').addEventListener('click',()=>{loopt?pauze():start();});
+$('b-next').addEventListener('click',volgende);
+$('b-reset').addEventListener('click',opnieuw);
+$('m-normaal').addEventListener('click',()=>kiesModus('normaal'));
+$('m-omgekeerd').addEventListener('click',()=>kiesModus('omgekeerd'));
+$('b-speed').addEventListener('click',()=>{
+  const t=nu();snel=(snel===1?4:1);
+  if(loopt){t0=t;p0=performance.now();}
+  $('b-speed').setAttribute('aria-pressed',snel===4);
+  render();
+});
+$('b-voice').addEventListener('click',()=>{
+  stem=!stem;
+  $('b-voice').setAttribute('aria-pressed',stem);
+  if(stem){
+    // de tik zelf ontgrendelt de stem op een iPhone
+    spreek('Stem aan. Ik zeg elke stap hardop.');
+    gezegd=begonnen?stapOp(nu()):-1;
+  }else if(window.speechSynthesis)speechSynthesis.cancel();
+});
+
+$('meta').innerHTML=R.meta;
+render();
+// voor het testen: naar een tijd springen zonder te wachten
+window.__ap={zet:(m,t)=>{kiesModus(m);begonnen=true;loopt=false;tStil=t;klaar=false;render();}};
+})();
+</script>
