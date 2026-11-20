@@ -1098,7 +1098,7 @@ function renderPour(){
   pourRecipes();pourLevers();renderBrewerArt();pourBloom();pourSteps();pourSchema();
   const t=document.getElementById('pc-time');if(t)t.textContent=pourFmt(pc.el);
   const n=document.getElementById('pc-note');
-  if(n)n.textContent=(typeof gcPast==='function'&&gcPast(pc.mid))
+  if(n)n.textContent=((typeof gcPast==='function'&&gcPast(pc.mid))||(typeof apPast==='function'&&apPast(pc.mid)))
     ?'start opens the big pour coach: the drawing, a big clock and what comes next. Off schedule? Tap next step when you actually do it.'
     :'the recipe runs with the clock. Off schedule? Tap the step when you actually do it and the rest shifts with you. Stop when the bed runs dry.';
   cardSummaries();
@@ -1118,8 +1118,10 @@ function pourSchema(){
 function pourRecipes(){
   const r=recipeById(pc.rid);
   const eigen=eigenRecepten(pc.mid);
+  // bij de AeroPress staan normaal (Hoffmann) en omgekeerd (Tay) er altijd tussen
+  const keus=isAeropress(pc.mid)?eigen.concat(FILTER_RECIPES.filter(x=>x.voor.includes('aeropress'))):eigen;
   const pick=document.getElementById('pc-pick');
-  if(pick)pick.innerHTML=(eigen.length>1)?eigen.map(x=>
+  if(pick)pick.innerHTML=(keus.length>1)?keus.map(x=>
     '<button type="button" class="lp '+(x.id===pc.rid?'sel':'')+
     '" onclick="pourPickRecipe(\''+x.id+'\')">'+esc(x.naam)+'</button>').join(''):'';
   const naam=document.getElementById('pc-naam');
@@ -1225,9 +1227,11 @@ function pourSteps(){
       : 'stop the clock when the bed runs dry';
   }
 }
-// bij de V60 en de Switch opent start de grote gietcoach (app/04-gietcoach.js)
+// bij de V60 en de Switch opent start de grote gietcoach (app/04-gietcoach.js),
+// bij de AeroPress de AeroPress-coach (app/04-aeropress.js)
 function pourToggle(){
   if(!pc.run&&typeof gcPast==='function'&&gcPast(pc.mid)){gcOpen();return;}
+  if(!pc.run&&typeof apPast==='function'&&apPast(pc.mid)){apOpen();return;}
   pc.run?pourStop():pourStart();
 }
 function pourStart(){
@@ -1266,7 +1270,9 @@ function pourStop(stil){
 function pourFill(){
   if(pc.total!=null){const t=document.getElementById('f-time');if(t){t.value=pourFmt(pc.total);normalizeTime(t);}}
   if(pc.draw!=null)setVal('f-draw',pourFmt(pc.draw));
-  if(pc.steps.length&&pc.steps[0].g)setVal('f-bloom-g',pc.steps[0].g);
+  // alleen een echte bloom-stap is een bloom (de AeroPress giet alles in één keer)
+  if(!pc.steps.length||pc.steps[0].k!=='bloom'||!pc.steps[0].g)return;
+  setVal('f-bloom-g',pc.steps[0].g);
   const bs=(pc.marks[0]!=null&&pc.marks[1]!=null)?Math.round(pc.marks[1]-pc.marks[0])
           :(pc.steps.length>1?(pc.steps[1].t-pc.steps[0].t):null);
   if(bs)setVal('f-bloom-s',bs);
