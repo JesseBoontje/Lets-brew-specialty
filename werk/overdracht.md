@@ -117,3 +117,21 @@ Claude. Nog ideeën?"
   gietsnelheid in plaats van 8). Bestaande code: app/04 vanaf "getekende
   zetters" (BREWER_ART, paintBrewer) en "pour coach" (pc, pourStart, pourSteps).
   Daarna klus 3 AeroPress, klus 4 shot clock + tarra-vak. Per klus een sessie.
+
+## Stand 20-11 avond: klus 2 gietcoach V60/Switch
+- Gebouwd in commit 530ac5a: nieuw bestand app/04-gietcoach.js (laadt na
+  app/04-brew-formulier.js; naam moet passen in de build-regex
+  [0-9]{2}-[a-z-]+.js). CSS onderaan styles.css, alles onder #gietcoach, ids
+  in de tekening beginnen met gc-. pourToggle opent bij gcPast(mid) (V60 of
+  Switch) de grote coach; andere filtermethodes houden de oude klok.
+- Coach leest pc.steps (eigen recept, dosis, verhouding), gietsnelheid 5 g/s,
+  droogvenster uit de tekst van de laatste stap ("droog rond 3:00 tot 3:30"),
+  anders laatste stap +60 s (Switch +45 s). Klaar zet pc.total/draw/marks en
+  roept pourFill() aan, net als de oude klok.
+- Testhaakjes: gc.snelheid(n), gc.stand(). Test: tests/gietcoach.spec.cjs.
+- CACHE scc-v105. Alle 22 Playwright (chromium) en 14 node-tests groen.
+- Na akkoord: handleiding bijwerken (skill lets-brew-handleiding).
+- Klus 3 (AeroPress) kan dezelfde opbouw volgen: kopieer de aanpak van
+  app/04-gietcoach.js naar een eigen bestand (bijv. app/04-aeropress.js) met
+  de tekening uit docs/opzet-aeropress.html; gcPast niet uitbreiden maar een
+  eigen past-functie in pourToggle.
