@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-20
+Laatst bijgewerkt: 2026-11-20 (avond)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -135,3 +135,22 @@ Claude. Nog ideeën?"
   app/04-gietcoach.js naar een eigen bestand (bijv. app/04-aeropress.js) met
   de tekening uit docs/opzet-aeropress.html; gcPast niet uitbreiden maar een
   eigen past-functie in pourToggle.
+
+## Klus 2 GOEDGEKEURD (20-11 avond)
+- Na 3 keurrondes goedgekeurd, zie werk/archief/2026-11-20-gietcoach-v60-switch.md.
+  Laatste commit e34a805, CACHE scc-v107.
+- Valkuil: in #gietcoach geen overflow:hidden op Caveat-tekst; de schuine
+  letters steken buiten hun vak en worden dan afgeknipt.
+- Cloudflare "letsbrewspecialty" faalt sinds cd6ee76 (slaagde bij 530ac5a).
+  Niet door de code te verklaren; Jesse heeft Cloudflare naar later geschoven.
+  Wel melden bij elke klus.
+
+## Eerstvolgende stap (opvolger)
+1. Klus 3: AeroPress normaal en omgekeerd volgens docs/opzet-aeropress.html
+   (recepten uit de opzet vervangen het bronloze 16 g/240 g-recept in app/01,
+   omgekeerd recept erbij). Zelfde opbouw als app/04-gietcoach.js, eigen
+   bestand, eigen past-functie in pourToggle. Eén keuring, dan Jesse melden.
+2. Klus 4: shot clock E61 met pre-infusie, rust, alleen volle druk telt,
+   tarra-vak en gewichten in my gear, volgens docs/opzet-shotclock-e61.html
+   (app/05, recept-instellingen in app/01, my gear in app/06/11).
+   Per klus een eigen sessie. Niet mergen zonder akkoord van Jesse.
