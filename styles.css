@@ -1409,5 +1409,5 @@ body.gc-open{overflow:hidden;}
 }
 
 /* zonder het handschrift-lettertype (eerste keer offline) mag het doel niet uit de kaart lopen */
-#gietcoach .nu-wat{flex:none;}
-#gietcoach .nu-doel{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+#gietcoach .nu-kop{flex-wrap:wrap;column-gap:10px;row-gap:0;}
+#gietcoach .nu-doel{margin-left:auto;padding-right:3px;}
