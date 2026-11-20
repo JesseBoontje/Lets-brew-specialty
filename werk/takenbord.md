@@ -17,3 +17,4 @@
 | Klus 3: AeroPress normaal/omgekeerd | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-aeropress.md | mee in PR #12, wacht op Jesse |
 | Klus 4: shot clock E61 + tarra-vak | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-shotclock-e61.md | mee in PR #12, wacht op Jesse |
 | Klus 1: elke brew aan een boon | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-brews-aan-bonen.md | mee in PR #12, wacht op Jesse |
+| Stem met ElevenLabs (eleven_v4) | nog niemand | nog geen | wacht op Jesse (2 vragen) | waar komt de stem; wiens sleutel. Zie overdracht |

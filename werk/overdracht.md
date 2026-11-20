@@ -211,3 +211,16 @@ Claude. Nog ideeën?"
 - Volgende klussen (volgorde Jesse): versheidsmeter met piekmelding, surprise me,
   delen als pagina/PDF (brews en bonen), AI-budget realistischer. Per klus een sessie.
 - Na akkoord: handleiding bijwerken (skill lets-brew-handleiding) voor klus 2, 3 en 4.
+
+## Nieuwe wens 20-11 middag: stem met ElevenLabs
+- Jesse wil de stem in de app met ElevenLabs, "V4" = model `eleven_v4` (nieuwste
+  voorleesmodel; kent toontags zoals [warmly], [pause]; geen snelheidsinstelling;
+  per teken 2x zo duur als flash/turbo). ElevenLabs is een nieuwe aanbieder; Jesse
+  vroeg er zelf om.
+- Niet bouwen tot Jesse twee vragen beantwoordt:
+  1. Waar komt de stem: stappen hardop in gietcoach/AeroPress/shot clock,
+     live spraakcoach (nu OpenAI), en/of AI-coach voorlezen.
+  2. Wiens sleutel: eigen ElevenLabs-sleutel per gebruiker via de Worker
+     (aanbevolen, zelfde patroon als de spraak-API nu) of één vaste sleutel van
+     Jesse in Cloudflare secrets (dan betaalt Jesse voor iedereen; rem nodig).
+- Klus 1 t/m 4 zijn alle goedgekeurd (zie archief). Alles in PR #12, niet gemerged.
