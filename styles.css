@@ -1626,3 +1626,9 @@ body.gc-open{overflow:hidden;}
 .tare-gear label{flex:1;min-width:0;font-size:15px;}
 .tare-gear input{width:110px;min-height:48px;text-align:center;font-size:18px;}
 .tare-gear span{color:var(--ink-soft);}
+
+/* stem voor de coaches (instellingen) */
+#stem-card .stem-veld{width:100%;min-height:48px;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:11px 14px;font-size:16px;color:var(--ink);box-sizing:border-box;}
+#stem-card input.stem-veld{font-family:monospace;}
+#stem-card select.stem-veld{font-family:inherit;margin-top:2px;}
+#stem-card .stem-veld:focus{outline:none;border-color:var(--ink);}

@@ -237,6 +237,13 @@ actief is staat in `scc_ai_prov`, met daarnaast per aanbieder een modelnaam
 (`scc_ai_model_<aanbieder>`) en het tarief dat jij invulde
 (`scc_ai_prijs_<aanbieder>`, dollar per miljoen tekens).
 
+De ElevenLabs-sleutel voor de stem van de coaches staat nergens op schijf: alleen
+in het geheugen van het tabblad (`BrewStem` in `brew-stem.js`). Wel bewaard, in
+`localStorage` en niet in de back-up: de gekozen stem uit je eigen
+ElevenLabs-lijst (`scc_el_voice`, de stem-id, en `scc_el_voice_naam`) en of de
+stappen hardop gaan (`scc_gc_stem`, gedeeld door gietcoach, AeroPress-coach en
+shot clock).
+
 Hetzelfde geldt voor de AI-teller onder `state.ai`. Die houdt per maand bij wat
 de app zelf aan Claude uitgaf — `{budget, maand, dagen:{dag:dollars},
 bron:{"aanbieder:naam":{n,d}}, gemeld:{p20,p10}}`, waarbij `budget` het plafond in dollars is

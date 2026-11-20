@@ -785,6 +785,21 @@
         </div>
       </div>
 
+      <div class="settings-card sketch soft" id="stem-card">
+        <button class="adv-head" onclick="document.getElementById('stem-card').classList.toggle('open')">
+          <div class="set-body"><div class="set-t hand">voice for the coaches</div>
+            <div class="set-d">steps out loud in the pour coach, AeroPress coach and shot clock</div></div>
+          <span class="g-arr">▸</span></button>
+        <div class="adv-body">
+          <div class="set-d" style="margin:6px 0 8px">without a key the coaches use your phone’s own voice. with your own ElevenLabs API key they use an ElevenLabs voice (model eleven_v4), paid from your own ElevenLabs credit. the key stays in this tab only: paste it again after reloading; it is never included in a back-up.</div>
+          <input id="stem-key" class="stem-veld" type="password" autocomplete="off" placeholder="sk_..." onchange="stemSleutel()">
+          <button class="profile-btn" style="margin-top:8px" onclick="stemLaad()">load my voices</button>
+          <select id="stem-kies" class="stem-veld" aria-label="ElevenLabs voice" onchange="stemKies()"><option value="">— pick one of your voices —</option></select>
+          <div class="set-d" id="stem-status" style="margin-top:8px"></div>
+          <button class="profile-btn" style="margin-top:8px" onclick="stemTest()">test the voice</button>
+        </div>
+      </div>
+
       <div class="settings-card sketch soft" id="reminder-card">
         <div class="set-row">
           <button class="adv-head" onclick="document.getElementById('reminder-card').classList.toggle('open')" style="flex:1">
@@ -919,6 +934,7 @@
 
 <script src="security.js"></script>
 <script src="brew-model.js"></script>
+<script src="brew-stem.js"></script>
 <script src="app/01-kennis.js"></script>
 <script src="app/02-opslag.js"></script>
 <script src="app/03-navigatie-home.js"></script>

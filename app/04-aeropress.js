@@ -87,7 +87,7 @@ function bouw(){
 function reset(){
   fase='klaar'; t=0; gezegd={}; eindT=null; eindOp=null; vorigeCur=-1; terug=false;
   starts=S.map(x=>x.t);
-  try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+  BrewStem.stil();
   wakeUit(); linBouw();
 }
 
@@ -300,6 +300,7 @@ function start(){
   if(fase==='af')reset();
   fase='aftel'; t=-GC_VOORAF; gezegd={}; vorigeCur=-1;
   zeg(tekstVooraf(0)); gezegd.v0=true;     // in de tik zelf, anders praat een iPhone niet
+  if(stem)BrewStem.voorbereid(stemZinnen());   // de rest alvast ophalen (alleen met ElevenLabs)
   wakeAan();
 }
 function startKnop(){
@@ -307,7 +308,7 @@ function startKnop(){
   else if(fase==='af')sluit();
   else if(fase==='aftel'||fase==='loopt'){
     pauzeVan=fase; fase='pauze'; wakeUit();
-    try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+    BrewStem.stil();
   }
   else if(fase==='pauze'){fase=pauzeVan; wakeAan();}
 }
@@ -347,24 +348,10 @@ function naarFormulier(){
 }
 
 /* ---- hardop zeggen (zelfde stem en knop als de gietcoach) ---- */
-let stemNL=null;
-function kiesStem(){
-  try{
-    const vs=speechSynthesis.getVoices()||[];
-    stemNL=vs.find(v=>/^nl[-_]NL/i.test(v.lang))||vs.find(v=>/^nl/i.test(v.lang))||null;
-  }catch(e){stemNL=null;}
-}
-if(window.speechSynthesis){try{speechSynthesis.addEventListener('voiceschanged',kiesStem);}catch(e){}}
 function zeg(tekst){
   if(!stem||!tekst)return;
   toonZegt(tekst);
-  try{
-    const ss=window.speechSynthesis; if(!ss)return;
-    ss.cancel();
-    const u=new SpeechSynthesisUtterance(tekst);
-    u.lang='nl-NL'; if(!stemNL)kiesStem(); if(stemNL)u.voice=stemNL;
-    ss.speak(u);
-  }catch(e){}
+  BrewStem.zeg(tekst);      // ElevenLabs met eigen sleutel, anders de stem van de telefoon
 }
 let zegtT=0;
 function toonZegt(tekst){
@@ -381,6 +368,13 @@ const KORT={swirl:'Swirlen.',roer:'Roeren.',wacht:'Laten trekken.',keer:'Kop ero
   dose:'Koffie erbij.',plunjer:'Plunjer erop.',lucht:'Lucht eruit.',dop:'Dop erop.',doorloop:'Laten zakken.'};
 const VOORAF={swirl:'swirlen',roer:'roeren',wacht:'laten trekken',keer:'omdraaien',pers:'drukken',dose:'koffie erbij',
   plunjer:'plunjer erop',lucht:'lucht eruit',dop:'dop erop',doorloop:'laten zakken'};
+// alle zinnen die de stem in dit recept kan zeggen, in volgorde
+function stemZinnen(){
+  const l=[];
+  for(let j=0;j<S.length;j++)l.push(tekstVooraf(j),tekstNu(j,true));
+  for(let j=0;j<S.length;j++)l.push(tekstNu(j,false));
+  return l.concat(['Klaar. Tik op klaar en proef.','Klaar.']);
+}
 function tekstVooraf(j){
   const s=S[j];
   if(s.g)return 'Over drie tellen '+(s.na?'aanvullen ':'')+'naar '+s.g+' gram.';
@@ -412,10 +406,10 @@ function stemKnop(){
   stem=!stem;
   try{localStorage.setItem('scc_gc_stem',stem?'1':'0');}catch(e){}
   if(stem){
-    if(!('speechSynthesis' in window))meld('no voice in this browser — the screen still shows every step');
-    else{kiesStem();zeg('Stem aan.');}
+    if(!BrewStem.kan())meld('no voice in this browser — the screen still shows every step');
+    else zeg('Stem aan.');
   }else{
-    try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+    BrewStem.stil();
     $('zegt').classList.remove('op');
   }
 }
@@ -625,6 +619,7 @@ function openen(){
   if(!pc.steps.length)pourBuild();
   if(!pc.steps.length){toast('no schedule yet — write a recipe first');return;}
   maak(); cache={};
+  try{stem=localStorage.getItem('scc_gc_stem')==='1';}catch(e){}   // gedeeld met de andere coaches
   bouw();
   const e=document.getElementById('apcoach');
   e.hidden=false; document.body.classList.add('gc-open'); open=true;
@@ -640,7 +635,7 @@ function dichtKnop(){
 }
 function sluit(){
   open=false; wakeUit();
-  try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+  BrewStem.stil();
   const e=document.getElementById('apcoach'); if(e)e.hidden=true;
   document.body.classList.remove('gc-open');
   if(raf){cancelAnimationFrame(raf);raf=0;}

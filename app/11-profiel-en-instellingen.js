@@ -213,6 +213,7 @@ function renderProfile(){
   const ss=document.getElementById('save-status');
   if(ss)ss.textContent='saved now: '+state.brews.length+' brews · '+state.beans.length+' beans · '+state.methods.length+' methods';
   renderReminder();
+  try{renderStem();}catch(e){}
   renderGear();
   renderFeatures();
   renderShortcuts();
@@ -463,6 +464,47 @@ function saveKey(){
   try{renderAiProv();renderAiBudget();}catch(e){}
   toast(v?'✓ key available in this tab':'key cleared');
 }
+/* ---------------- stem voor de coaches (ElevenLabs) ----------------
+   De sleutel zit alleen in BrewStem (geheugen van dit tabblad). De stem kies
+   je uit je eigen ElevenLabs-lijst; de app verzint geen stem-id.            */
+function renderStem(){
+  const st=BrewStem.stand(),el=document.getElementById('stem-status');if(!el)return;
+  const sel=document.getElementById('stem-kies');
+  if(sel&&st.stem&&!Array.from(sel.options).some(o=>o.value===st.stem)){
+    const o=document.createElement('option');o.value=st.stem;o.textContent=st.naam||'your chosen voice';sel.appendChild(o);
+  }
+  if(sel)sel.value=st.stem||'';
+  el.textContent=st.actief?('ElevenLabs voice on: '+(st.naam||'your chosen voice')+'.')
+    :st.afgewezen?'ElevenLabs refused this key — the coaches use the phone voice.'
+    :!st.sleutel?(st.stem?'voice '+(st.naam||'chosen')+' is remembered; paste your key in this tab to use it. until then: phone voice.':'no key — the coaches use the phone voice.')
+    :'key in this tab — load your voices and pick one. until then: phone voice.';
+}
+function stemSleutel(){
+  const i=document.getElementById('stem-key'),v=i.value.trim();
+  if(!BrewStem.zetSleutel(v)){toast('that does not look like an ElevenLabs key');return;}
+  i.value='';                      // niet in het veld laten staan; de status zegt dat hij er is
+  renderStem();toast(v?'✓ key available in this tab':'key cleared');
+}
+async function stemLaad(){
+  const el=document.getElementById('stem-status');
+  if(!BrewStem.stand().sleutel){toast('paste your ElevenLabs key first');return;}
+  el.textContent='loading your voices…';
+  try{
+    const lijst=await BrewStem.stemmen(),sel=document.getElementById('stem-kies');
+    sel.textContent='';
+    const leeg=document.createElement('option');leeg.value='';leeg.textContent=lijst.length?'— pick one of your voices —':'— no voices in your account —';sel.appendChild(leeg);
+    lijst.forEach(v=>{const o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.category?' · '+v.category:'');o.dataset.naam=v.name;sel.appendChild(o);});
+    renderStem();
+    if(lijst.length)toast('✓ '+lijst.length+' voices — pick one');
+  }catch(e){el.textContent=(e&&e.message)||'could not load your voices';}
+}
+function stemKies(){
+  const sel=document.getElementById('stem-kies'),o=sel.selectedOptions[0];
+  BrewStem.kiesStemId(sel.value,o&&o.dataset.naam||'');
+  renderStem();
+}
+function stemTest(){BrewStem.zeg('Over drie tellen bloom, naar 45 gram.');}
+
 /* ---------------- AI-budget: wat de AI deze maand kostte -------------------
    Anthropic geeft met een gewone sleutel nergens terug hoeveel tegoed er nog op
    je account staat -- dat kan alleen met een aparte beheerderssleutel, en die

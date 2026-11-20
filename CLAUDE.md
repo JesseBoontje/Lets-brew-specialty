@@ -16,7 +16,8 @@ werk/overdracht.md.
   - 10 bonenkeuzehulp en kaart · 11 profiel, instellingen, budget, export
   - 12 hulpfuncties en het starten van de app (moet als laatste)
 - `security.js`, `brew-model.js`, `brew-workspace.js`, `brew-voice.js` losse modules.
-- `site-worker.mjs` Cloudflare Worker (assets + spraak-API), `worker/` push-worker (niet actief).
+  `brew-stem.js` stem voor de coaches (ElevenLabs met eigen sleutel, anders telefoonstem).
+- `site-worker.mjs` Cloudflare Worker (assets + spraak-API + /api/stem/ voor ElevenLabs), `worker/` push-worker (niet actief).
 - Bij elke wijziging aan app-bestanden: CACHE-versie in service-worker.js ophogen.
 
 ## Testen

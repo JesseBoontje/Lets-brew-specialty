@@ -92,6 +92,18 @@ const KRUIS='<svg viewBox="0 0 24 24" class="acic" aria-hidden="true"><path d="M
 const sc={open:false,dose:null,speed:1,run:false,t:0,last:0,stand:'ready',stopT:null,drop:null,yOut:null,
           phase:null,sheet:false,gear:false,raf:0,tareOpen:false,check:''};
 let R=null;                  // het recept waar deze shot uit leest
+// stappen hardop: dezelfde aan/uit als de gietcoach en de AeroPress-coach
+let stem=false;
+try{stem=localStorage.getItem('scc_gc_stem')==='1';}catch(e){}
+function zinVan(id,p){return {pre:'Pre-infusie.',rest:'Rust.',full:'Volle druk.',stop:'Hendel omlaag bij '+p.Y+' gram.'}[id]||'';}
+function zeg(t){if(stem&&t)BrewStem.zeg(t);}
+function scStem(){
+  stem=!stem;
+  try{localStorage.setItem('scc_gc_stem',stem?'1':'0');}catch(e){}
+  if(stem){if(!BrewStem.kan())meld('no voice in this browser — the screen still shows every step');else zeg('Stem aan.');}
+  else BrewStem.stil();
+  renderSheet();
+}
 const cl=x=>Math.max(0,Math.min(1,x));
 function mss(sec){sec=Math.max(0,sec);const m=Math.floor(sec/60),s=Math.floor(sec%60);return m+':'+String(s).padStart(2,'0');}
 // afgerond op hele seconden: zo staat het ook in het invulveld
@@ -318,6 +330,8 @@ function renderSheet(){
     '<button type="button" class="sc-step" aria-label="longer rest" '+(on?'':'disabled')+' data-a="r+">'+PLUS+'</button></div>';
   h+='<div class="sc-op">target: <b>'+mss(p.F)+'</b> of full pressure, good '+mss(p.lo)+'–'+mss(p.hi)+
     (p.on?' · pre-infusion and rest come on top, total about '+mss(p.Tc):'')+'</div>';
+  h+='<div class="sc-row"><div class="sc-rl">steps out loud<small>'+(stem?(BrewStem.stand().actief?'on · ElevenLabs voice':'on · phone voice'):'off')+
+    '</small></div><button type="button" class="sc-tog" aria-label="steps out loud" aria-pressed="'+stem+'" data-a="stem"><span class="knob"></span></button></div>';
   h+='<button type="button" class="sc-btn pri" data-a="sheet-dicht">done</button>';
   $('sheet').innerHTML=h;
 }
@@ -377,6 +391,7 @@ function frame(p){
     if(id!==sc.phase){
       if(sc.phase)zoem();
       sc.phase=id;
+      zeg(zinVan(id,p));
       setLever(id==='pre'?LEVER.pre:id==='rest'?LEVER.rest:LEVER.full);
     }
     $('read').classList.toggle('wacht',id==='rest');
@@ -408,14 +423,15 @@ function scStart(){
   sc.stand='run';sc.t=0;sc.phase=null;sc.drop=null;sc.yOut=null;sc.stopT=null;
   sc.last=performance.now();sc.run=true;
   wakeAan();
-  renderHead();frame(plan());
+  renderHead();frame(plan());               // zegt de eerste stap, in de tik zelf
+  if(stem){const p=plan();BrewStem.voorbereid(p.ph.map(x=>zinVan(x.id,p)));}
   if(!sc.raf)sc.raf=requestAnimationFrame(tick);
 }
 function scStop(vanzelf){
   if(sc.stand!=='run')return;
   sc.run=false;if(sc.raf){cancelAnimationFrame(sc.raf);sc.raf=0;}
   sc.stopT=sc.t;sc.stand='done';sc.phase=null;
-  wakeUit();
+  wakeUit();BrewStem.stil();
   setLever(LEVER.down);
   const svg=$('svg');
   svg.classList.remove('flow','water','slow','thin');
@@ -627,7 +643,7 @@ function maak(){
       'w-':()=>scWeight(-1),'w+':()=>scWeight(1),pick:()=>scPick(b.dataset.id),preon:scPreOn,
       's-':()=>scSet('s',-1),'s+':()=>scSet('s',1),'r-':()=>scSet('rust',-1),'r+':()=>scSet('rust',1),
       part:()=>scPart(b.dataset.id),gear:()=>scGear(true),'gear-dicht':()=>scGear(false),
-      usedose:scUseDose,scrim:scCloseSheets}[a]||(()=>{}))();
+      usedose:scUseDose,scrim:scCloseSheets,stem:scStem}[a]||(()=>{}))();
   });
   e.addEventListener('input',ev=>{
     const i=ev.target;if(!i.dataset)return;
@@ -645,6 +661,7 @@ function openen(){
   if(!featOn('shotclock'))return;
   maak();
   R=receptInfo();
+  try{stem=localStorage.getItem('scc_gc_stem')==='1';}catch(e){}
   sc.open=true;
   const e=document.getElementById('shotclock');
   e.hidden=false; document.body.classList.add('gc-open');
@@ -659,7 +676,7 @@ function dichtKnop(){
 function sluit(){
   sc.open=false;sc.run=false;if(sc.raf){cancelAnimationFrame(sc.raf);sc.raf=0;}
   if(sc.stand==='run'){sc.stand='ready';}
-  wakeUit();scCloseSheets();if(sc.tareOpen)scTare(false);
+  wakeUit();BrewStem.stil();scCloseSheets();if(sc.tareOpen)scTare(false);
   const e=document.getElementById('shotclock'); if(e)e.hidden=true;
   document.body.classList.remove('gc-open');
 }
