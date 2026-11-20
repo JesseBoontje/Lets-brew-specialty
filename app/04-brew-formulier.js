@@ -1097,6 +1097,10 @@ function pourEigenRatio(bron){
 function renderPour(){
   pourRecipes();pourLevers();renderBrewerArt();pourBloom();pourSteps();pourSchema();
   const t=document.getElementById('pc-time');if(t)t.textContent=pourFmt(pc.el);
+  const n=document.getElementById('pc-note');
+  if(n)n.textContent=(typeof gcPast==='function'&&gcPast(pc.mid))
+    ?'start opens the big pour coach: the drawing, a big clock and what comes next. Off schedule? Tap next step when you actually do it.'
+    :'the recipe runs with the clock. Off schedule? Tap the step when you actually do it and the rest shifts with you. Stop when the bed runs dry.';
   cardSummaries();
 }
 // het gietschema zoals het in het receptenboek staat, in de receptkaart
@@ -1221,7 +1225,11 @@ function pourSteps(){
       : 'stop the clock when the bed runs dry';
   }
 }
-function pourToggle(){pc.run?pourStop():pourStart();}
+// bij de V60 en de Switch opent start de grote gietcoach (app/04-gietcoach.js)
+function pourToggle(){
+  if(!pc.run&&typeof gcPast==='function'&&gcPast(pc.mid)){gcOpen();return;}
+  pc.run?pourStop():pourStart();
+}
 function pourStart(){
   if(!pc.steps.length)pourBuild();
   pc.run=true;pc.t0=performance.now();pc.el=0;pc.done=0;pc.shift=0;pc.marks=[];pc.total=null;pc.draw=null;pc.live=-1;
