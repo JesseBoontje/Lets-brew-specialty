@@ -1,0 +1,311 @@
+/* ---------------- navigatie ---------------- */
+const pages=['welcome','home','choosebean','form','dialin','recipe','detail','brews','methods','beans','beanform','learn','learn-barista','learn-filter','learn-academy','learn-latte','profile','cupping','gallery','beanpick','finder'];
+const navMap={home:'home',choosebean:'brews',form:'home',dialin:'home',recipe:'brews',detail:'home',
+  cupping:'beans',gallery:'learn',brews:'brews',methods:'home',beans:'beans',beanform:'beans',learn:'learn','learn-barista':'learn','learn-filter':'learn','learn-academy':'learn','learn-latte':'learn',beanpick:'beans',finder:'beans',profile:'profile'};
+let navHistory=[];
+let currentPage='welcome';
+function go(p,isBack){
+  // de getekende boon hoort bij de app, niet bij het beginscherm
+  const bgb=document.getElementById('bg-bean');
+  if(bgb)bgb.classList.toggle('on',p!=='welcome');
+  // geschiedenis bijhouden (niet voor splash/naam, en niet bij terug-navigatie)
+  if(!isBack && currentPage && currentPage!==p && currentPage!=='welcome'){
+    navHistory.push(currentPage);
+    if(navHistory.length>30)navHistory.shift();
+  }
+  currentPage=p;
+  // detail hoort bij de lijst waar je vandaan kwam, niet altijd bij home
+  if(p==='detail'&&navHistory.length)navMap.detail=(navHistory[navHistory.length-1]==='brews')?'brews':'home';
+  pages.forEach(x=>document.getElementById('page-'+x).classList.add('hidden'));
+  document.getElementById('page-'+p).classList.remove('hidden');
+  const nav=document.getElementById('nav');
+  if(p==='welcome'){nav.classList.add('hidden');}
+  else{nav.classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===navMap[p]));}
+  if(p==='home')renderHome();
+  if(p==='brews')renderAll();
+  if(p==='methods')renderMethods();
+  if(p==='beans')renderBeans();
+  if(p==='choosebean')renderChooseBean();
+  if(p==='cupping')renderCupping();
+  if(p==='gallery'){renderGaHelp();renderGaShapePick();renderGallery();}
+  if(p==='learn'){
+    const w=document.getElementById('water-card');if(w)w.style.display=featOn('water')?'flex':'none';
+    if(featOn('water')){waterPresets();waterCalc();}
+    const wb=document.getElementById('water-body');if(wb&&!featOn('water'))wb.classList.add('hidden');
+    const bpc=document.getElementById('beanpick-card');
+    if(bpc){bpc.style.display=featOn('beanpick')?'flex':'none';if(featOn('beanpick'))bpPaspoortRegel();}
+    const cc=document.getElementById('cupping-card');if(cc)cc.style.display=featOn('cupping')?'flex':'none';
+    const gc=document.getElementById('gallery-card');if(gc)gc.style.display=featOn('latteart')?'flex':'none';
+    const ds=document.getElementById('learn-do-sect');
+    if(ds)ds.style.display=(featOn('cupping')||featOn('latteart'))?'flex':'none';
+  }
+  if(p==='learn-barista')renderLesson('barista-content',LESSONS.barista);
+  if(p==='learn-filter')renderLesson('filter-content',LESSONS.filter);
+  if(p==='learn-academy')renderLesson('academy-content',LESSONS.academy);
+  if(p==='learn-latte')renderLatte();
+  if(p==='beanpick')bpTeken();
+  if(p==='finder')fdTeken();
+  if(p==='profile')renderProfile();
+  applyAIVisibility();
+  try{fdPil();}catch(e){}
+  document.querySelector('.phone').scrollTop=0;
+}
+function goBack(){
+  if(navHistory.length){
+    const prev=navHistory.pop();
+    go(prev,true);
+  }
+}
+
+/* ---------------- home ---------------- */
+function timeAgo(ts){const d=(Date.now()-ts)/86400e3;
+  if(d<1)return'today';if(d<2)return'yesterday';return Math.floor(d)+' days ago';}
+function brewCard(b){
+  const m=methodById(b.method);
+  const heading=(b.title&&b.title.trim())?b.title:m.name;
+  return `<div class="card sketch row" style="background:var(${m.tint});cursor:pointer" onclick="openDetail('${b.id}')">
+    <div class="brew-thumb">${iconHTML(m,44)}</div>
+    <div class="brew-main"><div class="name hand">${esc(heading)}</div>
+      <div class="meta">${b.title&&b.title.trim()?esc(m.name)+' · ':''}${esc(b.beans||'—')} · ${b.dose||'?'}g<br>${esc(b.time||'')} · ${b.temp?b.temp+'°C':''}</div></div>
+    <div class="brew-side"><div class="when">${timeAgo(b.ts)}</div>
+      <div class="score hand">${(+b.score).toFixed(1)}<span>/10</span></div></div></div>`;
+}
+function renderHome(){
+  const g=document.getElementById('home-greeting');
+  if(g)g.textContent=state.userName?('hi '+state.userName):'hi there';
+  // recente brews: bonen-die-op-zijn niet prominent tonen (tenzij er niets anders is)
+  const pool=state.brews.filter(b=>!brewBeanGone(b));
+  const recent=[...(pool.length?pool:state.brews)].sort((a,b)=>b.ts-a.ts).slice(0,3);
+  document.getElementById('recent-list').innerHTML =
+    recent.length?recent.map(brewCard).join(''):'<div class="empty-note">no brews yet.<br>tap ＋ new brew to get started.</div>';
+  try{refreshWeather();}catch(e){}
+  const bn=document.getElementById('brew-now-btn');
+  if(bn)bn.style.display=(featOn('brewnow')&&state.brews.length)?'block':'none';
+  const ms=document.getElementById('methods-scroll');
+  ms.innerHTML=state.methods.filter(m=>m.on).map(m=>
+    `<button class="method" onclick="showMethodBrews('${m.id}')"><div class="ic">${iconHTML(m,46)}</div><div class="nm">${esc(m.name)}</div></button>`
+  ).join('');
+}
+// beveel een zetmethode (die aanstaat) + boon uit voorraad aan, op basis van
+// je eigen brews: de methode met het hoogste gemiddelde cijfer wint
+function recommendBrew(){
+  const onMethods=state.methods.filter(m=>m.on);
+  if(!onMethods.length)return null;
+  const stats={};
+  state.brews.forEach(b=>{
+    if(!b.method||b.score==null)return;
+    const s=stats[b.method]||(stats[b.method]={sum:0,n:0});
+    s.sum+=(+b.score||0);s.n++;
+  });
+  let method=onMethods[0],best=-1;
+  onMethods.forEach(m=>{
+    const s=stats[m.id];
+    const avg=s&&s.n?s.sum/s.n:-1;   // methodes zonder brews belanden achteraan
+    if(avg>best){best=avg;method=m;}
+  });
+  const inStock=state.beans.filter(b=>b.inStock);
+  const bean=inStock.find(b=>Array.isArray(b.methods)&&b.methods.includes(method.id))
+          || inStock.find(b=>b.method===method.id)
+          || inStock[0] || null;
+  return {method,bean};
+}
+async function quickBrew(){
+  const r=recommendBrew();
+  if(!r){toast('turn on a method first under methods');return;}
+  const method=r.method; const esp=methodFamily(method)==='espresso';
+  beginBrew(method.id);   // espresso -> dial-in-scherm, filter -> formulier (beide leeg)
+  // zonder AI: eenvoudige voorvulling (methode + boon uit voorraad)
+  if(!aiReady()){
+    if(r.bean){formBean=r.bean.id;esp?renderDiBeans():renderFormBeans();}
+    toast(r.bean?('recommended: '+method.name+' with '+r.bean.name+' — turn on AI for an invented recipe')
+                :('recommended: '+method.name+' — turn on AI for an invented recipe'));
+    return;
+  }
+  toast('AI is inventing a brew for '+method.name+'…');
+  const inStock=state.beans.filter(b=>b.inStock);
+  try{
+    const beansList=inStock.length
+      ? inStock.map(b=>{
+          const f=beanFreshness(b);
+          const extra=[f?f.days+' dagen na branden':'',b.fam?('zak zegt: '+(b.fam==='both'?'omni':b.fam)):''].filter(Boolean);
+          return `- ${b.name}${b.origin?' — '+b.origin:''}${b.process?' ('+b.process+')':''}`+
+                 `${b.roasternotes?'; smaak: '+b.roasternotes:''}${extra.length?'; '+extra.join(', '):''}`;
+        }).join('\n')
+      : '(geen bonen in voorraad)';
+    const milk=esp?` Je mag (als espresso) een melkdrank kiezen: espresso, flat white, cappuccino, latte, cortado, macchiato of americano. Kies je een melkdrank, zet dan de melkstappen (opschuimen, hoeveelheid, textuur, temperatuur) in "steps" en de dranknaam in "drink".`:'';
+    const wx=featOn('weather')?JSON.parse(localStorage.getItem('scc_weather')||'null'):null;
+    const wxLine=wx?` Het is nu ${Math.round(wx.t)}°C${wx.rain?' en het regent':''}; weeg dat mee (warm→verfrissend/iced, koud/regen→troostend).`:'';
+    const prompt=`Je bent een specialty-barista. Bedenk één concrete, nieuwe brew voor de methode "${method.name}".`+wxLine+milk+
+      (inStock.length?` Kies uit deze bonen in voorraad de best passende bij deze methode en dit recept. Sla een boon over waarvan de zak een andere familie noemt dan deze methode:\n${beansList}\n`
+                     :` Er zijn geen bonen in voorraad; kies een passend boontype.\n`)+
+      gearPromptBlock(method.id)+
+      ('\n'+APP_RULES+'\n'+BEAN_GRIND_RULES+'\n'+(esp?ESPRESSO_RULES:FILTER_RULES)+'\n')+
+      `Geef ALLEEN JSON terug zonder markdown: {"bean":"","title":"","drink":"","dose":"","yield":"","ratio":"","grind":"","grindNote":"","temp":"","time":"","tags":["",""],"steps":["",""],"tip":""}. `+
+      `bean = exacte naam van de gekozen boon uit de lijst (of korte omschrijving als er geen voorraad is). title = korte pakkende naam. drink = melkdranknaam of "espresso" (laat leeg bij filter). grind = KORTE maalstand voor het invulveld (alleen getal/klikken of één woord — GEEN uitleg of merknaam). grindNote = korte uitleg over de maling (mag molen noemen). dose/yield in gram, temp in °C, ratio als 1:x, time als mm:ss. Kort en praktisch, in het Nederlands.`;
+    const txt=await askAI([{role:"user",content:prompt}],900,'brew');
+    const d=extractJSON(txt);
+    let bean=null;
+    if(d.bean){const bn=(''+d.bean).toLowerCase().trim();
+      bean=inStock.find(b=>b.name.toLowerCase()===bn)||inStock.find(b=>bn.includes(b.name.toLowerCase())||b.name.toLowerCase().includes(bn));}
+    if(!bean)bean=r.bean||inStock[0]||null;
+    if(bean)formBean=bean.id;
+    const gShort=conciseGrind(d.grind);
+    const gNote=(d.grindNote||'').trim()||((''+(d.grind||'')).trim()!==gShort?(''+d.grind).trim():'');
+    let guide='';
+    if(Array.isArray(d.steps)&&d.steps.length)guide=d.steps.map((st,i)=>(i+1)+'. '+st).join('\n');
+    if(gNote)guide=(guide?guide+'\n\n':'')+'maling: '+gNote;
+    if(d.tip)guide=(guide?guide+'\n':'')+'💡 tip: '+d.tip;
+    pendingTarget={dose:numOf(d.dose),grind:gShort,time:cleanTime(d.time),yield:numOf(d.yield)};
+    const drink=(d.drink||'').trim();
+    pendingRecipe={guide,drink,title:(d.title||'').trim()};
+    if(esp){
+      setVal('di-dose',numOf(d.dose));setVal('di-yield',numOf(d.yield));
+      renderDialIn();
+      toast('✓ '+(drink||'espresso')+(bean?' · '+bean.name:'')+' — measure your shot & save');
+    }else{
+      setText('f-title',d.title||'');renderFormBeans();
+      setText('f-dose',numOf(d.dose));setText('f-yield',numOf(d.yield));
+      if(d.ratio)setText('f-ratio',numOf((''+d.ratio).split(':').pop()));
+      setText('f-time',cleanTime(d.time));setText('f-temp',numOf(d.temp));
+      if(gShort)setText('f-grind',gShort);
+      if(Array.isArray(d.tags)){formTags=d.tags.filter(Boolean).map(t=>(''+t).toLowerCase());renderFormTags();}
+      renderDialInHint();
+      toast('✓ '+method.name+(bean?' with '+bean.name:'')+' — check & save');
+    }
+  }catch(e){
+    if(r.bean){formBean=r.bean.id;esp?renderDiBeans():renderFormBeans();}
+    toast('couldn\'t make an AI brew — fill in the rest yourself');
+  }
+}
+let brewSort='date', filterMethod='all';
+/* Sorteren van je brews. De volgorde waarin je ze zette is de standaard; op
+   methode groepeert per zetter, op score zet je beste bovenaan.            */
+const BREW_SORTS=[['date','brew order'],['method','method'],['score','score']];
+function setSort(s){brewSort=s;renderAll();}
+function renderSortChips(){
+  const el=document.getElementById('sort-chips');if(!el)return;
+  el.innerHTML=BREW_SORTS.map(([v,label])=>
+    '<button class="sortc '+(brewSort===v?'on':'')+'" onclick="setSort(\''+v+'\')">'+esc(label)+'</button>').join('');
+}
+// de vergelijker die bij de gekozen volgorde hoort
+function brewSorter(){
+  if(brewSort==='score')return (a,b)=>(b.score||0)-(a.score||0)||b.ts-a.ts;
+  if(brewSort==='method')return (a,b)=>{
+    const na=(methodById(a.method)||{}).name||'', nb=(methodById(b.method)||{}).name||'';
+    return na.localeCompare(nb)||b.ts-a.ts;
+  };
+  return (a,b)=>b.ts-a.ts;
+}
+function setFilter(m){filterMethod=m;renderAll();}
+function renderFilterChips(){
+  // alleen de zetters waarmee je echt gezet hebt; anders staat de balk vol met
+  // knoppen die niets filteren
+  const used=[...new Set(state.brews.map(b=>b.method))];
+  const methodChips=state.methods.filter(m=>used.includes(m.id));
+  let html=`<button class="fc ${filterMethod==='all'?'sel':''}" onclick="setFilter('all')">all</button>`;
+  html+=methodChips.map(m=>
+    `<button class="fc ${m.id===filterMethod?'sel':''}" onclick="setFilter('${m.id}')"><span class="fc-ic">${iconHTML(m,22)}</span>${esc(m.name)}</button>`).join('');
+  document.getElementById('filter-methods').innerHTML=html;
+  // een balk met alleen "all" erin valt niets te kiezen; die laten we weg
+  const fb=document.querySelector('#page-brews .filter-bar');
+  if(fb)fb.style.display=methodChips.length?'':'none';
+}
+// een brew hoort in de "reservekast" als zijn boon niet meer in de kast staat
+function brewBeanGone(b){
+  if(!b.beanId)return false;
+  const bean=beanById(b.beanId);
+  if(!bean)return true;              // boon is verwijderd
+  return bean.inStock===false;       // boon is op
+}
+let reserveOpen=false;
+function toggleReserve(){reserveOpen=!reserveOpen;renderAll();}
+/* ---------------- je brews, in dezelfde kaartstijl ----------------
+   Zelfde jasje als de receptkaarten: tekening, titel, inklapbaar, prullenbakje
+   rechtsboven. Open zie je de cijfers van die kop en kun je door naar het
+   volledige detail.                                                        */
+let brewOpen={};
+function brewToggle(id){brewOpen[id]=!brewOpen[id];renderAll();}
+function brewDelete(id){
+  const b=state.brews.find(x=>x.id===id);if(!b)return;
+  if(!confirm('delete this brew?'))return;
+  state.brews=state.brews.filter(x=>x.id!==id);save();toast('\ud83d\uddd1 brew deleted');renderAll();
+}
+function brewCardNew(b){
+  const m=methodById(b.method);
+  const fam=methodFamily(b.method);
+  const titel=(b.title&&b.title.trim())?b.title:m.name;
+  const open=!!brewOpen[b.id];
+  const meta=[(b.title&&b.title.trim())?m.name:'',b.beans||'\u2014',
+    b.dose?b.dose+' g':'',b.time||''].filter(Boolean).join(' \u00b7 ');
+  const cel=(k,v)=>v?('<div class="bc-cel"><div class="k">'+esc(k)+'</div><div class="v hand">'+esc(v)+'</div></div>'):'';
+  const cijfers=cel('dose',b.dose?b.dose+' g':'')+
+    cel(fam==='filter'?'water':'yield',b.yield?b.yield+' g':'')+
+    cel('ratio',b.ratio?('1:'+(+b.ratio).toFixed(1)):'')+
+    cel(fam==='filter'?'time':'shot time',b.time)+
+    cel('drawdown',b.draw)+cel('grind',b.grind)+
+    cel('temp',b.temp?b.temp+'\u00b0C':'')+cel('bed',b.bed?bedName(b.bed):'')+
+    cel('tasted',b.cup?(cupById(b.cup)||{}).n:'');
+  return `<div class="card sketch rcard bcard ${open?'op':''}" style="background:var(${m.tint})">
+    <button type="button" class="rc-del" title="delete" aria-label="delete brew"
+      onclick="event.stopPropagation();brewDelete('${b.id}')">${ICO.del}</button>
+    <div class="row rc-head" onclick="brewToggle('${b.id}')">
+      <div class="brew-thumb">${iconHTML(m,44)}</div>
+      <div class="brew-main">
+        <div class="name hand">${esc(titel)}</div>
+        <div class="meta">${esc(meta)}</div>
+      </div>
+      <div class="bc-side"><div class="when">${timeAgo(b.ts)}</div>
+        <div class="sc hand">${(+b.score).toFixed(1)}<span>/10</span></div></div>
+      <div class="rc-arr">${open?'\u25be':'\u25b8'}</div>
+    </div>
+    <div class="rc-body">
+      <div class="bc-grid">${cijfers}</div>
+      ${asArr(b.tags).length?'<div class="note-tags">'+asArr(b.tags).map(t=>'<span class="nt">'+esc(t)+'</span>').join('')+'</div>':''}
+      ${b.notes?'<div class="rc-over" style="margin-top:8px">'+esc(b.notes)+'</div>':''}
+      <button class="rb-go" onclick="openDetail('${b.id}')">open this brew \u2192</button>
+      <button class="rb-edit" onclick="brewAgain('${b.id}')">brew it again</button>
+    </div>
+  </div>`;
+}
+function renderAll(){
+  renderFilterChips();renderSortChips();
+  const sb=document.getElementById('sort-bar');
+  if(sb)sb.style.display=(state.brews.length>=2)?'flex':'none';
+  const sw=document.getElementById('brew-search-wrap');
+  const zoekbaar=state.brews.length>=6;
+  if(sw)sw.style.display=zoekbaar?'flex':'none';
+  const q=(zoekbaar?(document.getElementById('brew-search')?.value||''):'').toLowerCase().trim();
+  let uit='';
+
+  // --- je geschiedenis, met de zoekterm en de methodefilters erboven ---
+  const brews=state.brews.filter(b=>{
+    if(filterMethod!=='all'&&b.method!==filterMethod)return false;
+    if(!q)return true;
+    const m=methodById(b.method);
+    return [m.name,b.beans,b.notes,b.title,asArr(b.tags).join(' ')].join(' ').toLowerCase().includes(q);
+  });
+  const sorter=brewSorter();
+  const actief=brews.filter(b=>!brewBeanGone(b)).sort(sorter);
+  const kast=brews.filter(brewBeanGone).sort(sorter);
+  // de titel boven de pagina zegt al "brews", dus hier alleen een regel als je zoekt
+  if(q)uit+='<div class="list-note">what matches "'+esc(q)+'"</div>';
+  uit+=actief.length?actief.map(brewCardNew).join('')
+      :(kast.length?''
+        :(state.brews.length?'<div class="empty-note">no brews found.</div>'
+          :'<div class="empty-note">no brews yet.<br>tap ＋ new brew to start.</div>'));
+  if(kast.length){
+    uit+='<button class="extra-kast" onclick="toggleReserve()"><svg viewBox="0 0 24 24" class="acic"><path d="M5.8 9.3 Q5.4 7.2 7.3 7 Q12 6.6 16.7 7 Q18.6 7.2 18.2 9.2 M18.1 8.7 Q18.4 13 18.1 17.1 Q18.3 18.8 16.4 19 Q12 19.4 7.4 19 Q5.5 18.8 5.9 17 Q5.4 12.9 6.1 8.5"/><path d="M9.4 7.1 Q9.2 5.3 9.5 3.8 Q12 3.5 14.5 3.9 Q14.8 5.5 14.6 7.2" opacity="0.6"/><path d="M8.8 12.4 Q12 12 15.3 12.6" opacity="0.5"/></svg> the vault \u00b7 '+
+      kast.length+' brew'+(kast.length===1?'':'s')+' with a bean that\u2019s gone '+(reserveOpen?'\u25be':'\u25b8')+'</button>';
+    if(reserveOpen){
+      uit+='<div class="kast-head">the bean is no longer in stock \u2014 your recipe stays saved</div>';
+      uit+=kast.map(brewCardNew).join('');
+    }
+  }
+  document.getElementById('all-list').innerHTML=uit;
+}
+function renderStats_DISABLED(){
+}
+
+
+

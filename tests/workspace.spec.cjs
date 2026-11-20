@@ -26,3 +26,14 @@ test('moka and pads have their own recipes and do not open espresso dial-in',asy
 test('a user can enable AI and enter their own key using real mobile taps',async({page})=>{
  await open(page);await page.locator('#nav [data-p="profile"]').tap();await page.getByText('Appinstellingen',{exact:true}).tap();await page.locator('#ai-card .adv-head').tap();await page.locator('#ai-toggle').tap();await expect(page.locator('#ai-toggle')).toHaveAttribute('aria-pressed','true');await page.locator('#ai-key').tap();await expect(page.locator('#ai-key')).toBeFocused();await page.locator('#ai-key').fill('synthetic-own-provider-key');await page.locator('#ai-card .set-t').tap();expect(await page.evaluate(()=>getKey())).toBe('synthetic-own-provider-key');expect(await page.evaluate(()=>localStorage.getItem(aiSleutelNaam()))).toBeNull();
 });
+test('own ratio or yield rescales the pour schedule and survives a dose change',async({page})=>{
+ await open(page);await page.evaluate(()=>openForm('v60'));
+ const set=(id,v)=>page.evaluate(([id,v])=>{const e=document.getElementById(id);e.value=v;e.dispatchEvent(new Event('input'));},[id,v]);
+ const read=()=>page.evaluate(()=>({yield:document.getElementById('f-yield').value,ratio:document.getElementById('f-ratio').value,last:pc.steps.at(-1).water,sum:document.getElementById('sum-recipe').textContent}));
+ await set('f-dose','15');await set('f-ratio','16');let r=await read();expect(r.yield).toBe('240');expect(r.last).toBe(240);expect(r.sum).toContain('15 g → 240 g');
+ await set('f-dose','20');r=await read();expect(r.last).toBe(320);expect(r.ratio).toBe('16.0');
+ await set('f-yield','300');r=await read();expect(r.last).toBe(300);expect(r.ratio).toBe('15.0');
+ await page.evaluate(()=>pourPickRecipe('kasuya'));r=await read();expect(r.last).toBe(300);
+ await set('f-dose','15');await set('f-ratio','16');await page.evaluate(()=>pourPickRecipe('hoffmann'));r=await read();expect(r.last).toBe(251);expect(r.ratio).toBe('16.7');
+ await set('f-ratio','16');await page.evaluate(()=>{go('home');openForm('v60');});const nieuw=await page.evaluate(()=>({dose:parseFloat(document.getElementById('f-dose').value)||recipeById(pc.rid).dose,last:pc.steps.at(-1).water}));expect(nieuw.last).toBe(Math.round(nieuw.dose*16.7));
+});

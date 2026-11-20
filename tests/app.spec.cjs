@@ -3,7 +3,8 @@ async function start(page){await page.route('https://fonts.googleapis.com/**',r=
 test('local app opens without login and main sections remain usable',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await start(page);
  for(const tab of ['home','brews','beans','learn','profile']){await page.locator(`#nav [data-p="${tab}"]`).tap();await expect(page.locator('#page-'+tab)).toBeVisible();}
- expect(errors).toEqual([]);await expect(page.locator('input[type=password]')).toHaveCount(1);
+ expect(errors).toEqual([]);// alleen de twee eigen API-sleutels (AI en ElevenLabs-stem), geen inlogveld
+ await expect(page.locator('input[type=password]')).toHaveCount(2);expect(await page.locator('input[type=password]').evaluateAll(l=>l.map(i=>i.id).sort())).toEqual(['ai-key','stem-key']);
 });
 test('malicious backup and friend imports are rejected atomically; a valid backup survives reload',async({page})=>{
  await start(page);await page.evaluate(()=>go('profile'));const before=await page.evaluate(()=>JSON.stringify(state));

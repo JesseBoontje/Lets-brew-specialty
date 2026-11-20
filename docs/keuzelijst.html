@@ -1,0 +1,155 @@
+<style>
+.groep{max-width:620px;margin:30px auto 10px;}
+.groep h2{font-family:'Caveat',cursive;font-size:31px;line-height:1.05;margin-bottom:2px;}
+.groep .uitleg{color:var(--ink-soft);font-size:16px;margin-bottom:10px;}
+.rij{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:12px 14px;margin:10px 0;filter:url(#wobble);}
+.rij.gekozen{border-color:var(--accent-soft);}
+.rij .naam{font-family:'Caveat',cursive;font-weight:700;font-size:25px;line-height:1.05;}
+.rij .eng{color:var(--ink-soft);font-size:14px;}
+.rij .wat{font-size:16px;margin:3px 0 9px;}
+.rij .uit{display:inline-block;font-size:13px;color:var(--ink-soft);border:1.5px solid var(--line);border-radius:9px;padding:0 7px;margin-left:4px;vertical-align:middle;}
+.knoppen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.knoppen button{min-height:52px;border-radius:16px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:17px;cursor:pointer;filter:url(#wobble);}
+.knoppen button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+.knoppen button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+.notitie{display:block;width:100%;margin-top:9px;min-height:52px;border:2px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);font:inherit;font-size:16px;padding:10px 12px;}
+.notitie[hidden]{display:none;}
+.stand{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;max-width:620px;margin:0 auto;background:var(--desk);padding:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:16px;}
+.stand .tel{font-family:'Caveat',cursive;font-size:24px;}
+.stand .opgeslagen{color:var(--ink-soft);font-size:14px;text-align:right;}
+.kopie{max-width:620px;margin:26px auto;}
+.kopie button{min-height:52px;width:100%;border-radius:18px;border:2px solid var(--accent-soft);background:var(--accent-soft);color:var(--cream);font:inherit;font-size:18px;filter:url(#wobble);}
+.kopie textarea{width:100%;min-height:150px;margin-top:10px;border:2px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);font:inherit;font-size:14px;padding:10px;}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+
+<header class="mk-kop">
+  <h1>Lets Brew keuzelijst</h1>
+  <p class="mk-onder">Tik per functie wat je wilt. Je keuze wordt meteen bewaard en ik lees hem daarna uit. Bij "aanpassen" kun je erbij zetten wat er anders moet.</p>
+</header>
+
+<div class="stand" aria-live="polite"><span class="tel" id="teller">0 van 0 gekozen</span><span class="opgeslagen" id="opslag">nog niets bewaard</span></div>
+
+<main id="lijst"></main>
+
+<section class="kopie">
+  <p class="zacht">Werkt het bewaren niet (bijvoorbeeld als je niet bent ingelogd)? Kopieer dan je keuzes en plak ze in de chat.</p>
+  <button type="button" id="kopieer">Kopieer mijn keuzes</button>
+  <textarea id="kopietekst" hidden readonly aria-label="Je keuzes als tekst"></textarea>
+</section>
+
+<script>
+(function(){
+var GROEPEN=[
+ {id:'inlog',titel:'Inlog',uitleg:'Hoe log je straks in voor je eigen database en de Claude-koppeling? Kies er één.',drie:['Face ID','mailcode','koppelcode'],items:[
+  {id:'inlog',naam:'Manier van inloggen',wat:'Face ID (passkey) is het advies: één keer je gezicht laten zien, geen wachtwoord, werkt in de geïnstalleerde app. Mailcode: Cloudflare stuurt een code. Koppelcode: geen account, wel kwijt = kwijt.'}]},
+ {id:'nieuw',titel:'Nieuwe ideeën',uitleg:'Bouwen, eerst aanpassen, of weg.',drie:['bouwen','aanpassen','weg'],items:[
+  {id:'n_handsfree',naam:'Handsfree gietcoach',wat:'Zegt de volgende giet hardop, scherm blijft aan, grote cijfers. Klein.'},
+  {id:'n_zakteller',naam:'Zak-teller met piekmelding',wat:'Dosis gaat van de zak af, "nog 4 koppen", melding op de beste dag. Middel.'},
+  {id:'n_claudeklaar',naam:'Claude zet klaar',wat:'Plan via Claude, staat \'s ochtends bovenaan home. Middel, na inlog.'}]},
+ {id:'zetten',titel:'Zetten en meten',uitleg:'Wat je gebruikt tijdens het koffiezetten.',drie:['behouden','aanpassen','weg'],items:[
+  {id:'shotclock',naam:'Shot clock',eng:'E61 shot clock',wat:'Trek de hendel op het dial-in-scherm, de tijd vult zich in.'},
+  {id:'journey',naam:'Dial-in-lijn',eng:'dial-in journey',wat:'Je pogingen als lijn die naar het doelvak loopt.'},
+  {id:'pourcoach',naam:'Gietcoach',eng:'pour coach',wat:'Filterrecepten die met een klok meelopen terwijl je giet.'},
+  {id:'drawdown',naam:'Doorlooptijd en koffiebed',eng:'drawdown & bed',wat:'Hoe lang het doorliep en hoe het bed eruitzag.'},
+  {id:'filtercompass',naam:'Filterkompas',eng:'filter compass',wat:'Wat je proefde, uitgezet, met één volgende stap.'},
+  {id:'puckprep',naam:'Puck-prep-lijst',eng:'puck prep',wat:'WDT, puckscreen, pre-infusie per espresso afvinken.'},
+  {id:'smartdefaults',naam:'Slim invullen',eng:'smart defaults',wat:'Laatste dosis, maling en temperatuur staan al ingevuld.'},
+  {id:'brewnow',naam:'Nu zetten-knop',eng:'brew now button',wat:'Eén tik op home: je vaste kop, ingevuld.'},
+  {id:'voice',naam:'Inspreken',eng:'voice logging',wat:'Zeg "18 in, 36 uit, 27 seconden".',uit:true},
+  {id:'pairing',naam:'Weegschaal koppelen',eng:'scale & machine pairing',wat:'Live gewicht via Bluetooth waar de browser dat toelaat (op de iPhone meestal niet).',uit:true}]},
+ {id:'bonen',titel:'Bonen en smaak',uitleg:'Alles rond je zakken koffie.',drie:['behouden','aanpassen','weg'],items:[
+  {id:'freshgauge',naam:'Versheidsmeter',eng:'freshness gauge',wat:'Rust, piek, afnemend, als meter op elke boon.'},
+  {id:'cost',naam:'Prijs per kop',eng:'cost per cup',wat:'Prijs en zakgewicht, dan zie je wat een kop kost.'},
+  {id:'wheel',naam:'Smaakwiel',eng:'taste wheel',wat:'Smaken aantikken op een wiel in plaats van typen.'},
+  {id:'wheelbig',naam:'Groot smaakwiel',eng:'big flavour wheel',wat:'Tik een familie aan en het wiel opent verder (bes wordt bosbes, framboos).',uit:true},
+  {id:'tastememory',naam:'Smaakgeheugen',eng:'taste memory',wat:'Wat je cijfers zeggen over je smaak.'}]},
+ {id:'ontdekken',titel:'Ontdekken en delen',uitleg:'Nieuwe koffie vinden en laten zien.',drie:['behouden','aanpassen','weg'],items:[
+  {id:'finder',naam:'Smaakzoeker',eng:'taste finder',wat:'Zoek op de wereldkaart op smaak, of vijf vragen naar drie streken.'},
+  {id:'finderai',naam:'Vraag de zoeker',eng:'ask the finder',wat:'Stel een echte vraag en krijg een antwoord, op de kaart of in woorden.'},
+  {id:'beanpick',naam:'Bonenkeuzehulp',eng:'bean chooser',wat:'Getekende wereldkaart: van land naar streek, en waar je op de zak op let.'},
+  {id:'water',naam:'Waterhulp',eng:'water helper',wat:'Mineralen en simpele waterrecepten op de leerpagina.'},
+  {id:'cupping',naam:'Cupping',eng:'cupping session',wat:'Twee bonen blind proeven, scoren en onthullen.'},
+  {id:'latteart',naam:'Latte art en coach',eng:'pouring shapes & coach',wat:'Foto\'s van je latte art, met AI-feedback.'},
+  {id:'sharecards',naam:'Deelkaarten',eng:'share cards',wat:'Een brew als getekend plaatje om te sturen.'},
+  {id:'friend',naam:'Van een vriend toevoegen',eng:'add from a friend',wat:'Bonen of recepten uit een bestand van iemand anders.'},
+  {id:'learn',naam:'Leerpagina\'s',eng:'learn',wat:'Uitleg over zetmethodes, percolatie en immersie, de Switch-klep.'}]},
+ {id:'slim',titel:'Slim en AI',uitleg:'Functies die rekenen, onthouden of de AI gebruiken.',drie:['behouden','aanpassen','weg'],items:[
+  {id:'aicoach',naam:'AI-koffiecoach',eng:'coffee coach',wat:'Vraag de coach om advies met je eigen bonen en brews, met je eigen sleutel.'},
+  {id:'livevoice',naam:'Live spraakcoach',eng:'live voice',wat:'Praat met de coach via OpenAI, met je eigen sleutel.'},
+  {id:'aibudget',naam:'AI-budget',eng:'AI budget',wat:'Wat de AI deze maand kostte, met een melding bij 20% en 10%.'},
+  {id:'brewsletter',naam:'Weekoverzicht',eng:'weekly brewsletter',wat:'Getekende kaart van je koffieweek.'},
+  {id:'reminder',naam:'Dagelijkse suggestie',eng:'daily brew suggestion',wat:'Melding met een brewvoorstel. De server erachter staat nog niet aan.'},
+  {id:'shortcuts',naam:'Snelkoppelingen',eng:'home-screen shortcuts',wat:'Een brew starten vanuit een iOS-opdracht.'},
+  {id:'weather',naam:'Weer-suggesties',eng:'weather-aware suggestions',wat:'IJskoffie op warme dagen, mokka als het regent (gebruikt je locatie).',uit:true},
+  {id:'night',naam:'Nachtstand',eng:'espresso night mode',wat:'De hele app als krijtbord.',uit:true},
+  {id:'printpdf',naam:'Printen als PDF',eng:'print',wat:'Een brew als nette pagina om te bewaren.'}]}
+];
+var keuzes={},db=null,bewaarRij={};
+var lijst=document.getElementById('lijst');
+function el(t,c,txt){var e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
+var alle=[];
+GROEPEN.forEach(function(g){
+ var s=el('section','groep');s.appendChild(el('h2',null,g.titel));s.appendChild(el('p','uitleg',g.uitleg));
+ g.items.forEach(function(it){
+  alle.push({groep:g,it:it});
+  var r=el('div','rij');r.id='rij-'+it.id;
+  var n=el('div','naam',it.naam);if(it.uit){n.appendChild(el('span','uit','staat nu uit'));}r.appendChild(n);
+  if(it.eng)r.appendChild(el('div','eng','in de app: '+it.eng));
+  r.appendChild(el('div','wat',it.wat));
+  var k=el('div','knoppen');k.setAttribute('role','group');k.setAttribute('aria-label',it.naam);
+  g.drie.forEach(function(w){var b=el('button',null,w);b.type='button';b.id='k-'+it.id+'-'+w.replace(/\s/g,'');b.setAttribute('aria-pressed','false');b.addEventListener('click',function(){kies(it.id,w);});k.appendChild(b);});
+  r.appendChild(k);
+  var t=el('textarea','notitie');t.id='n-'+it.id;t.placeholder='wat moet er anders?';t.hidden=true;t.setAttribute('aria-label','Notitie bij '+it.naam);
+  t.addEventListener('input',function(){if(!keuzes[it.id])return;keuzes[it.id].notitie=t.value;plan(it.id);});
+  r.appendChild(t);s.appendChild(r);
+ });
+ lijst.appendChild(s);
+});
+function teken(id){
+ var c=keuzes[id]||{},r=document.getElementById('rij-'+id);if(!r)return;
+ r.classList.toggle('gekozen',!!c.keuze);
+ r.querySelectorAll('.knoppen button').forEach(function(b){b.setAttribute('aria-pressed',String(b.textContent===c.keuze));});
+ var t=document.getElementById('n-'+id);t.hidden=!(c.keuze==='aanpassen'||(c.notitie&&c.notitie.length));
+ if(document.activeElement!==t)t.value=c.notitie||'';
+}
+function tel(){var n=alle.filter(function(a){return keuzes[a.it.id]&&keuzes[a.it.id].keuze;}).length;document.getElementById('teller').textContent=n+' van '+alle.length+' gekozen';}
+function kies(id,w){
+ var c=keuzes[id]||{notitie:''};c.keuze=(c.keuze===w)?'':w;keuzes[id]=c;teken(id);tel();
+ if(c.keuze==='aanpassen'){var t=document.getElementById('n-'+id);t.hidden=false;}
+ plan(id,true);
+}
+var timers={},bezig={},opnieuw={},wachtend={};
+function plan(id,nu){wachtend[id]=true;clearTimeout(timers[id]);timers[id]=setTimeout(function(){bewaar(id);},nu?50:800);}
+function bewaar(id){
+ if(!db){wachtend[id]=false;document.getElementById('opslag').textContent='bewaren lukt hier niet, gebruik kopiëren';return;}
+ if(bezig[id]){opnieuw[id]=true;return;}
+ bezig[id]=true;var a=alle.filter(function(x){return x.it.id===id;})[0];var c=keuzes[id]||{};
+ db.collection('keuzes').doc(id).set({naam:a.it.naam,groep:a.groep.titel,keuze:c.keuze||'',notitie:(c.notitie||'').slice(0,1000)}).then(function(){
+  document.getElementById('opslag').textContent='bewaard';
+ }).catch(function(e){document.getElementById('opslag').textContent=(e&&e.code==='quota_exceeded')?'opslag vol, gebruik kopiëren':'bewaren mislukt, gebruik kopiëren';})
+ .then(function(){bezig[id]=false;if(opnieuw[id]){opnieuw[id]=false;bewaar(id);}else{wachtend[id]=false;}});
+}
+tel();
+document.getElementById('kopieer').addEventListener('click',function(){
+ var regels=['Keuzes voor Lets Brew:'];
+ GROEPEN.forEach(function(g){g.items.forEach(function(it){var c=keuzes[it.id];if(c&&c.keuze)regels.push('- '+it.naam+': '+c.keuze+(c.notitie?' ('+c.notitie+')':''));});});
+ var tekst=regels.join('\n'),ta=document.getElementById('kopietekst');ta.value=tekst;ta.hidden=false;
+ var b=this;var klaar=function(){b.textContent='Gekopieerd';setTimeout(function(){b.textContent='Kopieer mijn keuzes';},1500);};
+ try{navigator.clipboard.writeText(tekst).then(klaar,function(){ta.select();});}catch(e){ta.select();}
+});
+function start(){if(!(window.claude&&window.claude.use))return false;
+ var wacht=setTimeout(function(){document.getElementById('opslag').textContent='opslag reageert nog niet';},10000);
+ window.claude.use('db').then(function(d){
+  if(!d){clearTimeout(wacht);document.getElementById('opslag').textContent='bewaren lukt hier niet, gebruik kopiëren';return;}
+  db=d;
+  d.collection('keuzes').onSnapshot(function(snap){
+   if(!snap.metadata.fromCache)clearTimeout(wacht);
+   snap.docs.forEach(function(doc){var v=doc.data()||{};if(wachtend[doc.id])return;keuzes[doc.id]={keuze:v.keuze||'',notitie:v.notitie||''};teken(doc.id);});
+   tel();if(!snap.empty&&!snap.metadata.fromCache)document.getElementById('opslag').textContent='je eerdere keuzes zijn geladen';
+  },function(){clearTimeout(wacht);document.getElementById('opslag').textContent='opslag niet bereikbaar, gebruik kopiëren';});
+ },function(){document.getElementById('opslag').textContent='bewaren lukt hier niet, gebruik kopiëren';});
+return true;}
+if(!start()){window.addEventListener('load',function(){if(!start())document.getElementById('opslag').textContent='bewaren lukt hier niet, gebruik kopiëren';},{once:true});}
+})();
+</script>

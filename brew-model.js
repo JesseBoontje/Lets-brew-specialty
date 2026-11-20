@@ -8,8 +8,26 @@ globalThis.BrewModel=(()=>{
   for(const b of s.brews)if(!b.outputMeaning)b.outputMeaning=family(s,b.method)==='espresso'?'cup_yield':'water_used';
   for(const m of s.methods){if(!m.family)m.family=family(s,m.id);if((s.dataVersion||0)<2&&['perculator','senseo'].includes(m.id))m.family='filter';}
   for(const r of s.recipes){r.fam=family(s,r.mid);r.eigen=true;}
+  linkBeansByName(s);
   for(const b of s.brews){b.kind=b.dialIn?'dial-in':'brew';const bean=s.beans.find(x=>x.id===b.beanId);if(bean&&!b.beanSnapshot)b.beanSnapshot=beanSnapshot(bean);}
   s.dataVersion=2;s.dialInCollapsed=true;return s;
+ }
+ // Elke brew hoort bij een boon. Oude brews zonder (geldige) beanId koppelen we
+ // alleen als de ingetypte naam precies één boon raakt (hoofdletters en spaties
+ // aan de randen tellen niet). De rest blijft ongekoppeld en de ingetypte naam
+ // (b.beans) blijft altijd staan. Geeft het aantal nieuw gekoppelde brews terug.
+ const nameKey=v=>String(v??'').trim().toLowerCase();
+ function linkBeansByName(s){
+  if(!Array.isArray(s.brews)||!Array.isArray(s.beans))return 0;
+  const byName=new Map();
+  for(const bean of s.beans){const k=nameKey(bean&&bean.name);if(!k)continue;byName.set(k,byName.has(k)?null:bean.id);}
+  let n=0;
+  for(const b of s.brews){
+   if(!b||(b.beanId&&s.beans.some(x=>x.id===b.beanId)))continue;
+   const id=byName.get(nameKey(b.beans));
+   if(id){b.beanId=id;n++;}
+  }
+  return n;
  }
  function beanSnapshot(b){return Object.fromEntries(['id','name','roaster','origin','process','roastdate','fam'].map(k=>[k,b[k]??null]));}
  function attachBrew(s,b,recipe){
@@ -49,5 +67,5 @@ globalThis.BrewModel=(()=>{
    return{t,p,k:st.action,d:st.text.trim(),klep:['open','dicht'].includes(st.valve)?st.valve:null};});
   return{id:'r_'+crypto.randomUUID(),eigen:true,mid:method.id,fam:method.family,beanId:input.beanId||null,naam:input.name.trim(),dose,ratio,temp,maling:short(input.grind||'',160),stand:short(input.targetGrind||'',80),over:short(input.explanation||'',2000),tijd:Math.floor(previousTime/60)+':'+String(previousTime%60).padStart(2,'0'),voor:[method.id],stappen:steps,source:'ai',createdAt:Date.now()};
  }
- return Object.freeze({migrate,attachBrew,context,canonicalRecipe,validateRecipe,beanSnapshot});
+ return Object.freeze({migrate,linkBeansByName,nameKey,attachBrew,context,canonicalRecipe,validateRecipe,beanSnapshot});
 })();

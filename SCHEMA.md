@@ -128,7 +128,7 @@ suggestie. Leeg zolang je op die methode niets hebt afgetekend.
 | veld | | |
 |---|---|---|
 | `id` `at` | string | `at` is ISO |
-| `methodId` `beanId` | string \| null | `beanId` is null bij een brew zonder gekoppelde zak |
+| `methodId` `beanId` | string \| null | Elke nieuwe brew hoort bij een boon. `beanId` is alleen null bij een oude brew die nog niet gekoppeld is (of waarvan de boon is verwijderd); de app koppelt die zelf op naam als precies één boon zo heet, de rest koppel je in *brews* |
 | `beanName` | string \| null | zoals ingetypt, ook als er geen `beanId` is |
 | `title` `drink` | string \| null | `drink` is bv. `flat white` |
 | `dose` `yield` `ratio` | number \| null | gram in, gram uit |
@@ -141,6 +141,7 @@ suggestie. Leeg zolang je op die methode niets hebt afgetekend.
 | `notes` | string \| null | |
 | `isDialIn` | bool | hoort bij de dial-in-lus, niet bij je gewone logboek |
 | `target` | object \| null | het doel waar je naartoe werkte |
+| `shot` | object \| null | alleen bij espresso uit de shot clock: `{pre, rest, full, total, drop, yieldEstimated}` in seconden. `pre` en `rest` zijn 0 zonder pre-infusie; `full` is de tijd onder volle druk (die telt voor de doeltijd en staat ook in `time`), `total` vanaf de hendel; `drop` de eerste druppel of null; `yieldEstimated` true als het gewicht niet is nagewogen |
 
 ### recipe
 
@@ -155,6 +156,22 @@ Bij een Hario Switch draagt elke stap in `stappen` daarnaast een `klep`:
 `"dicht"` (het water blijft staan — immersie) of `"open"` (het loopt door —
 percolatie), en `null` bij elke andere methode. Het is een stand, geen
 gebeurtenis: de app laat hem alleen zien op de stap waar hij verandert.
+
+### pre-infusie per recept (intern: `recipePre`)
+
+`{"<recept-id>": {on, s, rust}}` — wat je in de shot clock instelt voor een
+espressorecept: pre-infusie aan/uit, de seconden pre-infusie (1–15) en de rust
+daarna (0–10). Zonder eigen instelling geldt `pre` van het ingebouwde recept, en
+anders 5 s pre en 3 s rust. Zonder gekozen recept heet de sleutel `target`.
+
+### tarra-gewichten (intern: `tare` en `tareOn`)
+
+`tare` is `{naked, spout, ring, ps1, ps2, cup}`: het eigen gewicht in gram van
+naked portafilter, double spout portafilter, dosing ring, puck screen 1 en 2 en
+dosing cup, één keer gewogen op een lege, genulde weegschaal (*profile → my
+gear*). Een onderdeel zonder gewicht ontbreekt. `tareOn` onthoudt welke
+onderdelen er in het tarra-vak van de shot clock op de weegschaal liggen
+(`{naked:true, ring:true}`); naked en double spout sluiten elkaar uit.
 
 ### dialLog
 
@@ -219,6 +236,13 @@ aanbieder heeft zijn eigen plek in `localStorage`: `scc_ai_key` voor Anthropic
 actief is staat in `scc_ai_prov`, met daarnaast per aanbieder een modelnaam
 (`scc_ai_model_<aanbieder>`) en het tarief dat jij invulde
 (`scc_ai_prijs_<aanbieder>`, dollar per miljoen tekens).
+
+De ElevenLabs-sleutel voor de stem van de coaches staat nergens op schijf: alleen
+in het geheugen van het tabblad (`BrewStem` in `brew-stem.js`). Wel bewaard, in
+`localStorage` en niet in de back-up: de gekozen stem uit je eigen
+ElevenLabs-lijst (`scc_el_voice`, de stem-id, en `scc_el_voice_naam`) en of de
+stappen hardop gaan (`scc_gc_stem`, gedeeld door gietcoach, AeroPress-coach en
+shot clock).
 
 Hetzelfde geldt voor de AI-teller onder `state.ai`. Die houdt per maand bij wat
 de app zelf aan Claude uitgaf — `{budget, maand, dagen:{dag:dollars},

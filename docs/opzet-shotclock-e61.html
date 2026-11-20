@@ -1,0 +1,883 @@
+<style>
+/* ---- opzet shot clock E61: één telefoonscherm, prototype dat echt loopt ---- */
+.mk-kop,.mk-sect{max-width:620px;}
+.sc-fig{width:100%;max-width:400px;margin:0 auto;}
+.sc-phone{width:100%;max-width:400px;height:830px;margin:0 auto;}
+.sc-scr{flex:1;min-height:0;display:flex;flex-direction:column;padding:4px 14px 12px;position:relative;}
+.acic{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
+
+/* kop: het recept waar de klok uit leest */
+.sc-head{flex:none;display:flex;align-items:center;gap:10px;min-height:48px;}
+.sc-head>div{min-width:0;}
+.sc-head .sc-rn{font-size:24px;line-height:1;}
+.sc-head .sc-rd{font-size:13px;color:var(--ink-soft);line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-recbtn{margin-left:auto;flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;padding:0;
+  border-radius:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:16px;
+  filter:url(#wobble);cursor:pointer;}
+.sc-recbtn:disabled{opacity:.45;cursor:default;}
+.sc-recbtn svg{width:24px;height:24px;}
+
+/* tekening: 45% van het scherm */
+.sc-art{flex:0 0 43%;min-height:0;display:flex;justify-content:center;align-items:center;cursor:pointer;outline:none;}
+.sc-art:focus-visible{box-shadow:0 0 0 2px var(--line);border-radius:18px;}
+.sc-art svg{height:100%;width:100%;overflow:visible;fill:none;stroke:var(--ink);stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
+.sc-b{opacity:.62;stroke-width:1.35;}           /* de tweede, afwijkende pennestreek */
+.sc-grain{stroke:var(--ink-soft);stroke-width:1.2;opacity:.75;}
+#sc-wet{fill:var(--accent-soft);opacity:.55;stroke:none;transition:height .3s linear;}
+#sc-fill{fill:var(--accent-soft);stroke:none;transition:y .25s linear,height .25s linear;}
+#sc-crema{fill:#c8a577;stroke:none;transition:y .25s linear,height .25s linear;}
+/* water door de groep: alleen als er water loopt (pre-infusie langzaam, volle druk snel) */
+.sc-in path{stroke:var(--accent-soft);stroke-width:1.8;stroke-dasharray:5 5;opacity:0;transition:opacity .3s;}
+.water .sc-in path{opacity:.75;animation:scin .8s linear infinite;}
+.water.slow .sc-in path{animation-duration:2.4s;}
+@keyframes scin{to{stroke-dashoffset:-10;}}
+/* de straal: dun gestreepte lijn die stroomt */
+.sc-stream path{stroke:var(--accent-soft);stroke-width:2.4;opacity:0;stroke-dasharray:13 3;transition:opacity .3s,stroke-width .8s;}
+.flow .sc-stream path{opacity:.92;animation:scflow .55s linear infinite;}
+.flow.thin .sc-stream path{stroke-width:1.5;}
+@keyframes scflow{to{stroke-dashoffset:-16;}}
+/* druppels: pre-infusie en vlak voor de straal */
+.sc-drop{fill:var(--accent-soft);stroke:none;opacity:0;}
+.drip .sc-drop.dl{animation:scdl 1.1s ease-in infinite;}
+.drip .sc-drop.dr{animation:scdr 1.1s ease-in infinite;animation-delay:.3s;}
+.drip .sc-drop.d2{animation-delay:.6s;}
+.drip .sc-drop.dr.d2{animation-delay:.85s;}
+@keyframes scdl{0%{opacity:0;transform:translate(0,0)}12%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(4px,46px)}}
+@keyframes scdr{0%{opacity:0;transform:translate(0,0)}12%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(-4px,46px)}}
+/* de hendel: eigen groep, buiten het dubbele lijnwerk */
+#sc-lever{transition:transform .6s cubic-bezier(.4,1.5,.5,1);transform-origin:158px 58px;}
+
+/* klok + gewicht */
+.sc-read{flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:2px;}
+.sc-clock{white-space:nowrap;}
+.sc-big{font-size:92px;line-height:.8;}
+.sc-dec{font-size:44px;line-height:.8;}
+.sc-lbl{font-size:14px;color:var(--ink-soft);line-height:1.2;margin-top:4px;}
+.sc-wt{text-align:right;white-space:nowrap;}
+.sc-wv{font-size:44px;line-height:.85;}
+.sc-read.wacht .sc-big,.sc-read.wacht .sc-dec{color:var(--ink-soft);}
+
+/* doelband: te snel / goed / te traag */
+.sc-band{flex:none;position:relative;height:56px;margin-top:5px;}
+.sc-band svg{position:absolute;left:0;top:14px;width:100%;height:24px;overflow:visible;fill:none;
+  stroke:var(--ink);stroke-linecap:round;filter:url(#wobble-rough);}
+.sc-bn,.sc-bl{position:absolute;font-size:14px;color:var(--ink-soft);white-space:nowrap;line-height:1;}
+.sc-bn{top:0;transform:translateX(-50%);}
+.sc-bl{top:41px;}
+.sc-bl.on{color:var(--ink);font-family:'Caveat',cursive;font-weight:700;font-size:19px;top:38px;}
+
+/* strook: vorige / nu / volgende */
+.sc-strip{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:6px;margin-top:2px;}
+.sc-prev{font-size:15px;line-height:1.25;color:var(--ink-soft);padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-cur{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:18px;background:var(--card);
+  border:2px solid var(--ink);filter:url(#wobble);min-height:72px;}
+.sc-cur.rust{background:var(--card-2);}
+.sc-cur .k{font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;}
+.sc-cur .d{font-size:15px;color:var(--ink-soft);line-height:1.25;margin-top:2px;}
+.sc-cur .r{margin-left:auto;text-align:right;flex:none;}
+.sc-cur .r .v{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:.95;}
+.sc-cur .r .u{font-size:13px;color:var(--ink-soft);}
+.sc-cur.uitslag{min-height:60px;padding:7px 13px;}
+.sc-cur.uitslag .k{font-size:29px;}
+.sc-next{font-size:16px;color:var(--ink-soft);padding:0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.sc-next b{font-family:'Caveat',cursive;font-weight:700;font-size:23px;color:var(--ink);white-space:nowrap;}
+.sc-next.sterk{color:var(--ink);}
+.sc-next.gewicht{align-items:center;}
+.sc-pulse{animation:scpulse 1s ease-in-out infinite;}
+@keyframes scpulse{50%{opacity:.45}}
+
+/* knoppen: groot genoeg voor handschoenen */
+.sc-btns{flex:none;display:flex;gap:9px;margin-top:8px;}
+.sc-btn{min-height:58px;border-radius:18px;border:2px solid var(--ink);background:var(--card);color:var(--ink);
+  font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:25px;line-height:1;filter:url(#wobble);
+  cursor:pointer;padding:0 12px;flex:1;}
+.sc-btn.pri{background:var(--accent-soft);color:var(--cream);}
+.sc-btn.speed{flex:none;width:72px;}
+.sc-btn[aria-pressed="true"]{background:var(--accent-soft);color:var(--cream);}
+.sc-btn:disabled{opacity:.5;cursor:default;}
+.sc-step{flex:none;width:56px;height:56px;border-radius:16px;border:2px solid var(--ink);background:var(--card);
+  color:var(--ink);font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:34px;line-height:1;
+  filter:url(#wobble);cursor:pointer;}
+.sc-step{display:inline-flex;align-items:center;justify-content:center;padding:0;}
+.sc-step:disabled{opacity:.4;cursor:default;}
+.sc-val{min-width:62px;text-align:center;font-family:'Caveat',cursive;font-weight:700;font-size:30px;}
+
+/* tarra: rekenen met je eigen onderdelen */
+.sc-tarerow{flex:none;display:flex;align-items:center;gap:9px;width:100%;min-height:46px;margin-top:3px;padding:0 12px;
+  border-radius:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;text-align:left;
+  filter:url(#wobble);cursor:pointer;}
+.sc-tarerow:disabled{opacity:.5;cursor:default;}
+.sc-tarerow .tk{flex:none;font-family:'Caveat',cursive;font-weight:700;font-size:23px;line-height:1;}
+.sc-tarerow .ts{flex:1;min-width:0;font-size:15px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-tarerow .ta{flex:none;color:var(--ink-soft);font-size:21px;transition:transform .15s;}
+.sc-tarerow[aria-expanded="true"]{border-color:var(--ink);}
+.sc-tarerow[aria-expanded="true"] .ta{transform:rotate(90deg);}
+.sc-tp{position:absolute;left:14px;right:14px;top:110px;background:var(--paper);border:2px solid var(--ink);
+  border-radius:22px;padding:11px 12px 12px;z-index:3;overflow:auto;display:none;}
+.sc-tp.open{display:block;}
+.sc-tl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;color:var(--ink-soft);margin:0 2px 6px;}
+.sc-tl .vb{font-size:13px;border:1.5px dashed var(--line);border-radius:10px;padding:1px 7px;white-space:nowrap;}
+.sc-parts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sc-part{min-height:58px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;
+  text-align:left;padding:5px 11px;filter:url(#wobble);cursor:pointer;display:flex;flex-direction:column;justify-content:center;}
+.sc-part .pn{font-size:15px;line-height:1.1;}
+.sc-part .pg{font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.05;}
+.sc-part[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--ink);color:var(--cream);}
+.sc-aim{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:7px 12px;
+  border-radius:16px;background:var(--card-2);}
+.sc-aim .al{font-size:14px;line-height:1.25;color:var(--ink-soft);}
+.sc-aim .av{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:1;white-space:nowrap;}
+.sc-chk{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.sc-chk label{flex:1;min-width:0;font-size:15px;line-height:1.2;}
+.sc-num{width:150px;height:58px;border-radius:16px;border:2px solid var(--ink);background:var(--card);color:var(--ink);
+  font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:34px;text-align:center;padding:0 8px;}
+.sc-num.klein{width:112px;height:52px;font-size:28px;}
+.sc-res{font-size:15px;line-height:1.3;margin-top:7px;min-height:40px;color:var(--ink-soft);}
+.sc-res b{font-family:'Caveat',cursive;font-weight:700;font-size:25px;color:var(--ink);}
+.sc-tbtns{display:flex;gap:9px;margin-top:8px;}
+.sc-grow{display:flex;align-items:center;gap:9px;margin-top:8px;}
+.sc-grow label{flex:1;min-width:0;font-size:16px;line-height:1.15;}
+.sc-grow .u{font-size:16px;color:var(--ink-soft);}
+.sc-crumb{font-size:13px;color:var(--ink-soft);margin-bottom:2px;}
+
+/* instelpaneel: hoort bij het recept */
+.sc-scrim{position:absolute;inset:0;background:rgba(58,48,42,.28);opacity:0;pointer-events:none;transition:opacity .3s;z-index:4;}
+.sc-scrim.open{opacity:1;pointer-events:auto;}
+.sc-sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper);border-top:2px solid var(--ink);
+  border-radius:26px 26px 0 0;padding:14px 16px 14px;transform:translateY(105%);transition:transform .3s;z-index:5;}
+.sc-sheet.open{transform:none;}
+#sc-gear{z-index:7;}
+#sc-scrim.hoog{z-index:6;}
+.sc-sheet h3{font-family:'Caveat',cursive;font-size:30px;line-height:1;}
+.sc-sheet .zacht{margin:3px 0 9px;line-height:1.3;}
+.sc-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px;}
+.sc-chip{min-height:42px;padding:0 12px;border-radius:15px;border:2px solid var(--line);background:var(--card);
+  color:var(--ink);font:inherit;font-size:15px;filter:url(#wobble);cursor:pointer;}
+.sc-chip.sel{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+.sc-row{display:flex;align-items:center;gap:9px;margin-top:9px;}
+.sc-row .sc-rl{flex:1;min-width:0;line-height:1.15;}
+.sc-row .sc-rl small{display:block;color:var(--ink-soft);font-size:13px;}
+.sc-row.uit{opacity:.45;}
+.sc-tog{flex:none;width:78px;height:52px;border-radius:18px;border:2px solid var(--line);background:var(--card-2);
+  color:var(--ink);font:inherit;position:relative;cursor:pointer;filter:url(#wobble);}
+.sc-tog .knob{position:absolute;top:7px;left:7px;width:34px;height:34px;border-radius:50%;background:var(--paper);
+  border:2px solid var(--line);transition:left .15s;}
+.sc-tog[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--ink);}
+.sc-tog[aria-pressed="true"] .knob{left:35px;border-color:var(--ink);}
+.sc-op{margin:10px 0 2px;font-size:15px;color:var(--ink-soft);}
+.sc-op b{font-family:'Caveat',cursive;font-size:21px;color:var(--ink);}
+.sc-sheet .sc-btn{width:100%;margin-top:8px;}
+
+.sc-toast{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:max-content;max-width:88%;
+  background:var(--accent-soft);color:var(--cream);padding:11px 18px;border-radius:18px;border:2px solid var(--ink);
+  filter:url(#wobble);font-family:'Caveat',cursive;font-weight:700;font-size:21px;line-height:1.1;text-align:center;
+  opacity:0;transition:opacity .25s;pointer-events:none;z-index:6;}
+.sc-toast.show{opacity:1;}
+
+@media (prefers-reduced-motion:reduce){
+  .water .sc-in path,.flow .sc-stream path{animation:none;}
+  .drip .sc-drop{animation:none!important;opacity:1;}
+  .drip .sc-drop.d2{transform:translate(0,24px);}
+  #sc-lever,#sc-fill,#sc-crema,#sc-wet,.sc-sheet,.sc-scrim,.sc-tog .knob{transition:none;}
+  .sc-pulse{animation:none;}
+}
+</style>
+
+<div class="mk-kop">
+  <h1>Shot clock voor de E61</h1>
+  <div class="mk-onder">Een opzet in dezelfde opbouw als de gietcoach van de V60 en de AeroPress:
+    tekening bovenaan, een grote klok, vorige / nu / volgende stap, en grote knoppen.
+    Pre-infusie en rust komen uit het recept.</div>
+  <div class="mk-let">Probeer het: tik op <b>pull the lever</b> of op de hendel in de tekening.
+    Met <b>4x</b> loopt alles vier keer zo snel. Met de knop rechtsboven (de schuifjes) zet je pre-infusie aan of uit
+    en stel je de seconden in. Het vak <b>tare</b> rekent je dosis na met het eigen gewicht van je
+    onderdelen. Dit is een los prototype; de app zelf is niet aangepast.</div>
+</div>
+
+<figure class="sc-fig">
+<div class="phone sc-phone">
+ <div class="sc-scr" id="sc-scr">
+
+  <div class="sc-head">
+    <div>
+      <div class="sc-rn hand" id="sc-rn">classic 1:2</div>
+      <div class="sc-rd" id="sc-rd"></div>
+    </div>
+    <button type="button" class="sc-recbtn" id="sc-recbtn" aria-label="recipe settings" onclick="scSheet(true)">
+      <svg viewBox="0 0 24 24" class="acic" aria-hidden="true"><path d="M3.6 8.1 Q12 7.5 20.6 8.3"/><path d="M3.4 16 Q12 15.6 20.5 16.2"/><path d="M10.6 6 Q12.3 6.3 12.1 8.1 Q11.9 9.9 10.2 9.8 Q8.5 9.5 8.7 7.8 Q8.9 6.1 11 6.3"/><path d="M15.4 14.1 Q17.1 14.4 16.9 16.2 Q16.7 18 15 17.9 Q13.3 17.6 13.5 15.9 Q13.7 14.2 15.8 14.4"/></svg></button>
+  </div>
+
+  <button type="button" class="sc-tarerow" id="sc-tarerow" aria-expanded="false" aria-controls="sc-tp" onclick="scTare()">
+    <span class="tk">tare</span><span class="ts" id="sc-tsum"></span><span class="ta">&rsaquo;</span></button>
+
+  <div class="sc-art" id="sc-art" role="button" tabindex="0" aria-label="the lever: tap to start or stop the shot">
+   <svg viewBox="36 -14 214 256" id="sc-svg" aria-hidden="true">
+    <defs>
+      <clipPath id="sc-cupclip"><path d="M99 181 Q120 177 141 181 Q139 202 130 210 Q120 214 110 210 Q101 202 99 181 Z"/></clipPath>
+      <clipPath id="sc-puckclip"><path d="M92 118 Q120 127 148 118.5 Q146 128 143 136.5 Q120 144 97 135 Q94.5 127 92 118 Z"/></clipPath>
+    </defs>
+
+    <!-- bewegende delen, elk in een eigen groep en buiten het dubbele lijnwerk -->
+    <g class="sc-in"><path d="M102 58 Q100.5 84 103 110"/><path d="M138 58 Q139.5 84 137 110"/></g>
+    <g class="sc-grain">
+      <path d="M99 126 l2 .4"/><path d="M106 130 l1.8 -.5"/><path d="M113 125.5 l2 .3"/><path d="M121 132 l1.6 .5"/>
+      <path d="M128 126.5 l2 -.3"/><path d="M135.5 130 l1.7 .4"/><path d="M140.5 124 l1.5 .3"/><path d="M116 137 l1.8 -.2"/>
+    </g>
+    <rect id="sc-wet" x="86" y="114" width="68" height="0" clip-path="url(#sc-puckclip)"/>
+    <g class="sc-stream">
+      <path d="M105.5 157 Q108.5 172 115.5 208"/>
+      <path d="M134.5 157 Q131.5 172 124.5 208"/>
+    </g>
+    <g class="sc-drops">
+      <path class="sc-drop dl" d="M104.5 155.5 Q106.5 158.8 106.1 159.9 Q105.5 161.2 104.5 161.2 Q103.4 161.2 102.9 159.9 Q102.5 158.8 104.5 155.5"/>
+      <path class="sc-drop dl d2" d="M104.5 155.5 Q106.5 158.8 106.1 159.9 Q105.5 161.2 104.5 161.2 Q103.4 161.2 102.9 159.9 Q102.5 158.8 104.5 155.5"/>
+      <path class="sc-drop dr" d="M135.5 155.5 Q137.5 158.8 137.1 159.9 Q136.5 161.2 135.5 161.2 Q134.4 161.2 133.9 159.9 Q133.5 158.8 135.5 155.5"/>
+      <path class="sc-drop dr d2" d="M135.5 155.5 Q137.5 158.8 137.1 159.9 Q136.5 161.2 135.5 161.2 Q134.4 161.2 133.9 159.9 Q133.5 158.8 135.5 155.5"/>
+    </g>
+    <rect id="sc-fill" x="96" y="213" width="48" height="0" clip-path="url(#sc-cupclip)"/>
+    <rect id="sc-crema" x="96" y="213" width="48" height="0" clip-path="url(#sc-cupclip)"/>
+
+    <!-- lijnwerk: dezelfde E61 als in de app, elke rand een eigen streek, twee keer -->
+    <g class="sc-ink">
+      <path d="M64 21 Q120 9 176.5 16"/>
+      <path d="M172.5 13.5 Q169 26 163.5 39"/>
+      <path d="M168.5 35 Q120 43.5 70 32"/>
+      <path d="M75.5 37 Q70 25 65.5 16.5"/>
+      <path class="sc-b" d="M68.5 18 Q120 14 172 20.5"/>
+      <path class="sc-b" d="M169 18 Q166 27.5 162 35.5"/>
+      <path class="sc-b" d="M165 32 Q120 39 74.5 36"/>
+      <path class="sc-b" d="M72 31.5 Q69.5 24 67 19"/>
+
+      <path d="M97.5 28.5 Q95 42 92.5 57.5"/>
+      <path class="sc-b" d="M99.5 33 Q97.5 43 96 54"/>
+      <path d="M143 29 Q145.5 42 148 57"/>
+      <path class="sc-b" d="M141 34 Q143.5 44 145 53.5"/>
+
+      <path d="M87.5 45.5 Q77.5 80 82 100.5 Q86 112.5 96 118.5"/>
+      <path d="M152.5 46.5 Q162.5 80 158 100 Q154 113 144 119"/>
+      <path d="M79.5 52.5 Q120 43.5 160.5 53.5"/>
+      <path d="M88 112.5 Q120 124 152.5 111.5"/>
+      <path class="sc-b" d="M85 51 Q80.5 82 84 100 Q88 110 95 115"/>
+      <path class="sc-b" d="M155 52 Q159.5 82 156 99.5 Q152 110 145 115.5"/>
+      <path class="sc-b" d="M84 55.5 Q120 48.5 156.5 56"/>
+      <path class="sc-b" d="M91 110 Q120 119.5 149 109.5"/>
+
+      <path d="M129.5 78.5 Q131 91 118 93.5 Q105.5 93 105 81.5 Q105.5 70 118.5 70 Q128 70.5 129.5 78 Q130 82.5 128 88" opacity="0.62"/>
+      <path class="sc-b" d="M126.5 81.5 Q127 89.5 118.5 91 Q109.5 90.5 108.5 82 Q109 74.5 117.5 74 Q125 74.5 126.5 81" opacity="0.62"/>
+
+      <path d="M87 113.5 Q120 129.5 153 114"/>
+      <path d="M149.5 116.5 Q147 128 143 141.5"/>
+      <path d="M146.5 137 Q120 146 92.5 134.5"/>
+      <path d="M97 139.5 Q93.5 127 90 115"/>
+      <path class="sc-b" d="M92.5 118 Q120 126 148 117.5"/>
+      <path class="sc-b" d="M146 120 Q144 129 141.5 136.5"/>
+      <path class="sc-b" d="M143.5 134.5 Q120 141.5 97.5 133"/>
+      <path class="sc-b" d="M100 135 Q97 127 94.5 119.5"/>
+
+      <path d="M143.5 120.5 Q188 126 207.5 139 Q214.5 145 204.5 154.5" stroke-width="2.2"/>
+      <path class="sc-b" d="M150 127.5 Q184 132.5 201 142.5 Q207.5 147 202 150.5"/>
+
+      <path d="M111.5 137.5 Q108 148 104 158"/>
+      <path class="sc-b" d="M113.5 143 Q111 149 108.5 154.5"/>
+      <path d="M128.5 137.5 Q132 148 136 158"/>
+      <path class="sc-b" d="M126.5 143 Q129 149 131.5 154.5"/>
+
+      <path d="M91 175.5 Q120 169.5 149 177"/>
+      <path d="M146 173.5 Q142.5 200 132 215"/>
+      <path d="M134.5 210 Q120 219.5 105.5 210"/>
+      <path d="M109 214 Q97.5 201 93.5 174.5"/>
+      <path class="sc-b" d="M97.5 180 Q120 176 143 181"/>
+      <path class="sc-b" d="M141.5 178 Q139.5 200 130 210.5"/>
+      <path class="sc-b" d="M131.5 208 Q120 214.5 108.5 208.5"/>
+      <path class="sc-b" d="M110.5 210 Q100.5 200 98 179"/>
+
+      <path d="M141 181.5 Q162.5 179 164 192.5 Q165 206.5 140.5 207"/>
+      <path class="sc-b" d="M144.5 187 Q157 185.5 158 192.5 Q158.5 200.5 146 202"/>
+
+      <path d="M77.5 216.5 Q120 229.5 162.5 216" opacity="0.8"/>
+      <path class="sc-b" d="M86 221.5 Q120 229.5 153 220" opacity="0.8"/>
+      <path d="M53 228.5 Q120 239 187 229" opacity="0.34"/>
+      <path class="sc-b" d="M62 232.5 Q120 240 178 232.5" opacity="0.34"/>
+    </g>
+
+    <g id="sc-lever">
+      <path d="M153.5 53 Q177 87 200.5 122.5" stroke-width="2.2"/>
+      <path class="sc-b" d="M160.5 60.5 Q179 89 194 115.5"/>
+      <path d="M207 120 Q208.5 129.5 199 131 Q189.5 130 189 122 Q189.5 114 198.5 113.5 Q206 114 207.5 120.5 Q208 123 206.5 126"/>
+      <path class="sc-b" d="M203.8 121.6 Q204.2 127.4 198.6 127.8 Q193.2 127.4 192.8 121.8 Q193.3 117.2 198.4 116.9 Q203.2 117.3 204.1 122.4"/>
+    </g>
+   </svg>
+  </div>
+
+  <div class="sc-read" id="sc-read">
+    <div class="sc-clock">
+      <span class="sc-big hand" id="sc-time">0:00</span><span class="sc-dec hand" id="sc-dec">.0</span>
+      <div class="sc-lbl" id="sc-tlbl">from the lever</div>
+    </div>
+    <div class="sc-wt">
+      <div class="sc-wv hand" id="sc-w">0 g</div>
+      <div class="sc-lbl" id="sc-wlbl">in the cup · estimate</div>
+    </div>
+  </div>
+
+  <div class="sc-band" id="sc-band"></div>
+
+  <div class="sc-strip" id="sc-strip"></div>
+
+  <div class="sc-btns" id="sc-btns"></div>
+
+  <div class="sc-tp" id="sc-tp" role="region" aria-label="tare">
+    <div class="sc-tl"><span>on the scale — tap what's on it</span><span class="vb">example weights</span></div>
+    <div class="sc-parts" id="sc-parts"></div>
+    <div class="sc-aim"><div class="al" id="sc-aiml"></div><div class="av" id="sc-aim"></div></div>
+    <div class="sc-chk"><label for="sc-chkin">the scale reads<br><span class="zacht">type it, in g</span></label>
+      <input class="sc-num" id="sc-chkin" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" oninput="scCheck(this.value)"></div>
+    <div class="sc-res" id="sc-res"></div>
+    <div class="sc-tbtns">
+      <button type="button" class="sc-btn" onclick="scGear(true)">my gear</button>
+      <button type="button" class="sc-btn pri" id="sc-usedose" onclick="scUseDose()">use as dose</button>
+    </div>
+  </div>
+
+  <div class="sc-scrim" id="sc-scrim" onclick="scCloseSheets()"></div>
+  <div class="sc-sheet" id="sc-sheet" aria-hidden="true"></div>
+  <div class="sc-sheet" id="sc-gear" aria-hidden="true"></div>
+  <div class="sc-toast" id="sc-toast"></div>
+ </div>
+</div>
+</figure>
+
+<div class="mk-sect">
+  <h2>Hoe een shot loopt</h2>
+  <ul>
+    <li><b>pre-infusion</b> (standaard 5 s): hendel half omhoog, water loopt langzaam door de groep,
+      de puck kleurt van boven naar beneden nat, aan het eind een paar druppels.</li>
+    <li><b>rest</b> (standaard 3 s, instelbaar 0 tot 10): hendel terug naar de middenstand, geen pomp, geen
+      stroom. De puck trekt verder in. De klok loopt door, maar de cijfers worden grijs en de strook telt af:
+      "full pressure in 0:02". Een eigen stap in vorige / nu / volgende.</li>
+    <li><b>full pressure</b>: hendel helemaal omhoog, twee straaltjes in het kopje, het kopje vult met de
+      crèmeband. De grote klok begint hier opnieuw bij 0:00 en telt de seconden volle druk; de totale tijd
+      vanaf de hendel staat er klein onder. Vlak voor het doel worden de straaltjes dunner.</li>
+    <li><b>lever down</b>: op het geschatte doelgewicht zegt de strook "lever down at 36 g". Jij stopt met de
+      knop <b>stop</b> of door de hendel in de tekening aan te tikken. Daarna het advies, als tekst.</li>
+  </ul>
+</div>
+
+<div class="mk-sect">
+  <h2>Tarra: rekenen met je eigen onderdelen</h2>
+  <p>Voor als het nullen van de weegschaal misgaat. Dicht is het vak <b>tare</b> één regel, bijvoorbeeld
+    "naked + ring: 551.0 g · aim 569.0 g". Open tik je aan wat er op de weegschaal staat (grote knoppen; naked
+    en double spout sluiten elkaar uit) en rekent hij twee kanten op:</p>
+  <ul>
+    <li><b>doel</b>: bij 18.0 g dosis moet de weegschaal de onderdelen plus 18.0 g tonen;</li>
+    <li><b>controle</b>: typ wat de weegschaal echt toont (komma of punt mag), dan zie je je echte dosis en
+      het verschil met het doel. <b>use as dose</b> neemt die dosis over voor deze shot; het doel uit (36 g)
+      blijft staan.</li>
+  </ul>
+  <p>Rekenvoorbeeld, zo staat het ook in de opzet: naked 512.4 + ring 38.6 + 18.0 = <b>569.0 g</b> op de
+    weegschaal. Toont hij 569.4, dan is de dosis <b>18.4 g (+0.4)</b>.</p>
+  <p>De gewichten zijn <b>voorbeelden</b> (naked 512.4 g, double spout 548.0 g, dosing ring 38.6 g, puck
+    screen 1 12.3 g, puck screen 2 9.8 g, dosing cup 61.2 g). Je eigen gewichten weeg je één keer op een lege,
+    genulde weegschaal en vul je in bij <b>profile → my gear</b>; de knop <b>my gear</b> in het vak laat zien
+    hoe dat scherm eruitziet. Bij inbouwen komen die zes gewichten bij je gear en in SCHEMA.md.</p>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat ik overnam</h2>
+  <ul>
+    <li>De E61-tekening van de huidige shot clock: dezelfde lijnen, dezelfde hendel, het kopje dat vult
+      met de crèmeband, de straaltjes als stromende streepjeslijn.</li>
+    <li>De vaste opbouw van de V60- en AeroPress-coach: tekening, klok, vorige / nu / volgende, knoppen.</li>
+    <li>De doelwaarden uit het recept <b>classic 1:2</b>: 18 g in, 36 g uit, 0:28 volle druk. De band is
+      0:25 tot 0:31: 3 s naar elke kant, dezelfde marge die de dial-in nu al gebruikt. De andere vijf espressorecepten staan er ook in,
+      met hun eigen doel.</li>
+    <li>Jesse's eigen manier als standaard: 5 s pre-infusie, 3 s rust (zijn bereik is 2 tot 5 s).</li>
+    <li>De maalregel uit ESPRESSO_RULES, niet omgedraaid: te snel is fijner malen, te traag is grover.
+      Vul je het echte gewicht in, dan oordeelt hij op doorloopsnelheid (gram per seconde), niet op tijd alleen.</li>
+  </ul>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat ik anders deed, en waarom</h2>
+  <ul>
+    <li><b>Alleen de volle druk telt voor de doeltijd</b> (zo wil Jesse het): band en oordeel gaan over de
+      seconden volle druk, pre-infusie en rust komen erbovenop, en de totale tijd vanaf de hendel staat er klein
+      bij (classic: 0:28 volle druk, totaal ongeveer 0:36).</li>
+    <li><b>De eerste druppel ziet de app niet.</b> Daarom is er tijdens de shot een knop <b>first drop</b>:
+      tik als hij valt, dan staat die tijd er apart bij.</li>
+    <li><b>Hij stopt niet vanzelf op 36 g.</b> De app kan niet wegen. Stopte de klok vanzelf op het geschatte
+      gewicht, dan stond er elke keer precies de doeltijd en was elke shot "good". Hij waarschuwt op het doel en
+      jij stopt. Na 60 s stopt hij zelf.</li>
+    <li><b>Pre-infusie hoort bij het recept</b>: drie velden (aan/uit, seconden, rust). De puck-prep-rij
+      "pre-infusion" wordt daaruit vooraf aangevinkt en ingevuld. In de opgeslagen shot staat al wat je deed
+      (prep.preinf bestaat al). Classic, ristretto en melkbasis hebben hem standaard aan, light roast met
+      7 + 4 s, lungo en turbo shot uit.</li>
+    <li>Tijdens de shot alleen de band; het maaladvies komt pas na afloop, als tekst.</li>
+    <li>De klok in m:ss met een kleine tiende erachter: dezelfde notatie als de doeltijd en het aftellen.</li>
+  </ul>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat niet kan</h2>
+  <ul>
+    <li><b>Het gewicht in het kopje is een schatting.</b> Ik reken alsof de shot precies op doeltempo loopt:
+      een paar druppels in de pre-infusie, en daarna op naar 36 g op de doeltijd. Loopt je shot sneller of
+      trager, dan klopt de schatting niet. Juist daarom vraagt hij na afloop wat je weegschaal zei.</li>
+    <li>Een gekoppelde weegschaal (Bluetooth) kan de schatting vervangen en dan echt op 36 g stoppen, maar dat
+      werkt alleen op Android met Chrome, niet op een iPhone.</li>
+    <li>De app weet niet waar je hendel echt staat. De tekening wijst aan wat je moet doen.</li>
+    <li>De app ziet ook niet wat er op je weegschaal ligt: jij tikt de onderdelen aan.</li>
+    <li>Hendelstanden: op een gewone E61 gaat de pomp pas aan met de hendel helemaal omhoog, en de middenstand
+      opent de klep zonder pomp. Ik tekende het zoals Jesse het beschrijft (pre-infusie half omhoog, rust terug
+      naar de middenstand). Werkt het op zijn machine anders, dan is dat één hoek in de tekening.</li>
+    <li>Trillen bij een nieuwe stap kan op Android, niet op een iPhone.</li>
+  </ul>
+</div>
+
+<div class="mk-sect">
+  <h2>Open vragen voor Jesse</h2>
+  <ul>
+    <li>Klopt 3 s als standaard voor de rust, of liever 2?</li>
+  </ul>
+</div>
+
+<script>
+/* Opzet shot clock E61. Alles hier is prototype: niets wordt bewaard.
+   De recepten zijn ESPRESSO_RECIPES uit app/01-kennis.js; het veld pre
+   (aan/uit, seconden, rust) is nieuw en hoort bij het recept.           */
+const SC_RECIPES=[
+  {id:'e-classic',  naam:'classic 1:2',       dose:18, ratio:2,   tijd:28, pre:{on:true, s:5, rust:3}},
+  {id:'e-ristretto',naam:'ristretto 1:1.5',   dose:18, ratio:1.5, tijd:28, pre:{on:true, s:5, rust:3}},
+  {id:'e-lungo',    naam:'lungo 1:3',         dose:18, ratio:3,   tijd:33, pre:{on:false,s:5, rust:3}},
+  {id:'e-light',    naam:'light roast 1:2.5', dose:18, ratio:2.5, tijd:31, pre:{on:true, s:7, rust:4}},
+  {id:'e-turbo',    naam:'turbo shot',        dose:20, ratio:2.5, tijd:18, pre:{on:false,s:3, rust:0}},
+  {id:'e-milk',     naam:'melkbasis',         dose:20, ratio:1.8, tijd:29, pre:{on:true, s:5, rust:3}},
+];
+const TOL=3;                 // zelfde marge als diAdvice: 3 s naar elke kant
+const VEILIG=60;             // na een minuut stopt hij zelf
+const LEVER={down:0, rest:-46, pre:-66, full:-100};
+const MIN='<svg viewBox="0 0 24 24" class="acic" style="width:26px;height:26px;stroke-width:2.4"><path d="M5.2 12.4 Q12 11.5 18.9 12.1"/></svg>';
+const PLUS='<svg viewBox="0 0 24 24" class="acic" style="width:26px;height:26px;stroke-width:2.4"><path d="M5.2 12.4 Q12 11.5 18.9 12.1"/><path d="M12.3 5.1 Q11.7 12 12.1 19"/></svg>';
+const sc={dose:null,rid:'e-classic',speed:1,run:false,t:0,last:0,stand:'ready',stopT:null,drop:null,yOut:null,
+          phase:null,sheet:false,raf:null};
+
+const $=id=>document.getElementById(id);
+const cl=x=>Math.max(0,Math.min(1,x));
+function rec(){return SC_RECIPES.find(r=>r.id===sc.rid);}
+function mss(sec){sec=Math.max(0,sec);const m=Math.floor(sec/60),s=Math.floor(sec%60);return m+':'+String(s).padStart(2,'0');}
+function mssUp(sec){return mss(Math.ceil(sec-1e-6));}
+function tenth(sec){return mss(sec)+'.'+Math.floor((sec*10)%10);}
+
+/* het plan van de shot, uit het recept */
+function plan(){
+  const r=rec(),on=r.pre.on,P=on?r.pre.s:0,R=on?r.pre.rust:0,fs=P+R;
+  const Y=Math.round(r.dose*r.ratio);
+  const F=r.tijd;                            // doel: seconden onder volle druk (keuze Jesse)
+  const Tc=fs+F;                             // geschat moment van het doelgewicht, vanaf de hendel
+  const ts=on?fs+1.5:5.5;                    // eerste straal: natte puck snel, droge puck traag
+  const ph=[];
+  if(on){ph.push({id:'pre',a:0,b:P});if(R>0)ph.push({id:'rest',a:P,b:P+R});}
+  ph.push({id:'full',a:fs,b:Tc});
+  ph.push({id:'stop',a:Tc,b:Infinity});
+  return {r,on,P,R,fs,Y,F,Tc,ts,lo:F-TOL,hi:F+TOL,ph};
+}
+/* geschat gewicht op doeltempo -- géén meting */
+function weight(t,p){
+  let w=0;
+  if(p.on){w+=0.5*cl((t-0.6*p.P)/(0.4*p.P+0.8));w+=0.4*cl((t-p.fs)/(p.ts-p.fs));}
+  else w+=0.9*cl((t-3.5)/(p.ts-3.5));
+  if(t>p.ts){const x=(t-p.ts)/(p.Tc-p.ts);w+=(p.Y-0.9)*(x<=1?Math.pow(x,1.2):1+1.2*(x-1));}
+  return w;
+}
+function wetAt(t,p){
+  if(!p.on)return cl(t/4);
+  if(t<p.P)return 0.75*t/p.P;
+  if(t<p.fs)return 0.75+0.25*Math.sqrt((t-p.P)/p.R);   // de puck trekt in
+  return Math.min(1,0.75+0.25*(t-p.fs)/1);
+}
+function dripAt(t,p){
+  if(t>=p.ts)return false;
+  if(p.on)return (t>0.6*p.P&&t<p.P+0.8)||(t>p.fs&&t<p.ts);
+  return t>3.5;
+}
+function phaseAt(t,p){let i=0;p.ph.forEach((x,k)=>{if(t>=x.a)i=k;});return i;}
+function naam(id,p){return {pre:'pre-infusion',rest:'rest',full:'full pressure',stop:'lever down at '+p.Y+' g'}[id];}
+function zone(f,p){return f<p.lo?'fast':f>p.hi?'slow':'good';}   // f = seconden volle druk
+function fullS(t,p){return Math.max(0,t-p.fs);}
+function shotTime(p){return sc.stopT>p.fs?sc.stopT-p.fs:sc.stopT;}
+
+/* ---------- tekening ---------- */
+function setLever(a){$('sc-lever').style.transform='rotate('+a+'deg)';}
+function paintArt(t,p,running){
+  const svg=$('sc-svg');
+  const i=running?phaseAt(t,p):-1, id=i>=0?p.ph[i].id:null;
+  const water=running&&(id==='pre'||id==='full'||id==='stop');
+  svg.classList.toggle('water',water);
+  svg.classList.toggle('slow',water&&id==='pre');
+  svg.classList.toggle('flow',running&&t>=p.ts);
+  svg.classList.toggle('thin',running&&t>p.Tc-4);
+  if(running)svg.classList.toggle('drip',dripAt(t,p));
+  const wet=(running||sc.stand==='done')?wetAt(sc.stand==='done'?sc.stopT:t,p):0;
+  $('sc-wet').setAttribute('height',(wet*30).toFixed(1));
+  const w=(sc.stand==='ready')?0:weight(sc.stand==='done'?sc.stopT:t,p);
+  const top=181,bot=213,h=cl(w/p.Y)*0.9*(bot-top),y=bot-h;
+  $('sc-fill').setAttribute('y',y.toFixed(2));$('sc-fill').setAttribute('height',h.toFixed(2));
+  const ch=Math.min(h,2+3*cl(w/p.Y));
+  $('sc-crema').setAttribute('y',y.toFixed(2));$('sc-crema').setAttribute('height',ch.toFixed(2));
+  return w;
+}
+
+/* ---------- doelband ---------- */
+function bandMax(p){return Math.ceil((p.hi+10)/5)*5;}
+function renderBand(){
+  const p=plan(),S=bandMax(p),W=Math.round($('sc-band').clientWidth)||330,X=t=>4/100*W+cl(t/S)*(W*0.92);
+  let s='<svg viewBox="0 0 '+W+' 26">';
+  s+='<rect x="'+X(p.lo)+'" y="3" width="'+(X(p.hi)-X(p.lo))+'" height="18" fill="var(--card-2)" stroke="none"/>';
+  s+='<path d="M'+(X(0)-5)+' 3.5 Q'+W/2+' 1.6 '+(X(S)+6)+' 3"  stroke-width="1.7"/>';
+  s+='<path d="M'+(X(0)-6)+' 21 Q'+W/2+' 22.6 '+(X(S)+5)+' 20.6" stroke-width="1.7"/>';
+  s+='<path d="M'+(X(0)-3)+' 2.4 Q'+W/2+' 4.4 '+(X(S)+3)+' 4.2" stroke-width="1.2" opacity=".55"/>';
+  s+='<path d="M'+X(0)+' -1.5 Q'+(X(0)-1.2)+' 12 '+(X(0)+.6)+' 25" stroke-width="1.7"/>';
+  s+='<path d="M'+X(S)+' -1 Q'+(X(S)+1.3)+' 12 '+(X(S)-.4)+' 25.5" stroke-width="1.7"/>';
+  s+='<path d="M'+X(p.lo)+' -2 Q'+(X(p.lo)+1.2)+' 12 '+(X(p.lo)-.5)+' 26" stroke-width="1.5"/>';
+  s+='<path d="M'+X(p.hi)+' -1.5 Q'+(X(p.hi)-1)+' 12 '+(X(p.hi)+.6)+' 26.5" stroke-width="1.5"/>';
+  s+='<g id="sc-mark" style="display:none"><path d="M0 -5 Q.8 12 -.4 30" stroke-width="2.8"/><path d="M-4.5 -6.5 Q0 -4 4.6 -6.8" stroke-width="2.2"/></g>';
+  s+='</svg>';
+  const L=(t)=>(X(t)/W*100).toFixed(1)+'%';
+  s+='<span class="sc-bn" style="left:2px;top:-3px;transform:none;font-size:13px">full pressure</span>';
+  s+='<span class="sc-bn" style="left:'+L(p.lo)+'">'+mss(p.lo)+'</span>';
+  s+='<span class="sc-bn" style="left:'+L(p.hi)+'">'+mss(p.hi)+'</span>';
+  s+='<span class="sc-bl" data-z="fast" style="left:0">too fast</span>';
+  s+='<span class="sc-bl" data-z="good" style="left:'+L((p.lo+p.hi)/2)+';transform:translateX(-50%)">good</span>';
+  s+='<span class="sc-bl" data-z="slow" style="right:0">too slow</span>';
+  $('sc-band').innerHTML=s;
+  $('sc-band').dataset.w=W;
+}
+function paintBand(t,p,show,oordeel){
+  const m=$('sc-mark');if(!m)return;
+  const S=bandMax(p),W=+$('sc-band').dataset.w||330,x=4/100*W+cl(t/S)*(W*0.92);
+  m.style.display=show?'':'none';
+  m.setAttribute('transform','translate('+x.toFixed(1)+' 0)');
+  const z=(show&&oordeel)?zone(t,p):null;
+  document.querySelectorAll('#sc-band .sc-bl').forEach(el=>el.classList.toggle('on',el.dataset.z===z));
+}
+
+/* ---------- strook vorige / nu / volgende ---------- */
+let stripHTML='';
+function setStrip(h){if(h!==stripHTML){$('sc-strip').innerHTML=h;stripHTML=h;}}
+function cur(k,d,v,u,cls){
+  return '<div class="sc-cur '+(cls||'')+'"><div><div class="k">'+k+'</div><div class="d">'+d+'</div></div>'+
+    (v!=null?'<div class="r"><div class="v'+(cls==='rust'?' sc-pulse':'')+'">'+v+'</div><div class="u">'+u+'</div></div>':'')+'</div>';
+}
+function renderStrip(t,p){
+  if(sc.stand==='ready'){
+    const eerst=p.on?('pre-infusion '+mss(p.P)+(p.R?', rest '+mss(p.R):'')):'full pressure';
+    setStrip('<div class="sc-prev">puck prep: WDT · puckscreen · tamp</div>'+
+      cur('pull the lever','cup on the scale, portafilter locked in')+
+      '<div class="sc-next"><span>next</span><b>'+eerst+'</b></div>');
+    return;
+  }
+  if(sc.stand==='done'){renderResult(p);return;}
+  const i=phaseAt(t,p),x=p.ph[i],id=x.id;
+  let prev;
+  if(i===0)prev='lever pulled · 0:00';
+  else{const v=p.ph[i-1];prev=naam(v.id,p)+' · '+tenth(v.b-v.a)+' done';}
+  let c,n,nc='';
+  if(id==='pre'){
+    c=cur('pre-infusion','lever half up · the puck gets wet',mssUp(x.b-t),'left');
+    n='<span>next</span><b>'+naam(p.ph[i+1].id,p)+' in '+mssUp(x.b-t)+'</b>';
+  }else if(id==='rest'){
+    c=cur('rest — wait','lever back to the middle · no pump · the puck soaks it up',mssUp(x.b-t),'left','rust');
+    n='<span>next</span><b>full pressure in '+mssUp(x.b-t)+'</b>';nc=' sterk';
+  }else if(id==='full'){
+    c=cur('full pressure','lever all the way up · two streams into the cup',mss(p.F),'target');
+    n='<span>next</span><b>lever down at '+p.Y+' g in ≈ '+mssUp(p.Tc-t)+'</b>';
+  }else{
+    c=cur('lever down','when your scale says '+p.Y+' g — the estimate is there','+'+mss(t-x.a),'past target');
+    n='<span>next</span><b>done — as soon as you stop</b>';
+  }
+  setStrip('<div class="sc-prev">'+prev+'</div>'+c+'<div class="sc-next'+nc+'">'+n+'</div>');
+}
+function verdict(p){
+  const t=sc.stopT;
+  if(t<p.fs+1)return {k:'stopped early',d:'before full pressure — no read on the grind'};
+  const drop=sc.drop!=null?'first drop '+tenth(sc.drop)+' · ':'';
+  const F=t-p.fs;
+  if(sc.yOut==null){
+    const z=zone(F,p);
+    const k=z==='fast'?'too fast — grind finer':z==='slow'?'too slow — grind coarser':'good — keep this grind';
+    return {k,d:drop+'judged on full-pressure time'};
+  }
+  const f=sc.yOut/F,ft=p.Y/p.F;
+  let k;
+  if(f<ft*0.85)k='too slow — grind coarser';
+  else if(f>ft*1.15)k='too fast — grind finer';
+  else k=Math.abs(sc.yOut-p.Y)>2?'good flow — stop at '+p.Y+' g':'good — keep this grind';
+  return {k,d:drop+'flow '+f.toFixed(2)+' g/s · target '+ft.toFixed(2)+' g/s'};
+}
+function renderResult(p){
+  const v=verdict(p);
+  const y=sc.yOut==null?p.Y:sc.yOut;
+  const full=(sc.stopT-p.fs).toFixed(1);
+  const prev=sc.stopT<=p.fs?'lever down before full pressure':
+    (p.on?(p.P+' s pre + '+p.R+' s rest + '+full+' s full · total '+mss(sc.stopT)):(full+' s full pressure'));
+  setStrip('<div class="sc-prev">'+prev+'</div>'+
+    '<div class="sc-cur uitslag"><div><div class="k">'+v.k+'</div><div class="d">'+v.d+'</div></div></div>'+
+    '<div class="sc-next gewicht"><span>on your scale</span>'+
+      '<span style="display:flex;align-items:center;gap:6px">'+
+      '<button type="button" class="sc-step" aria-label="less" onclick="scWeight(-1)">'+MIN+'</button>'+
+      '<span class="sc-val" style="min-width:64px'+(sc.yOut==null?';color:var(--ink-soft)':'')+'">'+y+' g</span>'+
+      '<button type="button" class="sc-step" aria-label="more" onclick="scWeight(1)">'+PLUS+'</button></span></div>');
+}
+
+/* ---------- knoppen ---------- */
+let btnKey='';
+function renderBtns(){
+  const key=sc.stand+'|'+sc.speed+'|'+(sc.drop!=null)+'|'+(sc.stand==='done'?Math.round(sc.stopT):'');
+  if(key===btnKey)return;btnKey=key;
+  const sp='<button type="button" class="sc-btn speed" aria-pressed="'+(sc.speed>1)+'" onclick="scSpeed()">4x</button>';
+  let h;
+  if(sc.stand==='ready')h=sp+'<button type="button" class="sc-btn pri" onclick="scStart()">pull the lever</button>';
+  else if(sc.stand==='run')h=sp+
+    '<button type="button" class="sc-btn" '+(sc.drop!=null?'disabled':'')+' onclick="scDrop()">'+
+      (sc.drop!=null?'drop '+tenth(sc.drop):'first drop')+'</button>'+
+    '<button type="button" class="sc-btn pri" onclick="scStop()">stop</button>';
+  else h='<button type="button" class="sc-btn" onclick="scAgain()">again</button>'+
+    '<button type="button" class="sc-btn pri" onclick="scUse()">use '+mss(shotTime(plan()))+'</button>';
+  $('sc-btns').innerHTML=h;
+}
+
+/* ---------- kop en paneel ---------- */
+function renderHead(){
+  const p=plan();
+  $('sc-rn').textContent=p.r.naam;
+  $('sc-rd').textContent=(sc.dose!=null?sc.dose.toFixed(1):p.r.dose)+' → '+p.Y+' g · '+(p.on?('pre '+p.P+' s · rest '+p.R+' s'):'no pre-infusion')+' · full '+mss(p.F);
+  $('sc-recbtn').disabled=sc.stand==='run';
+  if(typeof renderTareRow==='function')renderTareRow();
+}
+function renderSheet(){
+  const p=plan(),r=p.r,on=r.pre.on;
+  let h='<h3>recipe</h3><div class="zacht">Pre-infusion and rest belong to the recipe: set them once and every '+
+    r.naam+' shot starts this way. The puck-prep row "pre-infusion" is ticked and filled from it.</div>';
+  h+='<div class="sc-chips">'+SC_RECIPES.map(x=>'<button type="button" class="sc-chip'+(x.id===sc.rid?' sel':'')+
+    '" onclick="scPick(\''+x.id+'\')">'+x.naam+'</button>').join('')+'</div>';
+  h+='<div class="sc-row"><div class="sc-rl">pre-infusion<small>'+(on?'on in this recipe':'off in this recipe')+
+    '</small></div><button type="button" class="sc-tog" aria-label="pre-infusion" aria-pressed="'+on+'" onclick="scPreOn()"><span class="knob"></span></button></div>';
+  h+='<div class="sc-row'+(on?'':' uit')+'"><div class="sc-rl">pre-infusion<small>lever half up</small></div>'+
+    '<button type="button" class="sc-step" aria-label="shorter pre-infusion" '+(on?'':'disabled')+' onclick="scSet(\'s\',-1)">'+MIN+'</button>'+
+    '<span class="sc-val">'+mss(r.pre.s)+'</span>'+
+    '<button type="button" class="sc-step" aria-label="longer pre-infusion" '+(on?'':'disabled')+' onclick="scSet(\'s\',1)">'+PLUS+'</button></div>';
+  h+='<div class="sc-row'+(on?'':' uit')+'"><div class="sc-rl">rest<small>lever to the middle, no pump</small></div>'+
+    '<button type="button" class="sc-step" aria-label="shorter rest" '+(on?'':'disabled')+' onclick="scSet(\'rust\',-1)">'+MIN+'</button>'+
+    '<span class="sc-val">'+mss(r.pre.rust)+'</span>'+
+    '<button type="button" class="sc-step" aria-label="longer rest" '+(on?'':'disabled')+' onclick="scSet(\'rust\',1)">'+PLUS+'</button></div>';
+  h+='<div class="sc-op">target: <b>'+mss(p.F)+'</b> of full pressure, good '+mss(p.lo)+'–'+mss(p.hi)+
+    (p.on?' · pre-infusion and rest come on top, total about '+mss(p.Tc):'')+'</div>';
+  h+='<button type="button" class="sc-btn pri" onclick="scSheet(false)">done</button>';
+  $('sc-sheet').innerHTML=h;
+}
+function scSheet(open){
+  if(open&&sc.stand==='run')return;
+  if(open&&tare.open)scTare(false);
+  sc.sheet=open;
+  if(open)renderSheet();
+  $('sc-sheet').classList.toggle('open',open);$('sc-scrim').classList.toggle('open',open);
+  $('sc-sheet').setAttribute('aria-hidden',String(!open));
+}
+function scPick(id){sc.rid=id;sc.yOut=null;sc.dose=null;afterSettings();}
+function scPreOn(){const r=rec();r.pre.on=!r.pre.on;if(r.pre.on&&r.pre.s<1)r.pre.s=5;afterSettings();}
+function scSet(k,d){
+  const r=rec();if(!r.pre.on)return;
+  if(k==='s')r.pre.s=Math.max(1,Math.min(15,r.pre.s+d));
+  else r.pre.rust=Math.max(0,Math.min(10,r.pre.rust+d));
+  afterSettings();
+}
+function afterSettings(){if(sc.stand==='done')scAgain();else{renderAll();}renderSheet();}
+
+/* ---------- de klok ---------- */
+function setClock(t){
+  $('sc-time').textContent=mss(t);
+  $('sc-dec').textContent='.'+Math.floor((t*10)%10);
+}
+function zoem(){try{if(navigator.vibrate)navigator.vibrate(60);}catch(e){}}
+function tick(now){
+  if(!sc.run)return;
+  const dt=Math.min(0.25,(now-sc.last)/1000);sc.last=now;
+  sc.t+=dt*sc.speed;
+  const p=plan();
+  if(sc.t>=VEILIG){scStop(true);return;}
+  frame(p);
+  sc.raf=requestAnimationFrame(tick);
+}
+function frame(p){
+  const t=sc.t,running=sc.stand==='run';
+  if(running){
+    const i=phaseAt(t,p),id=p.ph[i].id;
+    if(id!==sc.phase){
+      if(sc.phase)zoem();
+      sc.phase=id;
+      setLever(id==='pre'?LEVER.pre:id==='rest'?LEVER.rest:LEVER.full);
+    }
+    $('sc-read').classList.toggle('wacht',id==='rest');
+    if(id==='rest')$('sc-tlbl').textContent='waiting · from the lever';
+  }
+  const tt=sc.stand==='done'?sc.stopT:t;
+  const vol=sc.stand!=='ready'&&tt>=p.fs&&!(sc.stand==='done'&&sc.stopT<=p.fs);
+  setClock(vol?tt-p.fs:tt);
+  if(vol)$('sc-tlbl').textContent=p.on?'full pressure · total '+mss(tt):'full pressure · from the lever';
+  else if(sc.stand!=='run'||sc.phase!=='rest')$('sc-tlbl').textContent='from the lever';
+  const w=paintArt(t,p,running);
+  if(sc.stand==='done'){
+    $('sc-w').textContent=(sc.yOut==null?p.Y:sc.yOut)+' g';
+    $('sc-wlbl').textContent=sc.yOut==null?'on your scale? set below':'on your scale';
+  }else{
+    $('sc-w').textContent=sc.stand==='ready'?'0 g':'≈ '+Math.round(w)+' g';
+    $('sc-wlbl').textContent='of '+p.Y+' g · estimate';
+  }
+  const inFull=sc.stand==='done'?sc.stopT>p.fs+1:tt>=p.fs;
+  paintBand(fullS(tt,p),p,sc.stand!=='ready',inFull);
+  renderStrip(t,p);
+  renderBtns();
+}
+function renderAll(){renderHead();renderBand();frame(plan());}
+
+function scStart(){
+  if(sc.stand!=='ready')return;
+  scSheet(false);
+  sc.stand='run';sc.t=0;sc.phase=null;sc.drop=null;sc.yOut=null;sc.stopT=null;
+  sc.last=performance.now();sc.run=true;
+  renderHead();frame(plan());
+  sc.raf=requestAnimationFrame(tick);
+}
+function scStop(vanzelf){
+  if(sc.stand!=='run')return;
+  sc.run=false;cancelAnimationFrame(sc.raf);
+  sc.stopT=sc.t;sc.stand='done';sc.phase=null;
+  setLever(LEVER.down);
+  const svg=$('sc-svg');
+  svg.classList.remove('flow','water','slow','thin');
+  svg.classList.add('drip');                                // nog een paar laatste druppels
+  setTimeout(()=>{if(sc.stand==='done')svg.classList.remove('drip');},1800/Math.max(1,sc.speed/2));
+  $('sc-read').classList.remove('wacht');
+  renderHead();frame(plan());
+  if(vanzelf===true)toast('stopped by itself after a minute — you stop the shot at your weight');
+}
+function scAgain(){
+  sc.run=false;cancelAnimationFrame(sc.raf);
+  sc.stand='ready';sc.t=0;sc.stopT=null;sc.drop=null;sc.yOut=null;sc.phase=null;
+  sc.dose=null;tare.check='';$('sc-chkin').value='';   // nieuwe shot: opnieuw afwegen
+  setLever(LEVER.down);
+  $('sc-svg').classList.remove('flow','water','slow','thin','drip');
+  $('sc-read').classList.remove('wacht');
+  renderAll();
+}
+function scDrop(){if(sc.stand==='run'&&sc.drop==null){sc.drop=sc.t;renderBtns();}}
+function scSpeed(){sc.speed=sc.speed>1?1:4;renderBtns();}
+function scWeight(d){
+  const p=plan();
+  sc.yOut=Math.max(1,Math.min(99,(sc.yOut==null?p.Y:sc.yOut)+d));
+  frame(p);
+}
+function scUse(){
+  const p=plan();
+  toast(mss(shotTime(p))+(p.on&&sc.stopT>p.fs?' full pressure (total '+mss(sc.stopT)+')':'')+' and '+(sc.yOut==null?p.Y:sc.yOut)+' g filled in — still editable');
+}
+let toastT=null;
+function toast(s){
+  const el=$('sc-toast');el.textContent=s;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2600);
+}
+/* ---------- tarra ----------
+   Eigen gewicht van je onderdelen, één keer gewogen op een lege, genulde
+   weegschaal (in de app: profile -> my gear). Hier VOORBEELDGEWICHTEN.     */
+const GEAR=[
+  {id:'naked', n:'naked',         lang:'naked portafilter',        kort:'naked',    g:512.4, pf:true},
+  {id:'spout', n:'double spout',  lang:'double spout portafilter', kort:'spout',    g:548.0, pf:true},
+  {id:'ring',  n:'dosing ring',   lang:'dosing ring',              kort:'ring',     g:38.6},
+  {id:'ps1',   n:'puck screen 1', lang:'puck screen 1',            kort:'screen 1', g:12.3},
+  {id:'ps2',   n:'puck screen 2', lang:'puck screen 2',            kort:'screen 2', g:9.8},
+  {id:'cup',   n:'dosing cup',    lang:'dosing cup',               kort:'cup',      g:61.2},
+];
+const tare={on:{naked:true,ring:true},check:'',open:false};
+const g10=x=>Math.round(x*10)/10;
+function parseG(v){const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:null;}
+function partsSum(){return g10(GEAR.filter(x=>tare.on[x.id]).reduce((a,x)=>a+x.g,0));}
+function partsName(){const l=GEAR.filter(x=>tare.on[x.id]).map(x=>x.kort);return l.length?l.join(' + '):'nothing';}
+function aimG(){return g10(partsSum()+rec().dose);}
+function realDose(){const v=parseG(tare.check);return v==null?null:g10(v-partsSum());}
+function signed(d){return (d>0?'+':d<0?'−':'±')+Math.abs(d).toFixed(1)+' g';}
+function renderTareRow(){
+  $('sc-tsum').textContent=partsName()+': '+partsSum().toFixed(1)+' g · '+
+    (sc.dose!=null?'dose '+sc.dose.toFixed(1)+' g':'aim '+aimG().toFixed(1)+' g');
+  $('sc-tarerow').disabled=sc.stand==='run';
+}
+function renderTare(){
+  $('sc-parts').innerHTML=GEAR.map(x=>'<button type="button" class="sc-part" aria-pressed="'+!!tare.on[x.id]+
+    '" onclick="scPart(\''+x.id+'\')"><span class="pn">'+x.n+'</span><span class="pg">'+x.g.toFixed(1)+' g</span></button>').join('');
+  const dose=rec().dose;
+  $('sc-aiml').innerHTML='at '+dose.toFixed(1)+' g dose the scale should read<br>'+partsSum().toFixed(1)+' g parts + '+dose.toFixed(1)+' g coffee';
+  $('sc-aim').textContent=aimG().toFixed(1)+' g';
+  const d=realDose();let h,ok=false;
+  if(String(tare.check).trim()==='')h='type what the scale shows: the parts come off and you see your real dose.';
+  else if(d==null||d<=0||d>40)h='that doesn\'t add up — check what is on the scale.';
+  else{
+    const diff=g10(d-dose);ok=true;
+    const w=Math.abs(diff)<0.05?'spot on':diff>0?Math.abs(diff).toFixed(1)+' g too much':Math.abs(diff).toFixed(1)+' g short';
+    h='real dose <b id="sc-real">'+d.toFixed(1)+' g</b> · <b id="sc-diff">'+signed(diff)+'</b> — '+w;
+  }
+  $('sc-res').innerHTML=h;
+  $('sc-usedose').disabled=!ok;
+  renderTareRow();
+}
+function scTare(open){
+  if(open===undefined)open=!tare.open;
+  if(open&&sc.stand==='run')return;
+  if(open)scCloseSheets();
+  tare.open=open;
+  const row=$('sc-tarerow');
+  const top=row.offsetTop+row.offsetHeight+6;
+  $('sc-tp').style.top=top+'px';
+  $('sc-tp').style.maxHeight=($('sc-scr').clientHeight-top-12)+'px';
+  $('sc-tp').classList.toggle('open',open);
+  row.setAttribute('aria-expanded',String(open));
+  if(open)renderTare();
+}
+function scPart(id){
+  const x=GEAR.find(g=>g.id===id),aan=!tare.on[id];
+  if(aan&&x.pf)GEAR.filter(g=>g.pf).forEach(g=>{tare.on[g.id]=false;});   // één portafilter tegelijk
+  tare.on[id]=aan;renderTare();
+}
+function scCheck(v){tare.check=v;renderTare();}
+function scUseDose(){
+  const d=realDose();if(d==null||d<=0||d>40)return;
+  sc.dose=d;scTare(false);renderHead();renderTareRow();
+  toast('dose '+d.toFixed(1)+' g for this shot — target stays '+plan().Y+' g out');
+}
+/* my gear: waar je de gewichten invult (profiel) */
+function renderGear(){
+  let h='<div class="sc-crumb">profile → my gear → espresso</div><h3>my gear · weights</h3>'+
+    '<div class="zacht">Weigh each part once on an empty, zeroed scale. One decimal is enough. '+
+    '<span class="vb" style="border:1.5px dashed var(--line);border-radius:10px;padding:0 6px">example values</span></div>';
+  h+=GEAR.map((x,i)=>'<div class="sc-grow"><label for="sc-g'+i+'">'+x.lang+'</label>'+
+    '<input class="sc-num klein" id="sc-g'+i+'" type="text" inputmode="decimal" autocomplete="off" value="'+x.g.toFixed(1)+
+    '" oninput="scGearSet('+i+',this.value)" onblur="this.value=GEAR['+i+'].g.toFixed(1)"><span class="u">g</span></div>').join('');
+  h+='<button type="button" class="sc-btn pri" onclick="scGear(false)">done</button>';
+  $('sc-gear').innerHTML=h;
+}
+function scGearSet(i,v){const n=parseG(v);if(n!=null&&n>=0&&n<3000){GEAR[i].g=g10(n);if(tare.open)renderTare();else renderTareRow();}}
+function scGear(open){
+  if(open){renderGear();$('sc-scrim').classList.add('hoog');}
+  $('sc-gear').classList.toggle('open',open);
+  $('sc-gear').setAttribute('aria-hidden',String(!open));
+  $('sc-scrim').classList.toggle('open',open||sc.sheet);
+  if(!open){$('sc-scrim').classList.remove('hoog');if(tare.open)renderTare();}
+}
+function scCloseSheets(){if($('sc-gear').classList.contains('open'))scGear(false);if(sc.sheet)scSheet(false);}
+
+/* de hendel aantikken: klaar = overhalen, loopt = omlaag en stop */
+function leverTap(){if(sc.sheet||tare.open)return;if(sc.stand==='ready')scStart();else if(sc.stand==='run')scStop();}
+$('sc-art').addEventListener('click',leverTap);
+$('sc-art').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();leverTap();}});
+
+renderAll();
+</script>

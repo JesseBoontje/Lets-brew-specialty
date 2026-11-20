@@ -78,7 +78,7 @@
       <div class="form-head"><div class="h hand">new brew</div><button onclick="goBack('home')">Annuleren</button></div>
       <div class="subtitle">Pick a bean</div>
       <div id="choosebean-list"></div>
-      <button class="profile-btn" onclick="beginBrew(null)" style="margin-top:6px">no bean — just pick a method</button>
+      <button class="profile-btn" onclick="openBeanForm(false,'choosebean')" style="margin-top:6px">＋ add a new bean</button>
     </div>
   </div>
 
@@ -152,11 +152,11 @@
 
       <div class="field-row" id="fb-doserow">
         <div class="field"><label>dose (g)</label><input id="f-dose" type="number" inputmode="decimal" step="0.1" oninput="calc('dose');vulBloomAuto();pourRecalc()"></div>
-        <div class="field"><label id="f-yield-label">yield (g)</label><input id="f-yield" type="number" inputmode="decimal" step="0.1" oninput="calc('yield')"></div>
+        <div class="field"><label id="f-yield-label">yield (g)</label><input id="f-yield" type="number" inputmode="decimal" step="0.1" oninput="calc('yield');pourEigenRatio('yield')"></div>
       </div>
       <div class="ratio-row" id="fb-ratio">
         <span class="ratio-lbl">ratio 1:</span>
-        <input id="f-ratio" class="ratio-input" type="number" inputmode="decimal" step="0.1" oninput="calc('ratio')">
+        <input id="f-ratio" class="ratio-input" type="number" inputmode="decimal" step="0.1" oninput="calc('ratio');pourEigenRatio('ratio')">
         <span class="ratio-hint" id="f-ratio-hint">auto-calculates from dose + yield</span>
       </div>
 
@@ -314,10 +314,10 @@
           </svg>
         </div>
         <div class="e61-row">
-          <div><span class="e61-time hand" id="e61-time">0:00</span><div class="e61-tgt" id="e61-tgt"></div></div>
-          <button type="button" class="e61-btn" id="e61-btn" onclick="event.stopPropagation();e61Toggle()">pull the lever</button>
+          <div><span class="e61-time hand" id="e61-time" style="font-size:30px;white-space:nowrap">shot clock</span><div class="e61-tgt" id="e61-tgt"></div></div>
+          <button type="button" class="e61-btn" id="e61-btn" onclick="event.stopPropagation();e61Toggle()">open</button>
         </div>
-        <div class="set-d" style="margin-top:8px;font-size:14px">lever up = shot running · lever down = stop, the time is filled in below — you can always correct any value by hand</div>
+        <div class="set-d" style="margin-top:8px;font-size:14px">full screen: pre-infusion, rest and full pressure, with a tare box for your parts. Only full pressure counts for the target; the time is filled in below and stays editable.</div>
         <div id="voice-row" style="display:none;margin-top:8px">
           <div class="field-row voice-row">
             <input id="voice-text" placeholder='zeg of typ: 18 in, 36 uit, 27 seconden'>
@@ -714,7 +714,7 @@
       <div class="subtitle">settings & back-up</div>
 
 
-      <div class="sect"><span class="hand">your coffee</span><span class="sd">your gear and your week</span></div>
+      <div class="sect"><span class="hand">your coffee</span><span class="sd">your gear and your palate</span></div>
       <div class="settings-card sketch soft" id="gear-card">
         <button class="adv-head" onclick="document.getElementById('gear-card').classList.toggle('open')"><span class="set-t hand">my gear</span><span class="g-arr">▸</span></button>
         <div class="adv-body">
@@ -739,6 +739,9 @@
         </div>
         <div class="set-d" id="gear-range-note" style="display:none;font-size:14px;margin:-2px 0 8px">the full scale of your grinder — clicks, numbers, whatever it uses. This lets the app judge how big a step really is on your grinder.</div>
         <button class="profile-btn" onclick="addGear()" style="margin-top:2px">＋ add</button>
+        <div class="gear-cat-lbl" style="margin-top:14px">espresso parts · weight</div>
+        <div class="set-d" style="font-size:14px;margin:0 0 4px">for the tare box in the shot clock: weigh each part once on an empty, zeroed scale. Leave empty what you don't have.</div>
+        <div class="tare-gear" id="tare-gear"></div>
       
         <div id="pair-card" style="display:none;border-top:1.5px dashed var(--line);margin-top:14px;padding-top:12px">
         <div class="set-t hand" style="font-size:19px;margin-top:4px">pairing</div>
@@ -749,14 +752,9 @@
         </div>
       </div>
       <div class="settings-card sketch soft" id="week-card" style="display:none">
-        <button class="adv-head" onclick="document.getElementById('week-card').classList.toggle('open')"><span class="set-t hand">your week</span><span class="g-arr">▸</span></button>
+        <button class="adv-head" onclick="document.getElementById('week-card').classList.toggle('open')"><span class="set-t hand">your palate</span><span class="g-arr">▸</span></button>
         <div class="adv-body">
-        <div id="bl-card">
-        <div class="set-t hand">weekly brewsletter</div>
-        <div class="set-d" style="margin:4px 0 10px">a hand-drawn recap card of your week in coffee — share it or keep it.</div>
-        <button class="profile-btn" onclick="brewsletter()"><svg viewBox="0 0 24 24" class="acic btn-svg"><path d="M4.7 9.7 Q4.6 16.2 8 18.3 Q12 20.6 16.2 18.1 Q19.4 16.1 19.3 9.6 M4.3 10.2 Q12 8.3 19.7 10.1 M19.1 10.9 Q22.4 10.7 22.3 13.5 Q22.2 16.4 18.8 16.1 M3 21.4 Q12 22.1 21.1 21.3"/><path d="M8.9 5.9 Q8.1 7.6 9.5 8.8 M12.4 5.1 Q11.4 6.9 12.8 8.1 M15.7 5.9 Q14.8 7.6 16.2 8.8" opacity="0.7"/></svg> draw my week</button>
-      </div>
-        <div id="tm-card" style="border-top:1.5px dashed var(--line);margin-top:12px;padding-top:10px">
+        <div id="tm-card">
         <div class="set-t hand">taste memory</div>
         <div class="set-d" style="margin:4px 0 10px">what your scores say about your palate.</div>
         <div id="tm-body" class="set-d" style="color:var(--ink)"></div>
@@ -784,6 +782,21 @@
           <div id="ai-bud-wrap" class="aib"></div>
         </div>
         <div class="set-d" id="ai-off-note" style="margin-top:8px">AI is off. turn it on and enter a key to use label scanning and recipes. without a key the rest of the app works fine.</div>
+        </div>
+      </div>
+
+      <div class="settings-card sketch soft" id="stem-card">
+        <button class="adv-head" onclick="document.getElementById('stem-card').classList.toggle('open')">
+          <div class="set-body"><div class="set-t hand">voice for the coaches</div>
+            <div class="set-d">steps out loud in the pour coach, AeroPress coach and shot clock</div></div>
+          <span class="g-arr">▸</span></button>
+        <div class="adv-body">
+          <div class="set-d" style="margin:6px 0 8px">without a key the coaches use your phone’s own voice. with your own ElevenLabs API key they use an ElevenLabs voice (model eleven_v4), paid from your own ElevenLabs credit. the key stays in this tab only: paste it again after reloading; it is never included in a back-up.</div>
+          <input id="stem-key" class="stem-veld" type="password" autocomplete="off" placeholder="sk_..." onchange="stemSleutel()">
+          <button class="profile-btn" style="margin-top:8px" onclick="stemLaad()">load my voices</button>
+          <select id="stem-kies" class="stem-veld" aria-label="ElevenLabs voice" onchange="stemKies()"><option value="">— pick one of your voices —</option></select>
+          <div class="set-d" id="stem-status" style="margin-top:8px"></div>
+          <button class="profile-btn" style="margin-top:8px" onclick="stemTest()">test the voice</button>
         </div>
       </div>
 
@@ -921,7 +934,22 @@
 
 <script src="security.js"></script>
 <script src="brew-model.js"></script>
-<script src="app-core.js"></script>
+<script src="brew-stem.js"></script>
+<script src="app/01-kennis.js"></script>
+<script src="app/02-opslag.js"></script>
+<script src="app/03-navigatie-home.js"></script>
+<script src="app/04-brew-formulier.js"></script>
+<script src="app/04-gietcoach.js"></script>
+<script src="app/04-aeropress.js"></script>
+<script src="app/05-espresso-dial-in.js"></script>
+<script src="app/05-shotclock.js"></script>
+<script src="app/06-detail-en-methodes.js"></script>
+<script src="app/07-bonen.js"></script>
+<script src="app/08-ai.js"></script>
+<script src="app/09-leren-en-extra.js"></script>
+<script src="app/10-bonenkeuzehulp.js"></script>
+<script src="app/11-profiel-en-instellingen.js"></script>
+<script src="app/12-hulp-en-start.js"></script>
 <script src="brew-workspace.js"></script>
 <script src="brew-voice.js"></script>
 <script src="pwa.js"></script>
