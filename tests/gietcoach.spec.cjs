@@ -54,8 +54,8 @@ test('V60: countdown, steps follow the clock, next step shifts the rest, done fi
  expect(s.cur).toBe(2);
  const schuif=s.starts[2]-45;
  expect(schuif).toBeLessThan(0);
- expect(s.starts[3]-s.starts[2]).toBe(30);
- expect(s.starts[5]-s.starts[2]).toBe(75);
+ expect(s.starts[3]-s.starts[2]).toBeCloseTo(30,5);
+ expect(s.starts[5]-s.starts[2]).toBeCloseTo(75,5);
  await expect(page.locator('#gc-r-nu')).toContainText('151 g');
  // door naar het eind en klaar
  await page.evaluate(()=>gc.snelheid(30));

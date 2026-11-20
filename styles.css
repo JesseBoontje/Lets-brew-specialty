@@ -1408,3 +1408,6 @@ body.gc-open{overflow:hidden;}
   #gietcoach .gc-zegt,#gietcoach .gc-toast,#gietcoach #gc-tek .drip,#gietcoach #gc-tek .zacht{transition:none;}
 }
 
+/* zonder het handschrift-lettertype (eerste keer offline) mag het doel niet uit de kaart lopen */
+#gietcoach .nu-wat{flex:none;}
+#gietcoach .nu-doel{min-width:0;overflow:hidden;text-overflow:ellipsis;}
