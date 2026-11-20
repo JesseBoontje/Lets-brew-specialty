@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-19
+Laatst bijgewerkt: 2026-11-20
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -94,3 +94,18 @@ Claude. Nog ideeën?"
 2. Keuzes uitlezen, takenbord vullen, per keuze een klus (aannemers alleen waar
    het loont, max 3, elk eigen deel van app/).
 3. Mergen alleen na akkoord van Jesse.
+
+## Stand 20-11
+- Jesse besloot: eerst de kleinere klussen; Cloudflare (build, database, inlog,
+  Claude-koppeling) later. Volgorde: 1 brews aan bonen, 2 gietcoach V60/Switch,
+  3 AeroPress, 4 shot clock met tarra-vak. Eén keuring per klus.
+- Klus 1 gebouwd in commit 8bbbe57: BrewModel.linkBeansByName (brew-model.js),
+  koppelblok bovenaan brews (unlinkedHTML in app/07, aangeroepen vanuit
+  brew-workspace.js renderAll), boon verplicht in saveBrew/saveDialInBrew
+  (vraagBoon in app/05), nieuwe boon onderweg (openBeanForm(wens,terug) in
+  app/07), demo-brews met boon (app/02). Test: tests/bean-link.spec.cjs.
+- Valkuil: brew-workspace.js overschrijft renderAll uit app/03. Wijzigingen
+  aan de brews-lijst horen in brew-workspace.js.
+- Lokaal testen: maak pw-local.config.cjs (staat in .git/info/exclude) met
+  alleen chromium en executablePath; eerst `npm ci`.
+- Geen testlink mogelijk zolang de Cloudflare-build faalt.

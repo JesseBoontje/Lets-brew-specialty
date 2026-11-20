@@ -13,3 +13,7 @@
 | Opzet AeroPress normaal/omgekeerd + recepten | aannemer 2 | geen code (docs/) | wacht op Jesse | https://claude.ai/artifact/TVMyY3yJt45oMQw58mtToP ; huidig app-recept (16 g/240 g) heeft geen bron |
 | Opzet shot clock E61 + pre-infusie | aannemer 3 | geen code (docs/) | wacht op Jesse | https://claude.ai/artifact/STNHN6rDgvJXxiHnJcLmNQ ; open vraag: telt de rust mee in de doeltijd? |
 | Cloudflare-builds falen | volgende sessie | geen | wacht op koppeling | buildlogs lezen |
+| Klus 1: elke brew aan een boon | architect | claude/architect-skill-jesse-dhw83j | bij keurmeester (commit 8bbbe57) | na keuring: klus 2 gietcoach V60/Switch |
+| Klus 2: gietcoach V60/Switch inbouwen | architect | claude/architect-skill-jesse-dhw83j | nog niet begonnen | volgens docs/opzet-gietcoach-v60.html |
+| Klus 3: AeroPress normaal/omgekeerd | architect | idem | nog niet begonnen | docs/opzet-aeropress.html |
+| Klus 4: shot clock E61 + tarra-vak | architect | idem | nog niet begonnen | docs/opzet-shotclock-e61.html |
