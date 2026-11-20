@@ -15,7 +15,7 @@ test('imports preserve valid strings and reject executable image/identifier/prot
 test('import size, object depth and collection counts are bounded',()=>{
  let d={};for(let i=0;i<30;i++)d={next:d};assert.throws(()=>S.validateImport(d));assert.throws(()=>S.validateImport({beans:Array(10001).fill({})}));
 });
-const origin='https://letsbrewspecialty.jesseboontje.workers.dev';
+const origin='https://letsbrew.djez.app';
 const endpoint='https://fcm.googleapis.com/fcm/send/synthetic-token';
 function env(){const rows=new Map();return{rows,SUBS:{put:async(k,v)=>rows.set(k,v),get:async k=>rows.get(k)||null,delete:async k=>rows.delete(k)}};}
 const req=(body,headers={Origin:origin,'Content-Type':'application/json'})=>new Request('https://push.example/subscribe',{method:'POST',headers,body:JSON.stringify(body)});

@@ -93,7 +93,7 @@ bestaande logo wordt als cachebaar bestand hergebruikt. De geforceerde splash va
 app-pakket; nieuwe versies worden atomair geïnstalleerd en na activatie herladen.
 
 De app is op 24 oktober 2026 gepubliceerd op de bestaande origin
-`https://letsbrewspecialty.jesseboontje.workers.dev` in de Jesse Boontje-account.
+`https://letsbrew.djez.app` in de Jesse Boontje-account.
 De account-id staat expliciet in de Wrangler-configuratie. De productie-trigger
 bouwt met `npm run build` en publiceert alleen `main` met `npx wrangler deploy`.
 Andere branches gebruiken `npx wrangler versions upload`: zij vervangen de

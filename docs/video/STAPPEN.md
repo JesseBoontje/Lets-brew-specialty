@@ -257,7 +257,7 @@ python3 docs/video/bouw-landing.py pad/naar/klein.mp4
 ```
 
 Dat schrijft `docs/video/landing.html` met de video erin en de knop naar
-`letsbrewspecialty.jesseboontje.workers.dev`. Publiceer dat bestand als artifact op de
+`letsbrew.djez.app`. Publiceer dat bestand als artifact op de
 bestaande link, dan blijft hij hetzelfde:
 
 **https://claude.ai/code/artifact/9bd698cf-0b1a-418a-abe0-a6c65eaff2d9**

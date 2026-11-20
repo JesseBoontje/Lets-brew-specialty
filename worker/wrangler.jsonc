@@ -5,7 +5,7 @@
   // dashboard (zie README.md), dan zet je de variabelen, de KV-binding en de
   // cron daar en blijft dit bestand ongebruikt.
   "name": "lets-brew-push",
-  "account_id": "7d5fa36f0987a01dcf47b34791495fa6",
+  "account_id": "1aaa91af61ee9076f80653f8a1a554d7",
   "main": "src/index.js",
   "compatibility_date": "2026-10-24",
 
