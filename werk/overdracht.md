@@ -224,3 +224,9 @@ Claude. Nog ideeën?"
      (aanbevolen, zelfde patroon als de spraak-API nu) of één vaste sleutel van
      Jesse in Cloudflare secrets (dan betaalt Jesse voor iedereen; rem nodig).
 - Klus 1 t/m 4 zijn alle goedgekeurd (zie archief). Alles in PR #12, niet gemerged.
+- Antwoorden doorgegeven via een andere sessie (20-11 13:30 UTC), nog door Jesse
+  te bevestigen in deze sessie: vraag 1 "allemaal" (stappen hardop in
+  gietcoach/AeroPress/shot clock, live spraakcoach in plaats van OpenAI, AI-coach
+  voorlezen); vraag 2 "A" (eigen ElevenLabs-sleutel per gebruiker via de Worker,
+  alleen in tabbladgeheugen, nooit in back-up of database). Model eleven_v4.
+  Zonder sleutel blijft de huidige stem werken (terugval).
