@@ -94,6 +94,8 @@ const sc={open:false,dose:null,speed:1,run:false,t:0,last:0,stand:'ready',stopT:
 let R=null;                  // het recept waar deze shot uit leest
 const cl=x=>Math.max(0,Math.min(1,x));
 function mss(sec){sec=Math.max(0,sec);const m=Math.floor(sec/60),s=Math.floor(sec%60);return m+':'+String(s).padStart(2,'0');}
+// afgerond op hele seconden: zo staat het ook in het invulveld
+function mssR(sec){return mss(Math.round(sec));}
 function mssUp(sec){return mss(Math.ceil(sec-1e-6));}
 function tenth(sec){return mss(sec)+'.'+Math.floor((sec*10+1e-6)%10);}
 
@@ -261,7 +263,7 @@ function renderResult(p){
   const y=sc.yOut==null?p.Y:sc.yOut;
   const full=(sc.stopT-p.fs).toFixed(1);
   const prev=sc.stopT<=p.fs?'lever down before full pressure':
-    (p.on?(p.P+' s pre + '+p.R+' s rest + '+full+' s full · total '+mss(sc.stopT)):(full+' s full pressure'));
+    (p.on?(p.P+' s pre + '+p.R+' s rest + '+full+' s full · total '+mssR(sc.stopT)):(full+' s full pressure'));
   setStrip('<div class="sc-prev">'+prev+'</div>'+
     '<div class="sc-cur uitslag"><div><div class="k">'+v.k+'</div><div class="d">'+v.d+'</div></div></div>'+
     '<div class="sc-next gewicht"><span>on your scale</span>'+
@@ -283,7 +285,7 @@ function renderBtns(){
       (sc.drop!=null?'drop '+tenth(sc.drop):'first drop')+'</button>'+
     '<button type="button" class="sc-btn pri" data-a="stop">stop</button>';
   else h='<button type="button" class="sc-btn" data-a="again">again</button>'+
-    '<button type="button" class="sc-btn pri" data-a="use">use '+mss(shotTime(plan()))+'</button>';
+    '<button type="button" class="sc-btn pri" data-a="use">use '+mssR(shotTime(plan()))+'</button>';
   $('btns').innerHTML=h;
 }
 
@@ -449,7 +451,7 @@ function scUse(){
   if(sc.stand!=='done')return;
   const p=plan(), tijd=shotTime(p);
   const inp=document.getElementById('di-time');
-  if(inp){inp.value=mss(Math.round(tijd));normalizeTime(inp);}
+  if(inp){inp.value=mssR(tijd);normalizeTime(inp);}
   if(sc.yOut!=null)setVal('di-yield',sc.yOut);
   if(sc.dose!=null)setVal('di-dose',sc.dose.toFixed(1));
   if((state.prepItems||[]).some(x=>x.id==='preinf'))
@@ -460,7 +462,7 @@ function scUse(){
     drop:sc.drop!=null?Math.round(sc.drop*10)/10:null,
     yieldEstimated:sc.yOut==null};
   try{renderPrep();diAdvice();}catch(e){}
-  const tekst=mss(Math.round(tijd))+(p.on&&sc.stopT>p.fs?' full pressure (total '+mss(sc.stopT)+')':'')+
+  const tekst=mssR(tijd)+(p.on&&sc.stopT>p.fs?' full pressure (total '+mssR(sc.stopT)+')':'')+
     (sc.yOut!=null?' and '+sc.yOut+' g':'')+' filled in — still editable';
   sluit();
   toast(tekst);

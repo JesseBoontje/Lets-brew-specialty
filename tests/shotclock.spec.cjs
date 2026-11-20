@@ -32,7 +32,7 @@ test('classic: pre 5 s, rest 3 s, full pressure counts; use fills the dial-in an
  await expect(page.locator('#sc-strip')).toContainText('pre-infusion 0:05, rest 0:03');
  // knoppen groot genoeg, niets zijwaarts
  for(const sel of ['#sc-dicht','#sc-recbtn','#sc-btns [data-a="start"]','#sc-tarerow']){
-  const b=await page.locator(sel).boundingBox();expect(b.height).toBeGreaterThanOrEqual(46);expect(b.width).toBeGreaterThanOrEqual(46);
+  const b=await page.locator(sel).boundingBox();expect(b.height).toBeGreaterThanOrEqual(48);expect(b.width).toBeGreaterThanOrEqual(48);
  }
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
  // hendel overhalen
@@ -62,7 +62,7 @@ test('classic: pre 5 s, rest 3 s, full pressure counts; use fills the dial-in an
  const ft=36/28,f=35/vol;
  await expect(page.locator('#sc-strip')).toContainText('flow '+f.toFixed(2)+' g/s · target '+ft.toFixed(2)+' g/s');
  const tijd=Math.round(vol);
- await expect(page.locator('#sc-btns [data-a="use"]')).toHaveText('use 0:'+String(Math.floor(vol)).padStart(2,'0'));
+ await expect(page.locator('#sc-btns [data-a="use"]')).toHaveText('use 0:'+String(tijd).padStart(2,'0'));
  await page.locator('#sc-btns [data-a="use"]').tap();
  await expect(sc).toBeHidden();
  await expect(page.locator('#di-time')).toHaveValue('0:'+String(tijd).padStart(2,'0'));
@@ -106,6 +106,7 @@ test('recipe sheet: rest and pre-infusion belong to the recipe and are kept',asy
  await page.locator('#e61-btn').tap();
  await page.locator('#sc-recbtn').tap();
  await expect(page.locator('#sc-sheet')).toHaveClass(/open/);
+ const chip=await page.locator('#sc-sheet [data-a="pick"]').first().boundingBox();expect(chip.height).toBeGreaterThanOrEqual(48);
  await page.locator('#sc-sheet [data-a="r+"]').tap();
  await expect(page.locator('#sc-v-r')).toHaveText('0:04');
  await expect(page.locator('#sc-rd')).toContainText('pre 5 s · rest 4 s');

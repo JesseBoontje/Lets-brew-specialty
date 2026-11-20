@@ -539,7 +539,7 @@ function addMethod(){
 // "5 s pre + 3 s rest + 28.2 s full · total 0:36 · first drop 0:07.4", uit de shot clock
 function shotFasen(x){
   const n=v=>(typeof v==='number'&&isFinite(v))?v:0;
-  const tot=n(x.total), m=Math.floor(tot/60), sec=Math.floor(tot%60);
+  const tot=Math.round(n(x.total)), m=Math.floor(tot/60), sec=Math.floor(tot%60);
   const delen=[];
   if(n(x.pre))delen.push(n(x.pre)+' s pre + '+n(x.rest)+' s rest + '+n(x.full).toFixed(1)+' s full');
   else delen.push(n(x.full).toFixed(1)+' s full pressure');

@@ -204,3 +204,10 @@ Claude. Nog ideeën?"
   naar shot.loopt().
 - Testhaakjes: shot.snelheid(n), shot.stand(). CACHE scc-v110.
 - Lokaal 30 Playwright (chromium) + 14 node-tests groen.
+
+## Klus 4 GOEDGEKEURD (20-11)
+- Zie werk/archief/2026-11-20-shotclock-e61.md. CACHE scc-v111.
+- Wacht op Jesse: testen op zijn telefoon (zodra er een testlink is) en akkoord.
+- Volgende klussen (volgorde Jesse): versheidsmeter met piekmelding, surprise me,
+  delen als pagina/PDF (brews en bonen), AI-budget realistischer. Per klus een sessie.
+- Na akkoord: handleiding bijwerken (skill lets-brew-handleiding) voor klus 2, 3 en 4.

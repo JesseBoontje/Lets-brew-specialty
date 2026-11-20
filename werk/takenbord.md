@@ -15,5 +15,5 @@
 | Cloudflare-builds falen | later (Jesse) | geen | wacht | ook letsbrewspecialty faalt sinds cd6ee76 (slaagde bij 530ac5a); buildlogs in dashboard lezen |
 | Klus 2: gietcoach V60/Switch | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-gietcoach-v60-switch.md | mee in PR #12, wacht op Jesse |
 | Klus 3: AeroPress normaal/omgekeerd | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-aeropress.md | mee in PR #12, wacht op Jesse |
-| Klus 4: shot clock E61 + tarra-vak | architect | claude/architect-skill-jesse-dhw83j | bij keurmeester | gebouwd in app/05-shotclock.js, test tests/shotclock.spec.cjs |
+| Klus 4: shot clock E61 + tarra-vak | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-shotclock-e61.md | mee in PR #12, wacht op Jesse |
 | Klus 1: elke brew aan een boon | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-brews-aan-bonen.md | mee in PR #12, wacht op Jesse |
