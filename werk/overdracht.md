@@ -272,3 +272,15 @@ Claude. Nog ideeën?"
 - Niet lokaal te testen: echte ElevenLabs (geen sleutel, en eleven_v4 als
   model-id niet zelf nagegaan), geluid op een echte iPhone, Cloudflare-rem.
 - Geen testlink: Cloudflare-build faalt nog (Jesse heeft dat naar later geschoven).
+
+## Klus 5 GOEDGEKEURD (20-11)
+- Eén keurronde, zie werk/archief/2026-11-20-stem-elevenlabs.md (met 4 kleine
+  opruimpunten voor later).
+- Bestond al, apart aan Jesse gemeld: observability in wrangler.jsonc kan
+  request-headers loggen; onbevestigd of Authorization (eigen OpenAI- en
+  ElevenLabs-sleutel) wordt weggelakt. Oplossing: in dashboard nakijken, of
+  "logs":{"invocation_logs":false}. Wacht op Jesse.
+- Wacht op Jesse: testen met eigen ElevenLabs-sleutel zodra er een testlink is.
+- Volgende klussen (volgorde Jesse): versheidsmeter met piekmelding, surprise me,
+  delen als pagina/PDF, AI-budget realistischer; later ElevenLabs voor
+  spraakcoach en AI-coach. Per klus een sessie. Niet mergen zonder akkoord.

@@ -17,5 +17,6 @@
 | Klus 3: AeroPress normaal/omgekeerd | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-aeropress.md | mee in PR #12, wacht op Jesse |
 | Klus 4: shot clock E61 + tarra-vak | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-shotclock-e61.md | mee in PR #12, wacht op Jesse |
 | Klus 1: elke brew aan een boon | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-brews-aan-bonen.md | mee in PR #12, wacht op Jesse |
-| Klus 5: stem ElevenLabs (eleven_v4), alleen stappen hardop (verkleind) | architect | claude/architect-skill-jesse-dhw83j | bij keurmeester | keuring, dan Jesse melden |
+| Klus 5: stem ElevenLabs (eleven_v4), alleen stappen hardop | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-stem-elevenlabs.md | mee in PR #12, wacht op Jesse |
+| Logboek Worker: wordt de sleutel-header gelogd? (bestond al) | nog niemand | nog geen | wacht op Jesse | dashboard nakijken of invocation logs uit |
 | Later: ElevenLabs voor live spraakcoach en AI-coach voorlezen | nog niemand | nog geen | later (besluit Jesse) | eigen klus |
