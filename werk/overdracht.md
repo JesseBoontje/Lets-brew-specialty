@@ -235,6 +235,9 @@ Claude. Nog ideeën?"
   die klaarstaat zodra een gebruiker zijn eigen ElevenLabs-sleutel invult (via de
   Worker, alleen tabbladgeheugen), op alle drie plekken; zonder sleutel de
   huidige stem. Model eleven_v4. Klus 5, nieuwe sessie, één keuring.
+- 20-11 later: Jesse koos in deze sessie optie 2: EERST ALLEEN stappen hardop
+  (gietcoach, AeroPress, shot clock) met ElevenLabs. Live spraakcoach en AI-coach
+  voorlezen later als aparte klus. Bouwsessie klus 5 is bijgestuurd.
 
 ## Klus 5 VERKLEIND (20-11, besluit Jesse in de hoofdsessie, optie 2)
 - Letterlijk: "Ja, maar eerst alleen de stappen hardop (kleinere klus)".
