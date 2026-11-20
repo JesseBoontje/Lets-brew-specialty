@@ -235,3 +235,37 @@ Claude. Nog ideeën?"
   die klaarstaat zodra een gebruiker zijn eigen ElevenLabs-sleutel invult (via de
   Worker, alleen tabbladgeheugen), op alle drie plekken; zonder sleutel de
   huidige stem. Model eleven_v4. Klus 5, nieuwe sessie, één keuring.
+
+## Klus 5 VERKLEIND (20-11, besluit Jesse in de hoofdsessie, optie 2)
+- Letterlijk: "Ja, maar eerst alleen de stappen hardop (kleinere klus)".
+- Klus 5 = ALLEEN ElevenLabs (eleven_v4) voor stappen hardop in gietcoach
+  V60/Switch, AeroPress-coach en shot clock. NIET de live spraakcoach (blijft
+  OpenAI) en NIET de AI-coach laten voorlezen: die komen later als eigen klus.
+- Er is niets gebouwd voor spraakcoach of AI-coach (niets weg te halen).
+
+## Stand 20-11: klus 5 stem gebouwd (commit 48e4dca e.v.)
+- brew-stem.js (BrewStem, laadt na brew-model.js): zeg/voorbereid/stil/kan,
+  zetSleutel, stemmen (eigen lijst), kiesStemId, stand. Sleutel alleen in een
+  variabele (tabblad); stem-id in localStorage scc_el_voice(+_naam).
+  Komt een zin niet binnen 1,5 s of faalt hij: telefoonstem (speechSynthesis).
+  401 van ElevenLabs: rest van het tabblad telefoonstem. Bij de start worden
+  alle zinnen van het recept alvast opgehaald, één tegelijk, met cache.
+  In de eerste tik wordt een stil blob-geluid gespeeld (iPhone-ontgrendeling).
+- Worker: POST /api/stem/voices en /api/stem/zeg in site-worker.mjs (stemRoute).
+  Origin moet het eigen adres zijn, JSON, Bearer-sleutel (sk_ + 32-128 tekens),
+  body max 2 KB, alleen velden text (1-300, geen stuurtekens) en voice_id
+  (10-40 letters/cijfers), rem STEM_LIMITER 40/min per IP (wrangler.jsonc,
+  namespace 430284717). Doorsturen met xi-api-key, redirect error, timeout.
+  Fouten van ElevenLabs worden niet doorgegeven (geen sleutel, geen details).
+- Gietcoach en AeroPress: zeg() via BrewStem; shot clock heeft nu ook stem
+  (Pre-infusie / Rust / Volle druk / Hendel omlaag bij X gram), aan/uit in het
+  recept-paneel, gedeeld met scc_gc_stem.
+- Instellingen > make it smart > "voice for the coaches": sleutel, "load my
+  voices", keuzelijst uit eigen account, "test the voice".
+- Test: tests/stem.test.mjs (Worker) en tests/stem.spec.cjs (browser).
+  tests/app.spec.cjs telt nu twee sleutelvelden (ai-key, stem-key), geen inlog.
+- CACHE scc-v112. Lokaal 35 Playwright (chromium) + 20 node-tests groen,
+  wrangler dry-run goed, npm audit 0.
+- Niet lokaal te testen: echte ElevenLabs (geen sleutel, en eleven_v4 als
+  model-id niet zelf nagegaan), geluid op een echte iPhone, Cloudflare-rem.
+- Geen testlink: Cloudflare-build faalt nog (Jesse heeft dat naar later geschoven).
