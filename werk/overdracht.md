@@ -230,3 +230,8 @@ Claude. Nog ideeën?"
   voorlezen); vraag 2 "A" (eigen ElevenLabs-sleutel per gebruiker via de Worker,
   alleen in tabbladgeheugen, nooit in back-up of database). Model eleven_v4.
   Zonder sleutel blijft de huidige stem werken (terugval).
+- BEVESTIGD door Jesse (20-11 13:36 UTC, letterlijk via zijn sessie): "Ja
+  elevenlabs stem maar die potentiele api verbinding". Dus: bouwen als koppeling
+  die klaarstaat zodra een gebruiker zijn eigen ElevenLabs-sleutel invult (via de
+  Worker, alleen tabbladgeheugen), op alle drie plekken; zonder sleutel de
+  huidige stem. Model eleven_v4. Klus 5, nieuwe sessie, één keuring.
