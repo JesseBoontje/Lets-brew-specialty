@@ -960,7 +960,7 @@ function cardSummaries(){
   const dz=parseFloat(dose)||0;
   const start=bean?grindStartShort(bean,pc.mid):'';
   zet('bean',bean?([bean.name,f?f.label:'',(h&&dz)?('bloom '+Math.round(dz*h.mult)+' g, '+h.sec+' s'):'',start]
-    .filter(Boolean).join('  \u00b7  ')):'no bean picked');
+    .filter(Boolean).join('  \u00b7  ')):'pick a bean \u2014 every brew needs one');
 
   const g=[document.getElementById('f-brewer').value.trim(),formMolen].filter(Boolean);
   zet('gear',g.length?g.join('  \u00b7  '):'brewer & grinder \u2014 nothing set');

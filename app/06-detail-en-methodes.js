@@ -142,6 +142,7 @@ function importBrewsFile(ev){
         kopie.beanId=null;                    // koppeling geldt niet bij de ander
         state.brews.push(kopie);toegevoegd++;
       });
+      BrewModel.linkBeansByName(state);     // zelfde naam als een eigen boon: meteen koppelen
       save();
       toast('✓ '+toegevoegd+' brew'+(toegevoegd===1?'':'s')+' added');
       go('brews');
@@ -282,6 +283,7 @@ function importFriend(ev){
         state.brews.push(kopie);addedBrews++;
       });
       if(!addedBrews&&!addedBeans&&!skippedBeans){toast('no brews or beans in this file');ev.target.value='';return;}
+      BrewModel.linkBeansByName(state);   // zelfde naam als een eigen boon: meteen koppelen
       save();
       const parts=[];
       if(addedBrews)parts.push(addedBrews+' brew'+(addedBrews===1?'':'s'));

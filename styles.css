@@ -528,6 +528,19 @@
   .link-pick::-webkit-scrollbar{display:none;}
   .lp{flex:none;padding:10px 16px;border-radius:16px;background:var(--card);border:2px solid var(--line);filter:url(#wobble);font-family:inherit;font-size:18px;color:var(--ink-soft);cursor:pointer;white-space:nowrap;}
   .lp.sel{border-color:var(--ink);color:var(--ink);}
+  /* geen boon gekozen bij opslaan: de kiezer knippert kort in de accentkleur */
+  .link-pick.needs-pick{animation:needsPick .9s ease-in-out 2;border-radius:16px;}
+  @keyframes needsPick{50%{box-shadow:0 0 0 3px var(--accent);}}
+  @media (prefers-reduced-motion:reduce){.link-pick.needs-pick{animation:none;box-shadow:0 0 0 3px var(--accent);}}
+  /* oude brews zonder boon: koppelscherm op de brews-pagina */
+  .unl-open{display:block;width:100%;min-height:48px;margin:0 0 14px;padding:12px 16px;border-radius:16px;border:2px dashed var(--accent);background:var(--card);font-family:inherit;font-size:18px;color:var(--ink);text-align:left;cursor:pointer;}
+  .unl-box{margin:0 0 16px;}
+  .unl-row{padding:12px 14px;margin:0 0 10px;border-radius:16px;border:2px solid var(--line);background:var(--card);}
+  .unl-row .unl-n{font-size:20px;color:var(--ink);}
+  .unl-row .unl-m{font-size:15px;color:var(--ink-soft);margin:2px 0 8px;}
+  .unl-row .unl-act{display:flex;flex-wrap:wrap;gap:8px;}
+  .unl-row select{flex:1 1 160px;min-height:48px;font-family:inherit;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);padding:0 10px;}
+  .unl-row button{min-height:48px;padding:0 14px;border-radius:12px;border:2px solid var(--ink);background:var(--card);font-family:inherit;font-size:17px;color:var(--ink);cursor:pointer;}
   /* AI features */
   .scan-btn{width:100%;background:var(--card);border:2px dashed var(--ink);filter:url(#wobble);border-radius:18px;padding:14px;font-family:'Caveat',cursive;font-weight:700;font-size:24px;color:var(--ink);cursor:pointer;margin-bottom:6px;}
   .photo-btns{display:flex;gap:8px;margin-bottom:6px;}

@@ -196,9 +196,10 @@ function journeyRefresh(){
 
 function renderDiBeans(){
   const el=document.getElementById('di-beans');if(!el)return;
-  let html='<button class="lp '+(!formBean?'sel':'')+'" onclick="pickDiBean(null)">none</button>';
-  html+=state.beans.filter(b=>b.inStock!==false||b.id===formBean)
+  // elke shot hoort bij een boon: geen "none" meer, wel meteen een nieuwe maken
+  let html=state.beans.filter(b=>b.inStock!==false||b.id===formBean)
     .map(b=>'<button class="lp '+(b.id===formBean?'sel':'')+'" onclick="pickDiBean(\''+b.id+'\')">'+esc(b.name)+'</button>').join('');
+  html+='<button class="lp" onclick="openBeanForm(false,\'dialin\')">＋ new bean</button>';
   el.innerHTML=html;
 }
 function pickDiBean(id){formBean=id;renderDiBeans();renderDiGoal();diAdvice();renderStartHint('di-start');}
@@ -255,6 +256,7 @@ function diAdvice(){
   el.innerHTML=html;el.style.display=html?'block':'none';
 }
 async function saveDialInBrew(next){
+  if(!beanById(formBean)){vraagBoon('di-beans');return;}
   const dose=parseFloat(document.getElementById('di-dose').value)||null;
   const yld=parseFloat(document.getElementById('di-yield').value)||null;
   const usedGrind=(document.getElementById('di-grind').value||'').trim();
@@ -305,9 +307,12 @@ function renderFormBeans(){
   // alleen wat er nog in de kast staat. Een boon die op is blijft staan zolang
   // hij bij deze brew hoort, anders raak je hem kwijt zodra je iets bewerkt.
   const kiesbaar=state.beans.filter(b=>b.inStock!==false||b.id===formBean);
-  let html='<button class="lp '+(!formBean?'sel':'')+'" onclick="pickBean(null)">none</button>';
+  // elke brew hoort bij een boon. Alleen een oude brew die nog nergens aan hangt
+  // laat dat zien, zodat je hem bij het bewerken kunt koppelen.
+  const oud=editingId&&!beanById(formBean)?state.brews.find(x=>x.id===editingId):null;
+  let html=oud?'<button class="lp sel" onclick="pickBean(null)">not linked'+(oud.beans?' ('+esc(oud.beans)+')':'')+'</button>':'';
   html+=kiesbaar.map(b=>'<button class="lp '+(b.id===formBean?'sel':'')+'" onclick="pickBean(\''+b.id+'\')">'+esc(b.name)+'</button>').join('');
-  html+='<button class="lp" onclick="openBeanForm()">＋ nieuw</button>';
+  html+='<button class="lp" onclick="openBeanForm(false,\'form\')">＋ new bean</button>';
   el.innerHTML=html;
 }
 function pickBean(id){formBean=id;renderFormBeans();cardSummaries();
@@ -336,7 +341,17 @@ function calc(changed){
   else if(changed==='yield'&&dose>0&&yld>0){document.getElementById('f-ratio').value=(yld/dose).toFixed(1);}
   else if(changed==='dose'&&dose>0&&ratio>0&&!yld){document.getElementById('f-yield').value=(dose*ratio).toFixed(1);}
 }
+// Zonder boon geen nieuwe brew: zeg het, en zet de bonenkiezer in beeld.
+function vraagBoon(elId){
+  toast('pick a bean first — every brew belongs to a bean');
+  if(elId==='form-beans'&&typeof pcOpen==='object'&&!pcOpen.bean){pcOpen.bean=true;renderCards();}
+  const el=document.getElementById(elId);
+  if(el){try{el.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
+    el.classList.remove('needs-pick');void el.offsetWidth;el.classList.add('needs-pick');}
+}
 function saveBrew(){
+  // nieuwe brews altijd met boon; een oude brew zonder boon mag je wel bewerken
+  if(!beanById(formBean)&&!(editingId&&!beanById(state.brews.find(x=>x.id===editingId)?.beanId))){vraagBoon('form-beans');return;}
   const b={
     id:editingId||uid(),method:formMethod,
     title:document.getElementById('f-title').value.trim(),

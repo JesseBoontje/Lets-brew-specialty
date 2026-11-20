@@ -44,8 +44,9 @@ async function load(){
       }
     }catch(e){}
   }
-  if(s&&s.methods&&s.brews){try{BrewSecurity.validateImport(s,{backup:true});}catch(e){storageBlocked=true;throw e;}hadOpgeslagenData=true;state=s;if(!state.beans)state.beans=[];if(!state.gear)state.gear=[];state=BrewModel.migrate(state);mergeMethodImages();try{bpMigreerWensen();}catch(e){}if((s.dataVersion||0)<2)await save();return;}
-  state=BrewModel.migrate({methods:JSON.parse(JSON.stringify(DEFAULT_METHODS)),brews:demoBrews(),beans:demoBeans(),gear:[],prepItems:JSON.parse(JSON.stringify(DEFAULT_PREP))});
+  if(s&&s.methods&&s.brews){try{BrewSecurity.validateImport(s,{backup:true});}catch(e){storageBlocked=true;throw e;}hadOpgeslagenData=true;state=s;if(!state.beans)state.beans=[];if(!state.gear)state.gear=[];const gekoppeld=n=>(n.brews||[]).filter(b=>b&&b.beanId&&(n.beans||[]).some(x=>x.id===b.beanId)).length;const voor=gekoppeld(state);state=BrewModel.migrate(state);mergeMethodImages();try{bpMigreerWensen();}catch(e){}if((s.dataVersion||0)<2||gekoppeld(state)>voor)await save();return;}
+  const demoB=demoBeans();
+  state=BrewModel.migrate({methods:JSON.parse(JSON.stringify(DEFAULT_METHODS)),brews:demoBrews(demoB),beans:demoB,gear:[],prepItems:JSON.parse(JSON.stringify(DEFAULT_PREP))});
   save();
 }
 // vul standaard-afbeeldingen aan voor methodes die al opgeslagen waren zonder img
@@ -133,15 +134,18 @@ let savedT;
 function showSaved(){
   return;
 }
-function demoBrews(){
+// demo-brews horen, net als echte brews, elk bij een demo-boon
+function demoBrews(beans){
+  const id=naam=>((beans||[]).find(b=>b.name===naam)||{}).id||null;
   return [
-    {id:uid(),method:'v60',beans:'Ethiopia',dose:18,yield:300,ratio:16.7,time:'3:42',temp:92,score:8.6,notes:'balanced & smooth. great clarity.',ts:Date.now()-3600e3},
-    {id:uid(),method:'aeropress',beans:'Guatemala',dose:17,yield:270,ratio:15.9,time:'2:15',temp:85,score:8.2,notes:'clean & sweet. soft finish.',ts:Date.now()-9e7},
-    {id:uid(),method:'senseo',beans:'Classic Red',dose:15,yield:180,ratio:12,time:'0:30',temp:90,score:5.5,notes:'quick cup. does the job.',guide:'1. place pad in holder\n2. fill reservoir with water\n3. press the button\n4. done',ts:Date.now()-18e7},
+    {id:uid(),method:'v60',beanId:id('Ethiopia Guji'),beans:'Ethiopia Guji',dose:18,yield:300,ratio:16.7,time:'3:42',temp:92,score:8.6,notes:'balanced & smooth. great clarity.',ts:Date.now()-3600e3},
+    {id:uid(),method:'aeropress',beanId:id('Guatemala Huehuetenango'),beans:'Guatemala Huehuetenango',dose:17,yield:270,ratio:15.9,time:'2:15',temp:85,score:8.2,notes:'clean & sweet. soft finish.',ts:Date.now()-9e7},
+    {id:uid(),method:'senseo',beanId:id('Classic Red'),beans:'Classic Red',dose:15,yield:180,ratio:12,time:'0:30',temp:90,score:5.5,notes:'quick cup. does the job.',guide:'1. place pad in holder\n2. fill reservoir with water\n3. press the button\n4. done',ts:Date.now()-18e7},
   ];
 }
 function demoBeans(){return [
   {id:uid(),name:'Ethiopia Guji',roaster:'Friedhats',origin:'Guji, Ethiopia',process:'washed',variety:'heirloom',altitude:'1900-2100',roastdate:'',roasternotes:'jasmine, peach, black tea',method:'v60',methods:['v60'],inStock:true,notes:''},
+  {id:uid(),name:'Guatemala Huehuetenango',roaster:'Friedhats',origin:'Huehuetenango, Guatemala',process:'washed',variety:'bourbon, caturra',altitude:'1700-1900',roastdate:'',roasternotes:'red apple, caramel, cocoa',method:'aeropress',methods:['aeropress'],inStock:true,notes:''},
   {id:uid(),name:'Classic Red',roaster:'Senseo',origin:'Brazil',process:'ground',variety:'',altitude:'',roastdate:'',roasternotes:'chocolate, nuts, full-bodied',method:'senseo',methods:['senseo'],inStock:true,notes:'everyday coffee. always in stock.'},
 ];}
 function uid(){return Math.random().toString(36).slice(2,9);}

@@ -128,7 +128,7 @@ suggestie. Leeg zolang je op die methode niets hebt afgetekend.
 | veld | | |
 |---|---|---|
 | `id` `at` | string | `at` is ISO |
-| `methodId` `beanId` | string \| null | `beanId` is null bij een brew zonder gekoppelde zak |
+| `methodId` `beanId` | string \| null | Elke nieuwe brew hoort bij een boon. `beanId` is alleen null bij een oude brew die nog niet gekoppeld is (of waarvan de boon is verwijderd); de app koppelt die zelf op naam als precies één boon zo heet, de rest koppel je in *brews* |
 | `beanName` | string \| null | zoals ingetypt, ook als er geen `beanId` is |
 | `title` `drink` | string \| null | `drink` is bv. `flat white` |
 | `dose` `yield` `ratio` | number \| null | gram in, gram uit |

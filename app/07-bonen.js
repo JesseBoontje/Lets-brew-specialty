@@ -57,7 +57,7 @@ function renderChooseBean(){
   const el=document.getElementById('choosebean-list');if(!el)return;
   const inBeans=state.beans.filter(b=>b.inStock!==false);
   if(!inBeans.length){
-    el.innerHTML='<div class="empty-note">no beans in stock.<br>add one under beans, or start without one below.</div>';
+    el.innerHTML='<div class="empty-note">no beans in stock yet.<br>every brew belongs to a bean — add one below.</div>';
     return;
   }
   el.innerHTML=inBeans.map(b=>{
@@ -232,9 +232,13 @@ function renderBeanMode(){
   });
 }
 function beanZetMode(w){beanFormWens=!!w;renderBeanMode();}
-function beanFormWeg(){editingBean=null;editingWens=null;go('beans');}
-function openBeanForm(wens){
+/* Vanuit een brew een nieuwe boon maken: na opslaan ga je terug naar die brew,
+   met de nieuwe boon al gekozen. 'choosebean', 'form' of 'dialin'; anders null. */
+let beanFormTerug=null;
+function beanFormWeg(){const t=beanFormTerug;beanFormTerug=null;editingBean=null;editingWens=null;go(t||'beans');}
+function openBeanForm(wens,terug){
   editingBean=null; editingWens=null; beanFormWens=!!wens;
+  beanFormTerug=(!wens&&['choosebean','form','dialin'].includes(terug))?terug:null;
   ['b-name','b-roaster','b-origin','b-process','b-variety','b-altitude','b-roastdate','b-roasternotes','b-url','b-notes','b-price','b-bagsize'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   document.getElementById('scan-status').textContent='';
   const er=document.getElementById('enrich-row');if(er)er.style.display='none';
@@ -245,6 +249,7 @@ function openBeanForm(wens){
 }
 function editBean(id){
   const b=state.beans.find(x=>x.id===id);if(!b)return;
+  beanFormTerug=null;
   editingBean=id; editingWens=null; beanFormWens=false;
   const set=(f,v)=>{const el=document.getElementById(f);if(el)el.value=v||'';};
   set('b-name',b.name);set('b-roaster',b.roaster);set('b-origin',b.origin);
@@ -338,8 +343,16 @@ function saveBean(){
     if(editingWens){state.wishlist=(state.wishlist||[]).filter(w=>w.id!==editingWens);
       toast('✓ van je lijstje naar je plank');}
     else toast('✓ bean saved');
+    const terug=beanFormTerug;beanFormTerug=null;
+    if(terug){editingWens=null;save();beanPhoto=null;naNieuweBoon(terug,data.id);return;}
   }
-  editingWens=null;save();beanPhoto=null;go('beans');
+  beanFormTerug=null;editingWens=null;save();beanPhoto=null;go('beans');
+}
+// terug naar de brew waar je vandaan kwam, met de nieuwe boon gekozen
+function naNieuweBoon(terug,id){
+  if(terug==='choosebean'){brewBean(id);return;}
+  go(terug);
+  if(terug==='dialin')pickDiBean(id);else pickBean(id);
 }
 /* Dezelfde velden, maar dan als wens. Wat een zak pas heeft als hij er is --
    branddatum, prijs, waar je hem op zet -- slaan we niet op.               */
@@ -362,12 +375,86 @@ function saveBeanAlsWens(naam){
     state.brews.forEach(b=>{if(b.beanId===editingBean)b.beanId=null;});
     toast('✓ terug op je lijstje');
   }else toast('✓ op je lijstje');
-  editingBean=null;editingWens=null;save();beanPhoto=null;go('beans');
+  beanFormTerug=null;editingBean=null;editingWens=null;save();beanPhoto=null;go('beans');
 }
 function delBean(id){
-  if(!confirm('delete this bean?'))return;
+  // brews blijven altijd staan; ze raken alleen hun boon kwijt en komen dan in
+  // de lijst "brews without a bean" om opnieuw te koppelen
+  const n=state.brews.filter(b=>b.beanId===id).length;
+  const vraag=n?('delete this bean?\n\n'+n+' brew'+(n===1?'':'s')+' belong to it. They stay in your log, but lose the link to this bean.\n\nTip: finished the bag? Mark it as finished instead, then the link stays.'):'delete this bean?';
+  if(!confirm(vraag))return;
   state.beans=state.beans.filter(b=>b.id!==id);
   state.brews.forEach(b=>{if(b.beanId===id){b.beanId=null;}});
   save();renderBeans();toast('🗑 bean deleted');
 }
 
+
+/* ---------------- brews zonder boon ----------------
+   Elke brew hoort bij een boon. Oude brews waarvan de ingetypte naam precies
+   één boon raakt, koppelt de app zelf (BrewModel.linkBeansByName). De rest
+   staat hier: per ingetypte naam één regel om te koppelen aan een bestaande
+   boon of om van die naam een boon te maken. Er gaat nooit iets weg; de
+   ingetypte naam blijft op de brew staan.                                  */
+let unlOpen=false,unlLaatst=[];
+function brewsZonderBoon(){return state.brews.filter(b=>!beanById(b.beanId));}
+// groepen: brews met dezelfde ingetypte naam samen; zonder naam elk apart
+function unlGroepen(){
+  const g=new Map();
+  brewsZonderBoon().sort((a,c)=>(c.ts||0)-(a.ts||0)).forEach(b=>{
+    const naam=String(b.beans||'').trim();
+    const k=naam?('n:'+BrewModel.nameKey(naam)):('b:'+b.id);
+    if(!g.has(k))g.set(k,{k,naam,brews:[]});
+    g.get(k).brews.push(b);
+  });
+  return [...g.values()];
+}
+function unlBrewsVan(k){
+  if(k.startsWith('b:'))return state.brews.filter(b=>b.id===k.slice(2)&&!beanById(b.beanId));
+  const key=k.slice(2);
+  return brewsZonderBoon().filter(b=>BrewModel.nameKey(b.beans)===key);
+}
+function toggleUnlinked(){unlOpen=!unlOpen;renderAll();}
+function unlinkedHTML(){
+  const groepen=unlGroepen();unlLaatst=groepen.map(g=>g.k);
+  if(!groepen.length){unlOpen=false;return '';}
+  const n=brewsZonderBoon().length;
+  let h='<button class="unl-open" onclick="toggleUnlinked()">'+n+' brew'+(n===1?'':'s')+' without a bean \u2014 link '+(n===1?'it':'them')+' '+(unlOpen?'\u25be':'\u25b8')+'</button>';
+  if(!unlOpen)return h;
+  const opties=state.beans.slice().sort((a,c)=>(c.inStock!==false)-(a.inStock!==false)||String(a.name).localeCompare(String(c.name)))
+    .map(b=>'<option value="'+esc(b.id)+'">'+esc(b.name)+(b.inStock===false?' (finished)':'')+'</option>').join('');
+  h+='<div class="unl-box">';
+  groepen.forEach((g,i)=>{
+    const datums=g.brews.map(b=>b.ts).filter(Boolean);
+    const methodes=[...new Set(g.brews.map(b=>methodById(b.method).name))].join(', ');
+    const wanneer=datums.length?new Date(Math.min(...datums)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+    const kid='unl-sel-'+i;
+    h+='<div class="unl-row"><div class="unl-n hand">'+(g.naam?esc(g.naam):'no name typed')+'</div>'+
+      '<div class="unl-m">'+g.brews.length+' brew'+(g.brews.length===1?'':'s')+' \u00b7 '+esc(methodes)+(wanneer?(' \u00b7 '+(g.brews.length>1?'since ':'')+esc(wanneer)):'')+'</div>'+
+      '<div class="unl-act">'+
+      (opties?'<select id="'+kid+'" aria-label="pick a bean">'+opties+'</select><button onclick="unlKoppel('+i+')">link</button>':'')+
+      (g.naam?'<button onclick="unlMaakBoon('+i+')">\uff0b make bean \u201c'+esc(g.naam)+'\u201d</button>':'')+
+      '</div></div>';
+  });
+  return h+'</div>';
+}
+function unlKoppel(i){
+  const k=unlLaatst[i];if(!k)return;
+  const sel=document.getElementById('unl-sel-'+i);const bean=sel?beanById(sel.value):null;if(!bean)return;
+  const lijst=unlBrewsVan(k);
+  lijst.forEach(b=>{b.beanId=bean.id;b.beanSnapshot=BrewModel.beanSnapshot(bean);});
+  save();toast('\u2713 '+lijst.length+' brew'+(lijst.length===1?'':'s')+' linked to '+bean.name);renderAll();
+}
+// van de ingetypte naam een boon maken. Het gaat om oude brews, dus de zak is
+// waarschijnlijk op: hij komt als "finished" in je bonen, aanvullen kan daar.
+function unlMaakBoon(i){
+  const k=unlLaatst[i];if(!k)return;
+  const lijst=unlBrewsVan(k);if(!lijst.length)return;
+  const naam=String(lijst[0].beans||'').trim();if(!naam)return;
+  const tel={};lijst.forEach(b=>{if(b.method)tel[b.method]=(tel[b.method]||0)+1;});
+  const mid=Object.keys(tel).sort((a,c)=>tel[c]-tel[a])[0]||null;
+  const bean={id:uid(),name:naam,roaster:'',origin:'',process:'',variety:'',altitude:'',roastdate:'',roasternotes:'',
+    url:'',notes:'',photo:null,methods:mid?[mid]:[],method:mid,inStock:false};
+  state.beans.push(bean);
+  lijst.forEach(b=>{b.beanId=bean.id;b.beanSnapshot=BrewModel.beanSnapshot(bean);});
+  save();toast('\u2713 bean \u201c'+naam+'\u201d made (marked finished) \u2014 '+lijst.length+' brew'+(lijst.length===1?'':'s')+' linked');renderAll();
+}
