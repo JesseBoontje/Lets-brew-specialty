@@ -378,11 +378,7 @@ function saveBeanAlsWens(naam){
   beanFormTerug=null;editingBean=null;editingWens=null;save();beanPhoto=null;go('beans');
 }
 function delBean(id){
-  // brews blijven altijd staan; ze raken alleen hun boon kwijt en komen dan in
-  // de lijst "brews without a bean" om opnieuw te koppelen
-  const n=state.brews.filter(b=>b.beanId===id).length;
-  const vraag=n?('delete this bean?\n\n'+n+' brew'+(n===1?'':'s')+' belong to it. They stay in your log, but lose the link to this bean.\n\nTip: finished the bag? Mark it as finished instead, then the link stays.'):'delete this bean?';
-  if(!confirm(vraag))return;
+  if(!confirm('delete this bean?'))return;
   state.beans=state.beans.filter(b=>b.id!==id);
   state.brews.forEach(b=>{if(b.beanId===id){b.beanId=null;}});
   save();renderBeans();toast('🗑 bean deleted');
@@ -401,7 +397,7 @@ function brewsZonderBoon(){return state.brews.filter(b=>!beanById(b.beanId));}
 function unlGroepen(){
   const g=new Map();
   brewsZonderBoon().sort((a,c)=>(c.ts||0)-(a.ts||0)).forEach(b=>{
-    const naam=String(b.beans||'').trim();
+    const naam=String(b.beans||'').trim()||String((b.beanSnapshot&&b.beanSnapshot.name)||'').trim();
     const k=naam?('n:'+BrewModel.nameKey(naam)):('b:'+b.id);
     if(!g.has(k))g.set(k,{k,naam,brews:[]});
     g.get(k).brews.push(b);
@@ -411,7 +407,7 @@ function unlGroepen(){
 function unlBrewsVan(k){
   if(k.startsWith('b:'))return state.brews.filter(b=>b.id===k.slice(2)&&!beanById(b.beanId));
   const key=k.slice(2);
-  return brewsZonderBoon().filter(b=>BrewModel.nameKey(b.beans)===key);
+  return brewsZonderBoon().filter(b=>BrewModel.nameKey(String(b.beans||'').trim()||(b.beanSnapshot&&b.beanSnapshot.name))===key);
 }
 function toggleUnlinked(){unlOpen=!unlOpen;renderAll();}
 function unlinkedHTML(){
@@ -441,7 +437,7 @@ function unlKoppel(i){
   const k=unlLaatst[i];if(!k)return;
   const sel=document.getElementById('unl-sel-'+i);const bean=sel?beanById(sel.value):null;if(!bean)return;
   const lijst=unlBrewsVan(k);
-  lijst.forEach(b=>{b.beanId=bean.id;b.beanSnapshot=BrewModel.beanSnapshot(bean);});
+  lijst.forEach(b=>{b.beanId=bean.id;if(!b.beanSnapshot)b.beanSnapshot=BrewModel.beanSnapshot(bean);});
   save();toast('\u2713 '+lijst.length+' brew'+(lijst.length===1?'':'s')+' linked to '+bean.name);renderAll();
 }
 // van de ingetypte naam een boon maken. Het gaat om oude brews, dus de zak is
@@ -449,12 +445,14 @@ function unlKoppel(i){
 function unlMaakBoon(i){
   const k=unlLaatst[i];if(!k)return;
   const lijst=unlBrewsVan(k);if(!lijst.length)return;
-  const naam=String(lijst[0].beans||'').trim();if(!naam)return;
+  // dezelfde naam als op de knop: die van de nieuwste brew in de groep
+  const nieuwste=lijst.slice().sort((a,c)=>(c.ts||0)-(a.ts||0))[0];
+  const naam=String(nieuwste.beans||'').trim()||String((nieuwste.beanSnapshot&&nieuwste.beanSnapshot.name)||'').trim();if(!naam)return;
   const tel={};lijst.forEach(b=>{if(b.method)tel[b.method]=(tel[b.method]||0)+1;});
   const mid=Object.keys(tel).sort((a,c)=>tel[c]-tel[a])[0]||null;
   const bean={id:uid(),name:naam,roaster:'',origin:'',process:'',variety:'',altitude:'',roastdate:'',roasternotes:'',
     url:'',notes:'',photo:null,methods:mid?[mid]:[],method:mid,inStock:false};
   state.beans.push(bean);
-  lijst.forEach(b=>{b.beanId=bean.id;b.beanSnapshot=BrewModel.beanSnapshot(bean);});
+  lijst.forEach(b=>{b.beanId=bean.id;if(!b.beanSnapshot)b.beanSnapshot=BrewModel.beanSnapshot(bean);});
   save();toast('\u2713 bean \u201c'+naam+'\u201d made (marked finished) \u2014 '+lijst.length+' brew'+(lijst.length===1?'':'s')+' linked');renderAll();
 }

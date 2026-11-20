@@ -373,7 +373,9 @@ function saveBrew(){
     grinder:formMolen||'',
     paper:formOud.paper||'',
     water:formOud.water||'',
-    beanId:formBean,beans:(beanById(formBean)?.name)||'',
+    beanId:formBean,
+    // de ingetypte naam blijft altijd staan; alleen een nieuwe brew krijgt de boonnaam
+    beans:(editingId&&String(state.brews.find(x=>x.id===editingId)?.beans||'').trim())?state.brews.find(x=>x.id===editingId).beans:((beanById(formBean)?.name)||''),
     tags:[...formTags],
     custom:formCustom.filter(c=>c.k.trim()||c.v.trim()),
     guide:editingId?(state.brews.find(x=>x.id===editingId)?.guide||''):'',

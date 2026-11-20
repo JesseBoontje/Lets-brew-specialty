@@ -35,10 +35,16 @@ test('old brews link by exact name, the rest can be linked or turned into a bean
  expect((await link()).r2).toBe('b2');
  // van O'Brien blend een boon maken: alle drie de brews met die naam gaan mee
  await rijen.filter({has:page.locator('.unl-n',{hasText:"O'Brien"})}).getByRole('button',{name:/make bean/}).tap();
- const nieuw=await page.evaluate(()=>state.beans.find(b=>b.name==="O'Brien blend"));
+ const nieuw=await page.evaluate(()=>state.beans.find(b=>b.name==="O'Brien Blend"));   // naam van de nieuwste brew, zoals op de knop
  expect(nieuw.inStock).toBe(false);
  l=await link();expect([l.r3,l.r4,l.r5]).toEqual([nieuw.id,nieuw.id,nieuw.id]);
  await expect(knop).toContainText('1 brew without a bean');
+ // een oude brew bewerken houdt de ingetypte naam
+ await page.evaluate(()=>{state.brews.find(b=>b.id==='r6').beans='Nergens';openEdit(state.brews.find(b=>b.id==='r6'));});
+ await expect(page.locator('#form-beans')).toContainText('not linked (Nergens)');
+ await page.locator('#page-form .save-btn').tap();
+ expect(await page.evaluate(()=>state.brews.find(b=>b.id==='r6').beans)).toBe('Nergens');
+ await page.evaluate(()=>{state.brews.find(b=>b.id==='r6').beans='';});
  // niets weg: alle brews en hun ingetypte namen staan er nog
  const na=await page.evaluate(()=>state.brews.map(b=>b.id+'='+b.beans).sort());
  expect(na).toEqual(legacy.brews.map(b=>b.id+'='+b.beans).sort());

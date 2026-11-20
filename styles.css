@@ -539,7 +539,7 @@
   .unl-row .unl-n{font-size:20px;color:var(--ink);}
   .unl-row .unl-m{font-size:15px;color:var(--ink-soft);margin:2px 0 8px;}
   .unl-row .unl-act{display:flex;flex-wrap:wrap;gap:8px;}
-  .unl-row select{flex:1 1 160px;min-height:48px;font-family:inherit;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);padding:0 10px;}
+  .unl-row select{flex:1 1 160px;min-width:0;max-width:100%;min-height:48px;font-family:inherit;font-size:17px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);padding:0 10px;}
   .unl-row button{min-height:48px;padding:0 14px;border-radius:12px;border:2px solid var(--ink);background:var(--card);font-family:inherit;font-size:17px;color:var(--ink);cursor:pointer;}
   /* AI features */
   .scan-btn{width:100%;background:var(--card);border:2px dashed var(--ink);filter:url(#wobble);border-radius:18px;padding:14px;font-family:'Caveat',cursive;font-weight:700;font-size:24px;color:var(--ink);cursor:pointer;margin-bottom:6px;}
