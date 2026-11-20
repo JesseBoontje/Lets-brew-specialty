@@ -60,11 +60,13 @@ test('regular (Hoffmann): one pour, plunger, swirl, press; done fills the brew',
  await expect(page.locator('#ap-b-volg')).toHaveText('done');
  await page.locator('#ap-b-volg').tap();
  await expect(page.locator('#ap-r-nu')).toContainText('done');
- const uit=await page.evaluate(()=>({total:pc.total,time:document.getElementById('f-time').value,bg:document.getElementById('f-bloom-g').value}));
+ const uit=await page.evaluate(()=>({total:pc.total,time:document.getElementById('f-time').value,bg:document.getElementById('f-bloom-g').value,dr:document.getElementById('f-draw').value,draw:pc.draw}));
  expect(uit.total).toBe(Math.round((await stand(page)).eindT));
  expect(uit.total).toBeGreaterThanOrEqual(180);
  expect(uit.time).toBe(Math.floor(uit.total/60)+':'+String(uit.total%60).padStart(2,'0'));
- expect(uit.bg).toBe('');                           // geen bloom bij deze AeroPress
+ expect(uit.bg).toBe('');
+ expect(uit.dr).toBe('');                           // geen doorlooptijd bij een AeroPress
+ expect(uit.draw).toBe(null);                           // geen bloom bij deze AeroPress
  await page.locator('#ap-b-start').tap();
  await expect(coach).toBeHidden();
  await expect(page.locator('#pc-btn')).toHaveText('start again');
@@ -126,6 +128,8 @@ test('inverted (Tay): upside down until the flip, then press and top up; next st
 });
 test('a French press keeps the clock in the card',async({page})=>{
  await open(page,'fp');
+ await expect(page.locator('#pc-pick')).not.toContainText('AeroPress');
+ await expect(page.locator('#pc-pick')).not.toContainText('Tay');
  await page.locator('#pc-btn').tap();
  await expect(page.locator('#apcoach')).toHaveCount(0);
  await expect(page.locator('#pc-btn')).toHaveText('stop');

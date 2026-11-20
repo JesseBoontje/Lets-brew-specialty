@@ -336,11 +336,11 @@ function naarFormulier(){
   if(terug)return; terug=true;
   pc.marks=S.map((s,j)=>(isFinite(starts[j])&&starts[j]<=eindT)?Math.round(starts[j]*10)/10:null);
   pc.total=Math.round(eindT);
-  let laatste=null;
-  S.forEach((s,j)=>{if(s.g&&pc.marks[j]!=null)laatste=pc.marks[j];});
-  pc.draw=(laatste!=null&&eindT>laatste)?Math.max(0,Math.round(eindT-laatste)):null;
+  // een AeroPress heeft geen doorlooptijd: dat veld blijft leeg (anders
+  // denkt de dial-in hulp dat het bed vastloopt)
+  pc.draw=null;
   pc.el=eindT; pc.run=false;
-  pourFill();
+  pourFill(); setVal('f-draw','');
   pcOpen.log=true; pcOpen.pour=false;
   const b=document.getElementById('pc-btn'); if(b)b.textContent='start again';
   pourSteps(); renderCards();

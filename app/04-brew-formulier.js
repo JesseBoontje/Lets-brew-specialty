@@ -1119,7 +1119,7 @@ function pourRecipes(){
   const r=recipeById(pc.rid);
   const eigen=eigenRecepten(pc.mid);
   // bij de AeroPress staan normaal (Hoffmann) en omgekeerd (Tay) er altijd tussen
-  const keus=isAeropress(pc.mid)?eigen.concat(FILTER_RECIPES.filter(x=>x.voor.includes('aeropress'))):eigen;
+  const keus=(typeof apPast==='function'&&apPast(pc.mid))?eigen.concat(FILTER_RECIPES.filter(x=>x.voor.includes('aeropress'))):eigen;
   const pick=document.getElementById('pc-pick');
   if(pick)pick.innerHTML=(keus.length>1)?keus.map(x=>
     '<button type="button" class="lp '+(x.id===pc.rid?'sel':'')+
