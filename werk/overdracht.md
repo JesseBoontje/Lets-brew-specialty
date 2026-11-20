@@ -284,3 +284,15 @@ Claude. Nog ideeën?"
 - Volgende klussen (volgorde Jesse): versheidsmeter met piekmelding, surprise me,
   delen als pagina/PDF, AI-budget realistischer; later ElevenLabs voor
   spraakcoach en AI-coach. Per klus een sessie. Niet mergen zonder akkoord.
+
+## Live 20-11 avond
+- PR #12 gemerged in main (na samenvoegen met #13, verhuizing naar
+  letsbrew.djez.app op account 1aaa91af...). STEM_LIMITER namespace 430284718.
+- Workers Builds rolde main uit (versie d1e49d5d, 20:42 UTC). Live gecontroleerd
+  op https://letsbrew.djez.app: alle tabbladen, V60-schema (15 g op 1:16 = 240 g),
+  AeroPress-recepten, geen fouten. CACHE scc-v112.
+- Cloudflare API-token staat als netwerkgeheim op de standaardomgeving.
+  `wrangler deploy` via de proxy faalt bij het uploaden van bestanden (401,
+  de proxy overschrijft de upload-token); uitrollen gaat via Workers Builds.
+- Nieuw adres = nieuwe opslag in de browser: data van de oude app
+  (letsbrewspecialty.jesseboontje.workers.dev) moet één keer via export/import over.
