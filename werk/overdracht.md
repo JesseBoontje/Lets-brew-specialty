@@ -109,3 +109,11 @@ Claude. Nog ideeën?"
 - Lokaal testen: maak pw-local.config.cjs (staat in .git/info/exclude) met
   alleen chromium en executablePath; eerst `npm ci`.
 - Geen testlink mogelijk zolang de Cloudflare-build faalt.
+- 20-11 middag: klus 1 GOEDGEKEURD na 3 keurrondes (zie werk/archief/
+  2026-11-20-brews-aan-bonen.md). Laatste commit b6194cc, CACHE scc-v104.
+- Eerstvolgende stap: klus 2, gietcoach V60/Switch inbouwen volgens
+  docs/opzet-gietcoach-v60.html (tekening ketel > V60/Switch > server, grote
+  teller, strook vorige/nu/straks, 3 tellen aftellen, voice onderin, 5 g/s
+  gietsnelheid in plaats van 8). Bestaande code: app/04 vanaf "getekende
+  zetters" (BREWER_ART, paintBrewer) en "pour coach" (pc, pourStart, pourSteps).
+  Daarna klus 3 AeroPress, klus 4 shot clock + tarra-vak. Per klus een sessie.
