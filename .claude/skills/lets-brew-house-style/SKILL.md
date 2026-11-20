@@ -1,6 +1,6 @@
 ---
 name: lets-brew-house-style
-description: Build and change the Lets Brew Specialty coffee app in its hand-drawn house style, and publish preview artifacts of it. Use this skill whenever the user works on this repo's index.html, mentions Lets Brew Specialty, letsbrewspecialty.jesseboontje.workers.dev, "de koffie-app", "de app aanpassen", tekenstijl / hand-drawn style, brews, beans, dial-in, shot clock, brew methods, or asks for a preview/artifact of the app — even if they don't name the style explicitly.
+description: Build and change the Lets Brew Specialty coffee app in its hand-drawn house style, and publish preview artifacts of it. Use this skill whenever the user works on this repo's index.html, mentions Lets Brew Specialty, letsbrew.djez.app, "de koffie-app", "de app aanpassen", tekenstijl / hand-drawn style, brews, beans, dial-in, shot clock, brew methods, or asks for a preview/artifact of the app — even if they don't name the style explicitly.
 ---
 
 # Lets Brew Specialty — house style & build rules
