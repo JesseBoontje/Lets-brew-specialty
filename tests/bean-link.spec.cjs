@@ -44,7 +44,12 @@ test('old brews link by exact name, the rest can be linked or turned into a bean
  await expect(page.locator('#form-beans')).toContainText('not linked (Nergens)');
  await page.locator('#page-form .save-btn').tap();
  expect(await page.evaluate(()=>state.brews.find(b=>b.id==='r6').beans)).toBe('Nergens');
- await page.evaluate(()=>{state.brews.find(b=>b.id==='r6').beans='';});
+ // en kies je er bij bewerken een boon bij, dan volgt de naam die boon
+ await page.evaluate(()=>openEdit(state.brews.find(b=>b.id==='r6')));
+ await page.locator('#form-beans .lp',{hasText:'Ethiopia Guji'}).tap();
+ await page.locator('#page-form .save-btn').tap();
+ expect(await page.evaluate(()=>{const b=state.brews.find(b=>b.id==='r6');return b.beanId+'|'+b.beans;})).toBe('b1|Ethiopia Guji');
+ await page.evaluate(()=>{const b=state.brews.find(b=>b.id==='r6');b.beans='';b.beanId=null;});
  // niets weg: alle brews en hun ingetypte namen staan er nog
  const na=await page.evaluate(()=>state.brews.map(b=>b.id+'='+b.beans).sort());
  expect(na).toEqual(legacy.brews.map(b=>b.id+'='+b.beans).sort());

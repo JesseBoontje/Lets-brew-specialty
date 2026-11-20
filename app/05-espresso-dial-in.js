@@ -374,8 +374,11 @@ function saveBrew(){
     paper:formOud.paper||'',
     water:formOud.water||'',
     beanId:formBean,
-    // de ingetypte naam blijft altijd staan; alleen een nieuwe brew krijgt de boonnaam
-    beans:(editingId&&String(state.brews.find(x=>x.id===editingId)?.beans||'').trim())?state.brews.find(x=>x.id===editingId).beans:((beanById(formBean)?.name)||''),
+    // de ingetypte naam blijft staan zolang de boon niet verandert (of er geen
+    // boon gekozen is); kies je bij bewerken een andere boon, dan diens naam
+    beans:(function(){const o=editingId?state.brews.find(x=>x.id===editingId):null;
+      const oud=String(o?.beans||'').trim();const nb=beanById(formBean);
+      if(oud&&(!nb||o.beanId===formBean))return o.beans;return nb?nb.name:'';})(),
     tags:[...formTags],
     custom:formCustom.filter(c=>c.k.trim()||c.v.trim()),
     guide:editingId?(state.brews.find(x=>x.id===editingId)?.guide||''):'',
