@@ -18,7 +18,7 @@ HIER = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(HIER, '..', '..', '.claude', 'skills', 'nieuwe-feature',
                      'scripts', 'fonts.css')
 UIT = os.path.join(HIER, 'landing.html')
-APP = 'https://letsbrewspecialty.jesseboontje.workers.dev/'
+APP = 'https://letsbrew.djez.app/'
 GRENS = 15 * 1024 * 1024        # ruim onder de 16 MB die een artifact aankan
 
 def main():

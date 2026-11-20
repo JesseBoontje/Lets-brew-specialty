@@ -123,7 +123,7 @@ tenzij er iemand aan de beurt is.
 ## Beveiligingsaanpassingen 23 oktober 2026
 
 De app-origins zijn beperkt via `ALLOWED_ORIGINS` (komma-gescheiden; standaard
-`https://letsbrewspecialty.jesseboontje.workers.dev`). CORS is geen authenticatie:
+`https://letsbrew.djez.app`). CORS is geen authenticatie:
 een externe client kan een Origin-header namaken. Voor een publiek gebruikte
 server moet daarom ook een quota/rate-limitbeleid worden ingesteld. De live
 `RATE_LIMITER`-binding begrenst sinds 24 oktober 2026 tot 20 writes per minuut

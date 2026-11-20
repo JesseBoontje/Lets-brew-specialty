@@ -22,7 +22,7 @@ const CRON_INTERVAL_MIN = 5;
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const allowed=(env.ALLOWED_ORIGINS||'https://letsbrewspecialty.jesseboontje.workers.dev').split(',').map(x=>x.trim());
+    const allowed=(env.ALLOWED_ORIGINS||'https://letsbrew.djez.app').split(',').map(x=>x.trim());
     const origin=request.headers.get('Origin');
     const cors={'Vary':'Origin','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
     if(origin&&!allowed.includes(origin))return json({error:'origin not allowed'},403,cors);
