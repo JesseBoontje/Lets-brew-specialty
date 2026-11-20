@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-20 (avond)
+Laatst bijgewerkt: 2026-11-20 (nacht)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -154,3 +154,17 @@ Claude. Nog ideeën?"
    tarra-vak en gewichten in my gear, volgens docs/opzet-shotclock-e61.html
    (app/05, recept-instellingen in app/01, my gear in app/06/11).
    Per klus een eigen sessie. Niet mergen zonder akkoord van Jesse.
+
+## Stand 20-11 nacht: klus 3 AeroPress
+- Gebouwd in commit 01accb6: app/04-aeropress.js (eigen bestand, laadt na
+  04-gietcoach.js, gebruikt diens GC_*-constanten). apPast(mid) in pourToggle
+  (alleen echte AeroPress, geen "French press"). Scherm #apcoach met dezelfde
+  CSS als de gietcoach (:is(#gietcoach,#apcoach)), tekening-CSS onderaan styles.css.
+- Tekening volgt de soort stap; bij "wacht" de tekst (plunjer/lucht/dop, zie
+  apActie). Omgekeerd volgt recept.houding; keer-stap = omdraaien.
+- Recepten: 'aeropress' is nu Hoffmann (11 g/200 g), nieuw 'aeropress-om' Tay
+  (18 g, 100 g, aanvullen 115/155 g). Bij AeroPress staan beide in de recept-rij.
+- pourFill vult bloom alleen bij een echte bloom-stap.
+- CACHE scc-v108. Lokaal 25 Playwright (chromium) + 14 node-tests groen.
+- Testhaakjes: ap.snelheid(n), ap.stand(), ap.scene(t). Test: tests/aeropress.spec.cjs.
+- Keurmeester draait (één keuring). Daarna: Jesse melden, archiveren, klus 4.

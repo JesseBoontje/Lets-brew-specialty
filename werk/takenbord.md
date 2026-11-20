@@ -14,6 +14,6 @@
 | Opzet shot clock E61 + pre-infusie | aannemer 3 | geen code (docs/) | wacht op Jesse | https://claude.ai/artifact/STNHN6rDgvJXxiHnJcLmNQ ; open vraag: telt de rust mee in de doeltijd? |
 | Cloudflare-builds falen | later (Jesse) | geen | wacht | ook letsbrewspecialty faalt sinds cd6ee76 (slaagde bij 530ac5a); buildlogs in dashboard lezen |
 | Klus 2: gietcoach V60/Switch | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-gietcoach-v60-switch.md | mee in PR #12, wacht op Jesse |
-| Klus 3: AeroPress normaal/omgekeerd | opvolgende sessie | idem | volgende | docs/opzet-aeropress.html |
+| Klus 3: AeroPress normaal/omgekeerd | architect | claude/architect-skill-jesse-dhw83j | bij keurmeester (commit 01accb6) | keurrapport lezen; goed = Jesse melden en archiveren |
 | Klus 4: shot clock E61 + tarra-vak | architect | idem | nog niet begonnen | docs/opzet-shotclock-e61.html |
 | Klus 1: elke brew aan een boon | architect | claude/architect-skill-jesse-dhw83j | goedgekeurd, zie werk/archief/2026-11-20-brews-aan-bonen.md | mee in PR #12, wacht op Jesse |
