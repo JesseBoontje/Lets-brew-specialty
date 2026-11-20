@@ -1437,3 +1437,192 @@ body.gc-open{overflow:hidden;}
 #apcoach .nu-d svg{width:18px;height:18px;vertical-align:-3px;margin-right:5px;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 @media (prefers-reduced-motion:reduce){#apcoach #ap-tek .stream{animation:none;}}
+
+/* ---------------- shot clock E61 (volledig scherm) ----------------
+   Overgenomen uit docs/opzet-shotclock-e61.html, alles onder #shotclock. */
+#shotclock{position:fixed;inset:0;z-index:900;background:var(--paper);color:var(--ink);
+  display:flex;flex-direction:column;overflow:hidden;max-width:520px;margin:0 auto;
+  padding:calc(6px + env(safe-area-inset-top)) 14px calc(12px + env(safe-area-inset-bottom));}
+#shotclock[hidden]{display:none;}
+#shotclock button{-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+#shotclock .acic{width:auto;height:auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);vertical-align:middle;}
+#shotclock .sc-head .sc-headtxt{flex:1;min-width:0;}
+#shotclock .sc-head .sc-dicht{margin-left:0;width:48px;height:48px;}
+#shotclock .sc-head #sc-recbtn{width:48px;height:48px;}
+#shotclock .sc-info{flex:none;min-height:0;font-size:13px;color:var(--ink-soft);text-align:right;line-height:1.2;}
+#shotclock .sc-info:empty{display:none;}
+#shotclock .zacht{color:var(--ink-soft);font-size:14px;}
+#shotclock .sc-part .pg.leeg{font-family:inherit;font-weight:400;font-size:14px;color:var(--ink-soft);}
+/* ---- opzet shot clock E61: één telefoonscherm, prototype dat echt loopt ---- */
+/* kop: het recept waar de klok uit leest */
+#shotclock .sc-head{flex:none;display:flex;align-items:center;gap:10px;min-height:48px;}
+#shotclock .sc-head>div{min-width:0;}
+#shotclock .sc-head .sc-rn{font-size:24px;line-height:1;}
+#shotclock .sc-head .sc-rd{font-size:13px;color:var(--ink-soft);line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#shotclock .sc-recbtn{margin-left:auto;flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;padding:0;
+  border-radius:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:16px;
+  filter:url(#wobble);cursor:pointer;}
+#shotclock .sc-recbtn:disabled{opacity:.45;cursor:default;}
+#shotclock .sc-recbtn svg{width:24px;height:24px;}
+/* tekening: 45% van het scherm */
+#shotclock .sc-art{flex:0 0 43%;min-height:0;display:flex;justify-content:center;align-items:center;cursor:pointer;outline:none;}
+#shotclock .sc-art:focus-visible{box-shadow:0 0 0 2px var(--line);border-radius:18px;}
+#shotclock .sc-art svg{height:100%;width:100%;overflow:visible;fill:none;stroke:var(--ink);stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
+#shotclock .sc-b{opacity:.62;stroke-width:1.35;}
+/* de tweede, afwijkende pennestreek */
+#shotclock .sc-grain{stroke:var(--ink-soft);stroke-width:1.2;opacity:.75;}
+#shotclock #sc-wet{fill:var(--accent-soft);opacity:.55;stroke:none;transition:height .3s linear;}
+#shotclock #sc-fill{fill:var(--accent-soft);stroke:none;transition:y .25s linear,height .25s linear;}
+#shotclock #sc-crema{fill:#c8a577;stroke:none;transition:y .25s linear,height .25s linear;}
+/* water door de groep: alleen als er water loopt (pre-infusie langzaam, volle druk snel) */
+#shotclock .sc-in path{stroke:var(--accent-soft);stroke-width:1.8;stroke-dasharray:5 5;opacity:0;transition:opacity .3s;}
+#shotclock .water .sc-in path{opacity:.75;animation:scin .8s linear infinite;}
+#shotclock .water.slow .sc-in path{animation-duration:2.4s;}
+@keyframes scin{to{stroke-dashoffset:-10;}}
+/* de straal: dun gestreepte lijn die stroomt */
+#shotclock .sc-stream path{stroke:var(--accent-soft);stroke-width:2.4;opacity:0;stroke-dasharray:13 3;transition:opacity .3s,stroke-width .8s;}
+#shotclock .flow .sc-stream path{opacity:.92;animation:scflow .55s linear infinite;}
+#shotclock .flow.thin .sc-stream path{stroke-width:1.5;}
+@keyframes scflow{to{stroke-dashoffset:-16;}}
+/* druppels: pre-infusie en vlak voor de straal */
+#shotclock .sc-drop{fill:var(--accent-soft);stroke:none;opacity:0;}
+#shotclock .drip .sc-drop.dl{animation:scdl 1.1s ease-in infinite;}
+#shotclock .drip .sc-drop.dr{animation:scdr 1.1s ease-in infinite;animation-delay:.3s;}
+#shotclock .drip .sc-drop.d2{animation-delay:.6s;}
+#shotclock .drip .sc-drop.dr.d2{animation-delay:.85s;}
+@keyframes scdl{0%{opacity:0;transform:translate(0,0)}12%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(4px,46px)}}
+@keyframes scdr{0%{opacity:0;transform:translate(0,0)}12%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(-4px,46px)}}
+/* de hendel: eigen groep, buiten het dubbele lijnwerk */
+#shotclock #sc-lever{transition:transform .6s cubic-bezier(.4,1.5,.5,1);transform-origin:158px 58px;}
+/* klok + gewicht */
+#shotclock .sc-read{flex:none;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:2px;}
+#shotclock .sc-clock{white-space:nowrap;}
+#shotclock .sc-big{font-size:92px;line-height:.8;}
+#shotclock .sc-dec{font-size:44px;line-height:.8;}
+#shotclock .sc-lbl{font-size:14px;color:var(--ink-soft);line-height:1.2;margin-top:4px;}
+#shotclock .sc-wt{text-align:right;white-space:nowrap;}
+#shotclock .sc-wv{font-size:44px;line-height:.85;}
+#shotclock .sc-read.wacht .sc-big,#shotclock .sc-read.wacht .sc-dec{color:var(--ink-soft);}
+/* doelband: te snel / goed / te traag */
+#shotclock .sc-band{flex:none;position:relative;height:56px;margin-top:5px;}
+#shotclock .sc-band svg{position:absolute;left:0;top:14px;width:100%;height:24px;overflow:visible;fill:none;
+  stroke:var(--ink);stroke-linecap:round;filter:url(#wobble-rough);}
+#shotclock .sc-bn,#shotclock .sc-bl{position:absolute;font-size:14px;color:var(--ink-soft);white-space:nowrap;line-height:1;}
+#shotclock .sc-bn{top:0;transform:translateX(-50%);}
+#shotclock .sc-bl{top:41px;}
+#shotclock .sc-bl.on{color:var(--ink);font-family:'Caveat',cursive;font-weight:700;font-size:19px;top:38px;}
+/* strook: vorige / nu / volgende */
+#shotclock .sc-strip{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:6px;margin-top:2px;}
+#shotclock .sc-prev{font-size:15px;line-height:1.25;color:var(--ink-soft);padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#shotclock .sc-cur{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:18px;background:var(--card);
+  border:2px solid var(--ink);filter:url(#wobble);min-height:72px;}
+#shotclock .sc-cur.rust{background:var(--card-2);}
+#shotclock .sc-cur .k{font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;}
+#shotclock .sc-cur .d{font-size:15px;color:var(--ink-soft);line-height:1.25;margin-top:2px;}
+#shotclock .sc-cur .r{margin-left:auto;text-align:right;flex:none;}
+#shotclock .sc-cur .r .v{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:.95;}
+#shotclock .sc-cur .r .u{font-size:13px;color:var(--ink-soft);}
+#shotclock .sc-cur.uitslag{min-height:60px;padding:7px 13px;}
+#shotclock .sc-cur.uitslag .k{font-size:29px;}
+#shotclock .sc-next{font-size:16px;color:var(--ink-soft);padding:0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+#shotclock .sc-next b{font-family:'Caveat',cursive;font-weight:700;font-size:23px;color:var(--ink);white-space:nowrap;}
+#shotclock .sc-next.sterk{color:var(--ink);}
+#shotclock .sc-next.gewicht{align-items:center;}
+#shotclock .sc-pulse{animation:scpulse 1s ease-in-out infinite;}
+@keyframes scpulse{50%{opacity:.45}}
+/* knoppen: groot genoeg voor handschoenen */
+#shotclock .sc-btns{flex:none;display:flex;gap:9px;margin-top:8px;}
+#shotclock .sc-btn{min-height:58px;border-radius:18px;border:2px solid var(--ink);background:var(--card);color:var(--ink);
+  font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:25px;line-height:1;filter:url(#wobble);
+  cursor:pointer;padding:0 12px;flex:1;}
+#shotclock .sc-btn.pri{background:var(--accent-soft);color:var(--cream);}
+#shotclock .sc-btn.speed{flex:none;width:72px;}
+#shotclock .sc-btn[aria-pressed="true"]{background:var(--accent-soft);color:var(--cream);}
+#shotclock .sc-btn:disabled{opacity:.5;cursor:default;}
+#shotclock .sc-step{flex:none;width:56px;height:56px;border-radius:16px;border:2px solid var(--ink);background:var(--card);
+  color:var(--ink);font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:34px;line-height:1;
+  filter:url(#wobble);cursor:pointer;}
+#shotclock .sc-step{display:inline-flex;align-items:center;justify-content:center;padding:0;}
+#shotclock .sc-step:disabled{opacity:.4;cursor:default;}
+#shotclock .sc-val{min-width:62px;text-align:center;font-family:'Caveat',cursive;font-weight:700;font-size:30px;}
+/* tarra: rekenen met je eigen onderdelen */
+#shotclock .sc-tarerow{flex:none;display:flex;align-items:center;gap:9px;width:100%;min-height:46px;margin-top:3px;padding:0 12px;
+  border-radius:15px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;text-align:left;
+  filter:url(#wobble);cursor:pointer;}
+#shotclock .sc-tarerow:disabled{opacity:.5;cursor:default;}
+#shotclock .sc-tarerow .tk{flex:none;font-family:'Caveat',cursive;font-weight:700;font-size:23px;line-height:1;}
+#shotclock .sc-tarerow .ts{flex:1;min-width:0;font-size:15px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#shotclock .sc-tarerow .ta{flex:none;color:var(--ink-soft);font-size:21px;transition:transform .15s;}
+#shotclock .sc-tarerow[aria-expanded="true"]{border-color:var(--ink);}
+#shotclock .sc-tarerow[aria-expanded="true"] .ta{transform:rotate(90deg);}
+#shotclock .sc-tp{position:absolute;left:14px;right:14px;top:110px;background:var(--paper);border:2px solid var(--ink);
+  border-radius:22px;padding:11px 12px 12px;z-index:3;overflow:auto;display:none;}
+#shotclock .sc-tp.open{display:block;}
+#shotclock .sc-tl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;color:var(--ink-soft);margin:0 2px 6px;}
+#shotclock .sc-tl .vb{font-size:13px;border:1.5px dashed var(--line);border-radius:10px;padding:1px 7px;white-space:nowrap;}
+#shotclock .sc-parts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+#shotclock .sc-part{min-height:58px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;
+  text-align:left;padding:5px 11px;filter:url(#wobble);cursor:pointer;display:flex;flex-direction:column;justify-content:center;}
+#shotclock .sc-part .pn{font-size:15px;line-height:1.1;}
+#shotclock .sc-part .pg{font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.05;}
+#shotclock .sc-part[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--ink);color:var(--cream);}
+#shotclock .sc-aim{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:7px 12px;
+  border-radius:16px;background:var(--card-2);}
+#shotclock .sc-aim .al{font-size:14px;line-height:1.25;color:var(--ink-soft);}
+#shotclock .sc-aim .av{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:1;white-space:nowrap;}
+#shotclock .sc-chk{display:flex;align-items:center;gap:10px;margin-top:10px;}
+#shotclock .sc-chk label{flex:1;min-width:0;font-size:15px;line-height:1.2;}
+#shotclock .sc-num{width:150px;height:58px;border-radius:16px;border:2px solid var(--ink);background:var(--card);color:var(--ink);
+  font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:34px;text-align:center;padding:0 8px;}
+#shotclock .sc-num.klein{width:112px;height:52px;font-size:28px;}
+#shotclock .sc-res{font-size:15px;line-height:1.3;margin-top:7px;min-height:40px;color:var(--ink-soft);}
+#shotclock .sc-res b{font-family:'Caveat',cursive;font-weight:700;font-size:25px;color:var(--ink);}
+#shotclock .sc-tbtns{display:flex;gap:9px;margin-top:8px;}
+#shotclock .sc-grow{display:flex;align-items:center;gap:9px;margin-top:8px;}
+#shotclock .sc-grow label{flex:1;min-width:0;font-size:16px;line-height:1.15;}
+#shotclock .sc-grow .u{font-size:16px;color:var(--ink-soft);}
+#shotclock .sc-crumb{font-size:13px;color:var(--ink-soft);margin-bottom:2px;}
+/* instelpaneel: hoort bij het recept */
+#shotclock .sc-sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper);border-top:2px solid var(--ink);
+  border-radius:26px 26px 0 0;padding:14px 16px 14px;transform:translateY(105%);transition:transform .3s;z-index:5;}
+#shotclock .sc-sheet.open{transform:none;}
+#shotclock #sc-gear{z-index:7;}
+#shotclock #sc-scrim.hoog{z-index:6;}
+#shotclock .sc-sheet h3{font-family:'Caveat',cursive;font-size:30px;line-height:1;}
+#shotclock .sc-sheet .zacht{margin:3px 0 9px;line-height:1.3;}
+#shotclock .sc-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px;}
+#shotclock .sc-chip{min-height:42px;padding:0 12px;border-radius:15px;border:2px solid var(--line);background:var(--card);
+  color:var(--ink);font:inherit;font-size:15px;filter:url(#wobble);cursor:pointer;}
+#shotclock .sc-chip.sel{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+#shotclock .sc-row{display:flex;align-items:center;gap:9px;margin-top:9px;}
+#shotclock .sc-row .sc-rl{flex:1;min-width:0;line-height:1.15;}
+#shotclock .sc-row .sc-rl small{display:block;color:var(--ink-soft);font-size:13px;}
+#shotclock .sc-row.uit{opacity:.45;}
+#shotclock .sc-tog{flex:none;width:78px;height:52px;border-radius:18px;border:2px solid var(--line);background:var(--card-2);
+  color:var(--ink);font:inherit;position:relative;cursor:pointer;filter:url(#wobble);}
+#shotclock .sc-tog .knob{position:absolute;top:7px;left:7px;width:34px;height:34px;border-radius:50%;background:var(--paper);
+  border:2px solid var(--line);transition:left .15s;}
+#shotclock .sc-tog[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--ink);}
+#shotclock .sc-tog[aria-pressed="true"] .knob{left:35px;border-color:var(--ink);}
+#shotclock .sc-op{margin:10px 0 2px;font-size:15px;color:var(--ink-soft);}
+#shotclock .sc-op b{font-family:'Caveat',cursive;font-size:21px;color:var(--ink);}
+#shotclock .sc-sheet .sc-btn{width:100%;margin-top:8px;}
+#shotclock .sc-toast{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:max-content;max-width:88%;
+  background:var(--accent-soft);color:var(--cream);padding:11px 18px;border-radius:18px;border:2px solid var(--ink);
+  filter:url(#wobble);font-family:'Caveat',cursive;font-weight:700;font-size:21px;line-height:1.1;text-align:center;
+  opacity:0;transition:opacity .25s;pointer-events:none;z-index:6;}
+#shotclock .sc-toast.show{opacity:1;}
+@media (prefers-reduced-motion:reduce){#shotclock .water .sc-in path,#shotclock .flow .sc-stream path{animation:none;}#shotclock .drip .sc-drop{animation:none!important;opacity:1;}#shotclock .drip .sc-drop.d2{transform:translate(0,24px);}#shotclock #sc-lever,#shotclock #sc-fill,#shotclock #sc-crema,#shotclock #sc-wet,#shotclock .sc-sheet,#shotclock .sc-scrim,#shotclock .sc-tog .knob{transition:none;}#shotclock .sc-pulse{animation:none;}
+}
+
+/* in de app: de tekening vult wat er over is, de rest staat vast */
+#shotclock .sc-art{flex:1 1 0;min-height:120px;}
+#shotclock .sc-big{font-size:min(92px,23vw);}
+#shotclock .sc-strip{flex:none;}
+/* tarra-gewichten onder profile -> my gear */
+.tare-gear{display:grid;grid-template-columns:1fr;gap:6px;margin:4px 0 8px;}
+.tare-gear .tg-rij{display:flex;align-items:center;gap:8px;}
+.tare-gear label{flex:1;min-width:0;font-size:15px;}
+.tare-gear input{width:110px;min-height:48px;text-align:center;font-size:18px;}
+.tare-gear span{color:var(--ink-soft);}

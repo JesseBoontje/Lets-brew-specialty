@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-20 (nacht)
+Laatst bijgewerkt: 2026-11-20 (klus 4)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -186,3 +186,21 @@ Claude. Nog ideeën?"
    app/05-shotclock.js), CSS-shell hergebruiken via :is(...). Featurevlag shotclock.
    Eén keuring, dan Jesse melden.
 2. Niet mergen zonder akkoord van Jesse. Cloudflare-builds blijven falen (later).
+
+## Stand 20-11: klus 4 shot clock E61
+- Gebouwd: app/05-shotclock.js (laadt na 05-espresso-dial-in.js). Volledig
+  scherm #shotclock, eigen CSS onderaan styles.css (#shotclock ...), ids sc-.
+  De kaart "Shot timer" op het dial-in-scherm opent hem (e61Toggle -> shot.openen).
+- Recept: state.lastRecipe[formMethod] (espresso), doel uit pendingTarget.
+  Pre-infusie: ESPRESSO_RECIPES[].pre in app/01, eigen instelling in
+  state.recipePre[recept-id] ('target' zonder recept). Standaard 5 s + 3 s.
+- Alleen volle druk telt: plan() fs = pre+rust, band lo..hi = F±3 s.
+  "use" vult di-time met de seconden volle druk, di-yield als nagewogen,
+  di-dose uit het tarra-vak, formPrep.preinf, en diShot -> brew.shot
+  ({pre,rest,full,total,drop,yieldEstimated}); detail toont "shot clock".
+- Tarra: state.tare {naked,spout,ring,ps1,ps2,cup} (profiel > Mijn setup >
+  my gear, renderTareGear) en state.tareOn. SCHEMA.md bijgewerkt.
+- Valkuil: e61Run bestond niet meer; weegschaal-koppeling (app/09) kijkt nu
+  naar shot.loopt().
+- Testhaakjes: shot.snelheid(n), shot.stand(). CACHE scc-v110.
+- Lokaal 30 Playwright (chromium) + 14 node-tests groen.

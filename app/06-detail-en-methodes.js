@@ -56,6 +56,7 @@ function openDetail(id){
     <div class="hero-img"><span class="doodle steam" style="top:0;left:50%;">∿ ∿ ∿</span>${iconHTML(m,210)}</div>
     <div class="stat-card sketch" style="background:var(${m.tint});">${grid}</div>
     ${(fam==='espresso'&&b.target&&fmtShot(b.target))?'<div class="notes-card sketch soft"><div class="k">target (dial-in)</div><div class="v">'+esc(fmtShot(b.target))+'</div></div>':''}
+    ${(fam==='espresso'&&b.shot&&typeof b.shot==='object')?'<div class="notes-card sketch soft"><div class="k">shot clock</div><div class="v">'+esc(shotFasen(b.shot))+'</div></div>':''}
     ${advice?'<div class="notes-card sketch soft"><div class="k">grind tip'+(fam==='espresso'?'':' — gear-aware')+'</div><div class="v">next time: grind '+esc(advice.grind)+(advice.reason?' <span style="color:var(--ink-soft)">— '+esc(advice.reason)+'</span>':'')+'</div></div>':''}
     ${prepHtml?'<div class="notes-card sketch soft"><div class="k">'+(fam==='espresso'?'puck-prep & machine':'prep')+'</div>'+prepHtml+'</div>':''}
     ${(b.brewer||b.grinder||b.paper||b.water)?'<div class="notes-card sketch soft"><div class="k">gear</div><div class="v">'+[b.brewer,b.grinder,b.paper,b.water].filter(Boolean).map(esc).join(' · ')+'</div></div>':''}
@@ -534,3 +535,16 @@ function addMethod(){
   save();renderMethods();toast('✓ method added');
 }
 
+
+// "5 s pre + 3 s rest + 28.2 s full · total 0:36 · first drop 0:07.4", uit de shot clock
+function shotFasen(x){
+  const n=v=>(typeof v==='number'&&isFinite(v))?v:0;
+  const tot=n(x.total), m=Math.floor(tot/60), sec=Math.floor(tot%60);
+  const delen=[];
+  if(n(x.pre))delen.push(n(x.pre)+' s pre + '+n(x.rest)+' s rest + '+n(x.full).toFixed(1)+' s full');
+  else delen.push(n(x.full).toFixed(1)+' s full pressure');
+  delen.push('total '+m+':'+String(sec).padStart(2,'0'));
+  if(typeof x.drop==='number'&&isFinite(x.drop))delen.push('first drop '+x.drop.toFixed(1)+' s');
+  if(x.yieldEstimated)delen.push('weight not checked');
+  return delen.join(' · ');
+}

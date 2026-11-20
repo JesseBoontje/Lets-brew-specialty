@@ -436,10 +436,12 @@ const FILTER_RECIPES=[
 /* Espressorecepten hebben dezelfde vorm als de filterrecepten, zodat dezelfde
    kaart ze kan tonen. Het verschil: ratio betekent hier yield-uit-dose, en de
    stappen zijn je routine in plaats van een gietschema. tijd = de doeltijd
-   waar het dial-in-scherm naartoe werkt.                                    */
+   waar het dial-in-scherm naartoe werkt: de seconden onder volle druk.
+   pre = pre-infusie (aan/uit, seconden) en rust daarna, voor de shot clock
+   (app/05-shotclock.js); eigen instellingen staan in state.recipePre.     */
 const ESPRESSO_RECIPES=[
   {id:'e-classic', fam:'espresso', naam:'classic 1:2', voor:['espresso'], dose:18, ratio:2, temp:93,
-   tijd:'0:28', maling:'fijn',
+   tijd:'0:28', pre:{on:true, s:5, rust:3}, maling:'fijn',
    over:'Het moderne uitgangspunt. Werkt op vrijwel elke boon en is het eerlijkste vertrekpunt om vanaf te dial-innen.',
    stappen:[
      {t:0,p:0,k:'dose',  d:'weeg 18 g en verdeel het maalsel met een naaldje (WDT)'},
@@ -449,7 +451,7 @@ const ESPRESSO_RECIPES=[
      {t:28,p:0,k:'stop', d:'stop op 36 g uit en proef meteen'}]},
 
   {id:'e-ristretto', fam:'espresso', naam:'ristretto 1:1.5', voor:['espresso'], dose:18, ratio:1.5, temp:94,
-   tijd:'0:28', maling:'fijner dan classic',
+   tijd:'0:28', pre:{on:true, s:5, rust:3}, maling:'fijner dan classic',
    over:'Korter getrokken: dikker, zoeter en minder zuur. Mooi op donkerdere brandingen en in kleine melkdranken.',
    stappen:[
      {t:0,p:0,k:'dose', d:'zelfde dose, maar maal een stap fijner'},
@@ -457,7 +459,7 @@ const ESPRESSO_RECIPES=[
      {t:28,p:0,k:'stop',d:'stop al op 27 g uit — daarna wordt het snel bitter'}]},
 
   {id:'e-lungo', fam:'espresso', naam:'lungo 1:3', voor:['espresso'], dose:18, ratio:3, temp:92,
-   tijd:'0:33', maling:'grover dan classic',
+   tijd:'0:33', pre:{on:false,s:5, rust:3}, maling:'grover dan classic',
    over:'Langer doorgetrokken voor meer aroma en een lichtere kop. Maal grover, anders haal je de bittere staart mee.',
    stappen:[
      {t:0,p:0,k:'dose', d:'maal een stap grover dan je classic'},
@@ -465,7 +467,7 @@ const ESPRESSO_RECIPES=[
      {t:33,p:0,k:'stop',d:'stop op 54 g uit'}]},
 
   {id:'e-light', fam:'espresso', naam:'light roast 1:2.5', voor:['espresso'], dose:18, ratio:2.5, temp:95,
-   tijd:'0:31', maling:'fijn',
+   tijd:'0:31', pre:{on:true, s:7, rust:4}, maling:'fijn',
    over:'Lichte brandingen zijn dichter en lossen trager op. Een langere ratio en hetere zet halen de zoetheid eruit in plaats van alleen het zuur.',
    stappen:[
      {t:0,p:0,k:'temp', d:'zet zo warm als je machine toelaat, richting 95–96 °C'},
@@ -474,7 +476,7 @@ const ESPRESSO_RECIPES=[
      {t:31,p:0,k:'stop',d:'stop op 45 g uit'}]},
 
   {id:'e-turbo', fam:'espresso', naam:'turbo shot', voor:['espresso'], dose:20, ratio:2.5, temp:93,
-   tijd:'0:18', maling:'grof voor espresso',
+   tijd:'0:18', pre:{on:false,s:3, rust:0}, maling:'grof voor espresso',
    over:'Grover malen en snel doorlopen. Weinig weerstand, dus vergevingsgezind — en verrassend zoet op lichte brandingen.',
    stappen:[
      {t:0,p:0,k:'dose', d:'20 g, duidelijk grover dan je normale espresso'},
@@ -482,7 +484,7 @@ const ESPRESSO_RECIPES=[
      {t:18,p:0,k:'stop',d:'stop op 50 g uit, ergens tussen 15 en 22 seconden'}]},
 
   {id:'e-milk', fam:'espresso', naam:'melkbasis', voor:['espresso'], dose:20, ratio:1.8, temp:94,
-   tijd:'0:29', maling:'fijn',
+   tijd:'0:29', pre:{on:true, s:5, rust:3}, maling:'fijn',
    over:'Iets korter en met een hogere dose, zodat de koffie door de melk heen komt in een flat white of cappuccino.',
    stappen:[
      {t:0,p:0,k:'dose', d:'20 g in je mand — meer koffie, kortere ratio'},

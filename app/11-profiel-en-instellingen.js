@@ -287,6 +287,7 @@ function gearLabel(g){
 }
 function renderGear(){
   renderGearCatPick();
+  if(typeof renderTareGear==='function')renderTareGear();   // tarra-gewichten voor de shot clock
   const el=document.getElementById('gear-list');if(!el)return;
   const g=state.gear||[];
   if(!g.length){el.innerHTML='<div class="set-d" style="margin-bottom:4px">nothing added yet.</div>';return;}
@@ -760,7 +761,7 @@ function lbBrew(x){
     ratio:x.ratio==null?null:x.ratio,time:x.time||null,timeSec:parseTimeSec(x.time),
     grind:x.grind||null,temp:x.temp==null?null:x.temp,
     score:x.score==null?null:x.score,tags:asArr(x.tags).slice(),notes:x.notes||null,
-    kind:x.kind||(x.dialIn?'dial-in':'brew'),recipeId:x.recipeId||null,recipeSnapshot:x.recipeSnapshot?lbKopie(x.recipeSnapshot):null,beanSnapshot:x.beanSnapshot?lbKopie(x.beanSnapshot):null,isDialIn:isDialInBrew(x),target:x.target?lbKopie(x.target):null};
+    kind:x.kind||(x.dialIn?'dial-in':'brew'),recipeId:x.recipeId||null,recipeSnapshot:x.recipeSnapshot?lbKopie(x.recipeSnapshot):null,beanSnapshot:x.beanSnapshot?lbKopie(x.beanSnapshot):null,isDialIn:isDialInBrew(x),target:x.target?lbKopie(x.target):null,shot:x.shot?lbKopie(x.shot):null};
 }
 function lbRecipe(r){
   return {id:r.id,name:r.naam||'',family:recipeFam(r),methodId:methodForRecipe(r),

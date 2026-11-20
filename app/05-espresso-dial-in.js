@@ -24,7 +24,9 @@ function openDialIn(methodId){
     const last=state.brews.filter(x=>x.method===formMethod).sort((a,b)=>b.ts-a.ts)[0];
     if(last){setVal('di-dose',last.dose||'');setVal('di-yield',last.yield||'');if(last.grind)setVal('di-grind',last.grind);}
   }
-  e61Reset();renderDialIn();go('dialin');
+  e61Reset();
+  if(typeof scVulPrep==='function')scVulPrep(false);   // pre-infusie uit het recept in de puck-prep
+  renderDialIn();go('dialin');
 }
 function renderDialIn(){renderDiBeans();renderDiGoal();renderPrep();diAdvice();renderDiClock();renderDiJourney();renderStartHint('di-start');
   const laLink=document.getElementById('di-latteart-link');
@@ -40,59 +42,27 @@ function renderStartHint(elId){
   el.style.display='block';
   el.innerHTML='<span class="sh-k">starting point</span> '+esc(t);
 }
-/* --- E61 shot clock: stopwatch, geen simulator — jouw waarden blijven leidend --- */
-let e61Run=false,e61T0=0,e61Raf=null;
+/* --- E61 shot clock: de kaart op het dial-in-scherm opent het volledige
+   scherm (app/05-shotclock.js). De kaart zelf toont het doel en of
+   pre-infusie aanstaat; de tekening blijft stil.                        */
+let diShot=null;   // fasen van de laatste shot uit de shot clock, gaat mee in de brew
 function e61Fmt(sec){const m=Math.floor(sec/60),ss=Math.floor(sec%60);return m+':'+String(ss).padStart(2,'0');}
 function renderDiClock(){
   const card=document.getElementById('di-clock-card');if(!card)return;
   card.style.display=featOn('shotclock')?'block':'none';
   const t=pendingTarget||{};
   const tgt=document.getElementById('e61-tgt');
-  if(tgt)tgt.textContent='target '+(t.time||'0:28');
+  if(tgt){
+    const pre=(typeof scPreVan==='function')?scPreVan(typeof scReceptNu==='function'?scReceptNu():null):null;
+    tgt.textContent='full '+(t.time||'0:28')+(pre?(pre.on?' · pre '+pre.s+' s · rest '+pre.rust+' s':' · no pre-infusion'):'');
+  }
   const vr=document.getElementById('voice-row');
   if(vr)vr.style.display=featOn('voice')?'block':'none';
 }
-function e61Reset(){
-  e61Run=false;cancelAnimationFrame(e61Raf);
-  e61SetFill(0);
-  const e=document.getElementById('e61');if(e)e.classList.remove('e61-run');
-  const b=document.getElementById('e61-btn');if(b)b.textContent='pull the lever';
-  const tm=document.getElementById('e61-time');if(tm)tm.textContent='0:00';
-}
-// het kopje loopt mee met de klok: vol op je doeltijd (blijft daarna vol)
-const CUP_TOP=181, CUP_BOTTOM=213;   // binnenkant van de demitasse
-function e61SetFill(p){
-  const fill=document.getElementById('e61-fill'), crema=document.getElementById('e61-crema');
-  if(!fill||!crema)return;
-  const h=Math.max(0,Math.min(1,p))*(CUP_BOTTOM-CUP_TOP);
-  const y=CUP_BOTTOM-h;
-  fill.setAttribute('y',y);fill.setAttribute('height',h);
-  const ch=Math.min(h,5);                       // laagje crema op het oppervlak
-  crema.setAttribute('y',y);crema.setAttribute('height',ch);
-}
-function e61Tick(){
-  const s=(performance.now()-e61T0)/1000;
-  const tm=document.getElementById('e61-time');if(tm)tm.textContent=e61Fmt(s);
-  const tgt=parseTimeSec((pendingTarget||{}).time)||28;
-  e61SetFill(s/tgt);
-  if(e61Run)e61Raf=requestAnimationFrame(e61Tick);
-}
+function e61Reset(){diShot=null;}
 function e61Toggle(){
   if(!featOn('shotclock'))return;
-  const e=document.getElementById('e61'),b=document.getElementById('e61-btn');
-  if(!e61Run){
-    e61Run=true;e61T0=performance.now();
-    e61SetFill(0);
-    e.classList.add('e61-run');b.textContent='stop';
-    e61Tick();
-  }else{
-    e61Run=false;cancelAnimationFrame(e61Raf);
-    e.classList.remove('e61-run');b.textContent='pull the lever';
-    const s=Math.round((performance.now()-e61T0)/1000);
-    const inp=document.getElementById('di-time');
-    if(inp){inp.value=e61Fmt(s);normalizeTime(inp);diAdvice();}
-    toast('⏱ '+e61Fmt(s)+' filled in — correct it if your machine says otherwise');
-  }
+  shot.openen();
 }
 /* --- dial-in journey: elke poging getekend, de lijn wandelt de doelzone in --- */
 function renderDiJourney(){
@@ -270,7 +240,7 @@ async function saveDialInBrew(next){
     score:0,notes:'',grind:usedGrind||t.grind||'',
     beanId:formBean,beans:(beanById(formBean)?.name)||'',
     tags:[],custom:[],guide:(rec.guide||''),target:pendingTarget||null,
-    prep:Object.keys(prep).length?prep:null,ts:Date.now()};
+    prep:Object.keys(prep).length?prep:null,shot:diShot||null,ts:Date.now()};
   BrewModel.attachBrew(state,b,formRecipeSnapshot||recipeById((state.lastRecipe||{})[formMethod]));
   state.brews.push(b);
   // journey-log: elke poging apart bewaren (het brew-record blijft er één)

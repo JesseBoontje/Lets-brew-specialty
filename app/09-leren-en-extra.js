@@ -442,7 +442,7 @@ async function pairScale(){
         const el=document.getElementById('e61-live');
         if(el)el.textContent='⚖ live: '+g.toFixed(1)+' g';
         const y=document.getElementById('di-yield');
-        if(y&&e61Run)y.value=g.toFixed(1);
+        if(y&&typeof shot==='object'&&shot.loopt())y.value=g.toFixed(1);   // alleen terwijl de shot clock loopt
       }
     });
     toast('⚖ scale connected');

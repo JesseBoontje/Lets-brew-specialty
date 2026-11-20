@@ -314,10 +314,10 @@
           </svg>
         </div>
         <div class="e61-row">
-          <div><span class="e61-time hand" id="e61-time">0:00</span><div class="e61-tgt" id="e61-tgt"></div></div>
-          <button type="button" class="e61-btn" id="e61-btn" onclick="event.stopPropagation();e61Toggle()">pull the lever</button>
+          <div><span class="e61-time hand" id="e61-time" style="font-size:30px;white-space:nowrap">shot clock</span><div class="e61-tgt" id="e61-tgt"></div></div>
+          <button type="button" class="e61-btn" id="e61-btn" onclick="event.stopPropagation();e61Toggle()">open</button>
         </div>
-        <div class="set-d" style="margin-top:8px;font-size:14px">lever up = shot running · lever down = stop, the time is filled in below — you can always correct any value by hand</div>
+        <div class="set-d" style="margin-top:8px;font-size:14px">full screen: pre-infusion, rest and full pressure, with a tare box for your parts. Only full pressure counts for the target; the time is filled in below and stays editable.</div>
         <div id="voice-row" style="display:none;margin-top:8px">
           <div class="field-row voice-row">
             <input id="voice-text" placeholder='zeg of typ: 18 in, 36 uit, 27 seconden'>
@@ -739,6 +739,9 @@
         </div>
         <div class="set-d" id="gear-range-note" style="display:none;font-size:14px;margin:-2px 0 8px">the full scale of your grinder — clicks, numbers, whatever it uses. This lets the app judge how big a step really is on your grinder.</div>
         <button class="profile-btn" onclick="addGear()" style="margin-top:2px">＋ add</button>
+        <div class="gear-cat-lbl" style="margin-top:14px">espresso parts · weight</div>
+        <div class="set-d" style="font-size:14px;margin:0 0 4px">for the tare box in the shot clock: weigh each part once on an empty, zeroed scale. Leave empty what you don't have.</div>
+        <div class="tare-gear" id="tare-gear"></div>
       
         <div id="pair-card" style="display:none;border-top:1.5px dashed var(--line);margin-top:14px;padding-top:12px">
         <div class="set-t hand" style="font-size:19px;margin-top:4px">pairing</div>
@@ -923,6 +926,7 @@
 <script src="app/04-gietcoach.js"></script>
 <script src="app/04-aeropress.js"></script>
 <script src="app/05-espresso-dial-in.js"></script>
+<script src="app/05-shotclock.js"></script>
 <script src="app/06-detail-en-methodes.js"></script>
 <script src="app/07-bonen.js"></script>
 <script src="app/08-ai.js"></script>

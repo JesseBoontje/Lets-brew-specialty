@@ -141,6 +141,7 @@ suggestie. Leeg zolang je op die methode niets hebt afgetekend.
 | `notes` | string \| null | |
 | `isDialIn` | bool | hoort bij de dial-in-lus, niet bij je gewone logboek |
 | `target` | object \| null | het doel waar je naartoe werkte |
+| `shot` | object \| null | alleen bij espresso uit de shot clock: `{pre, rest, full, total, drop, yieldEstimated}` in seconden. `pre` en `rest` zijn 0 zonder pre-infusie; `full` is de tijd onder volle druk (die telt voor de doeltijd en staat ook in `time`), `total` vanaf de hendel; `drop` de eerste druppel of null; `yieldEstimated` true als het gewicht niet is nagewogen |
 
 ### recipe
 
@@ -155,6 +156,22 @@ Bij een Hario Switch draagt elke stap in `stappen` daarnaast een `klep`:
 `"dicht"` (het water blijft staan — immersie) of `"open"` (het loopt door —
 percolatie), en `null` bij elke andere methode. Het is een stand, geen
 gebeurtenis: de app laat hem alleen zien op de stap waar hij verandert.
+
+### pre-infusie per recept (intern: `recipePre`)
+
+`{"<recept-id>": {on, s, rust}}` — wat je in de shot clock instelt voor een
+espressorecept: pre-infusie aan/uit, de seconden pre-infusie (1–15) en de rust
+daarna (0–10). Zonder eigen instelling geldt `pre` van het ingebouwde recept, en
+anders 5 s pre en 3 s rust. Zonder gekozen recept heet de sleutel `target`.
+
+### tarra-gewichten (intern: `tare` en `tareOn`)
+
+`tare` is `{naked, spout, ring, ps1, ps2, cup}`: het eigen gewicht in gram van
+naked portafilter, double spout portafilter, dosing ring, puck screen 1 en 2 en
+dosing cup, één keer gewogen op een lege, genulde weegschaal (*profile → my
+gear*). Een onderdeel zonder gewicht ontbreekt. `tareOn` onthoudt welke
+onderdelen er in het tarra-vak van de shot clock op de weegschaal liggen
+(`{naked:true, ring:true}`); naked en double spout sluiten elkaar uit.
 
 ### dialLog
 
