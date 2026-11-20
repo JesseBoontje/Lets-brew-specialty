@@ -167,4 +167,22 @@ Claude. Nog ideeën?"
 - pourFill vult bloom alleen bij een echte bloom-stap.
 - CACHE scc-v108. Lokaal 25 Playwright (chromium) + 14 node-tests groen.
 - Testhaakjes: ap.snelheid(n), ap.stand(), ap.scene(t). Test: tests/aeropress.spec.cjs.
-- Keurmeester draait (één keuring). Daarna: Jesse melden, archiveren, klus 4.
+
+## Klus 3 GOEDGEKEURD (20-11 nacht)
+- Ronde 2 goedgekeurd, zie werk/archief/2026-11-20-aeropress.md. Laatste
+  commit 8f4e698, CACHE scc-v109.
+- Valkuil: brewerArtKey maakt van elke naam met "press" een aeropress; voor
+  coach en recepten altijd apPast(mid) gebruiken, niet isAeropress.
+- Valkuil: poort 4175 kan bezet zijn door een eerdere test-server
+  (pkill -f test-server.mjs).
+- Na akkoord: handleiding bijwerken (skill lets-brew-handleiding) voor klus 2 en 3.
+
+## Eerstvolgende stap (opvolger)
+1. Klus 4: shot clock E61 met pre-infusie (5 s), rust (instelbaar, 3 s), alleen
+   volle druk telt voor de doeltijd, tarra-vak en gewichten in my gear, volgens
+   docs/opzet-shotclock-e61.html en werk/keuzes-2026-11-19.md (app/05,
+   recept-instellingen in app/01, my gear in app/06/11). Zelfde aanpak als
+   app/04-gietcoach.js en app/04-aeropress.js: eigen bestand (bijv.
+   app/05-shotclock.js), CSS-shell hergebruiken via :is(...). Featurevlag shotclock.
+   Eén keuring, dan Jesse melden.
+2. Niet mergen zonder akkoord van Jesse. Cloudflare-builds blijven falen (later).
