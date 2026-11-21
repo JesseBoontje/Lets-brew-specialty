@@ -125,7 +125,7 @@ function freshPeakText(b,pk,days){
   const bron=pk.learned?(pk.from==='bean'?'learned from your '+pk.n+' scores of this bean'
     :'learned from your '+pk.n+' scores across beans'):'the usual curve — your scores will refine it';
   const roast=new Date(b.roastdate+'T00:00:00');
-  const dag=n=>{const d=new Date(roast.getTime()+n*86400000);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});};
+  const dag=n=>{const d=new Date(roast.getTime()+n*86400000);return d.toLocaleDateString('en-GB',d.getFullYear()===new Date().getFullYear()?{day:'numeric',month:'short'}:{day:'numeric',month:'short',year:'numeric'});};
   const wanneer=days==null||days<pk.start?'at its best from '+dag(pk.start)+' (day '+pk.start+')'
     :days<=pk.end?'at its best now, until '+dag(pk.end)+' (day '+pk.end+')'
     :'its best days were '+dag(pk.start)+' – '+dag(pk.end);

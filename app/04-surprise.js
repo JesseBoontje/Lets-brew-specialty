@@ -12,8 +12,8 @@ const SUR_TWISTS=[
   {id:'dose-',en:'one gram less coffee for a lighter, clearer cup',nl:'een gram minder koffie voor een lichtere, helderdere kop',f:r=>{r.dose=Math.max(7,r.dose-1);}},
   {id:'warm',en:'one degree warmer to pull out more sweetness',nl:'een graad warmer om meer zoetheid eruit te halen',f:r=>{r.temp=Math.min(97,r.temp+1);}},
   {id:'koel',en:'one degree cooler to calm the acidity',nl:'een graad koeler om het zuur rustiger te maken',f:r=>{r.temp=Math.max(85,r.temp-1);}},
-  {id:'lang',en:'a slightly longer ratio for a more open cup',nl:'een iets langere verhouding voor een opener kop',f:r=>{r.ratio=Math.round((r.ratio+(r.fam==='espresso'?.25:.5))*100)/100;}},
-  {id:'kort',en:'a slightly shorter ratio for a fuller cup',nl:'een iets kortere verhouding voor een vollere kop',f:r=>{r.ratio=Math.round((r.ratio-(r.fam==='espresso'?.25:.5))*100)/100;}},
+  {id:'lang',en:'a slightly longer ratio for a more open cup',nl:'een iets langere verhouding voor een opener kop',f:r=>{r.ratio=Math.round((r.fam==='espresso'?r.ratio+.25:r.ratio*1.04)*100)/100;}},
+  {id:'kort',en:'a slightly shorter ratio for a fuller cup',nl:'een iets kortere verhouding voor een vollere kop',f:r=>{r.ratio=Math.round((r.fam==='espresso'?r.ratio-.25:r.ratio*0.96)*100)/100;}},
 ];
 
 // bonen in huis, met een gewicht: op z'n best telt zwaar, nog aan het rusten licht
@@ -33,11 +33,14 @@ function surTrek(lijst){
   return lijst[lijst.length-1];
 }
 // welke methodes passen bij deze boon (de zak of jouw keuze bij de boon)
-// pads (senseo) kun je niet met je eigen bonen zetten: die doen niet mee.
-// Zegt de boon niets, dan de methodes waar je echt mee zet.
+/* Pads (senseo) zet je niet met je eigen bonen, en bij een mokapot liggen
+   dosis en water vast (mandje vol, ketel tot onder het ventiel): daar valt
+   niets te verrassen. Die twee doen dus niet mee. Zegt de boon niets, dan de
+   methodes waar je echt mee zet.                                          */
+const SUR_NIET=['senseo','perculator'];
 function surMethodes(b){
-  const alle=state.methods.filter(m=>m.on),aan=alle.filter(m=>m.id!=='senseo');
-  if(!aan.length)return alle;
+  const aan=state.methods.filter(m=>m.on&&!SUR_NIET.includes(m.id));
+  if(!aan.length)return [];
   const eigen=(Array.isArray(b.methods)&&b.methods.length?b.methods:(b.method?[b.method]:[]));
   let l=aan.filter(m=>eigen.includes(m.id));
   if(!l.length&&beanFam(b))l=aan.filter(m=>methodFamily(m.id)===beanFam(b));
@@ -54,22 +57,22 @@ function surMaak(b,mid){
   const basis=recipesFor(mid).filter(r=>!r.eigen&&(mid==='switch'||!(r.stappen||[]).some(st=>st.klep)));
   const laatst=state.lastRecipe&&state.lastRecipe[mid];
   const keuze=basis.filter(r=>r.id!==laatst);
-  const t=(keuze.length?keuze:basis)[Math.floor(Math.random()*(keuze.length||basis.length))];
-  if(!t)return null;
+  const t=(keuze.length?keuze:basis)[Math.min((keuze.length||basis.length)-1,Math.floor(Math.random()*(keuze.length||basis.length)))];
+  if(!t||!(t.ratio>0))return null;
   const r={fam:esp?'espresso':'filter',dose:t.dose,ratio:t.ratio,temp:t.temp};
   const waarom=[];
   const roast=b.roast||'';
   if(roast==='light'){
     r.temp=Math.min(esp?96:97,r.temp+2);
     if(esp&&r.ratio<2.5)r.ratio=2.5;
-    waarom.push(['light roast: hotter water ('+r.temp+' °C)'+(esp?' and a longer 1:'+r.ratio:''),'lichte branding: heter water ('+r.temp+' °C)'+(esp?' en een langere 1:'+r.ratio:'')]);
+    waarom.push(['light roast: hotter water'+(esp?' and a longer ratio':''),'lichte branding: heter water'+(esp?' en een langere verhouding':'')]);
   }else if(roast==='medium-light'){
     r.temp=Math.min(96,r.temp+1);
-    waarom.push(['medium-light roast: a degree warmer ('+r.temp+' °C)','medium-lichte branding: een graad warmer ('+r.temp+' °C)']);
+    waarom.push(['medium-light roast: a degree warmer','medium-lichte branding: een graad warmer']);
   }else if(/dark/.test(roast)){
     r.temp=Math.max(86,r.temp-3);
-    r.ratio=esp?Math.min(r.ratio,1.8):Math.min(r.ratio,15);
-    waarom.push(['darker roast: cooler water ('+r.temp+' °C) and a shorter 1:'+r.ratio,'donkere branding: koeler water ('+r.temp+' °C) en een kortere 1:'+r.ratio]);
+    r.ratio=esp?Math.min(r.ratio,1.8):Math.round(r.ratio*0.92*100)/100;
+    waarom.push(['darker roast: cooler water and a shorter ratio','donkere branding: koeler water en een kortere verhouding']);
   }
   if(/natural|anaerob|honey/i.test(b.process||'')){
     r.temp=Math.max(85,r.temp-1);
@@ -87,10 +90,14 @@ function surMaak(b,mid){
   tw.f(r);
   waarom.push(['the twist: '+tw.en,'de draai: '+tw.nl]);
   r.dose=Math.max(7,Math.min(30,r.dose));
-  r.ratio=esp?Math.max(1.2,Math.min(3.5,r.ratio)):Math.max(12,Math.min(19,r.ratio));
+  // filter: nooit verder dan 10% van het basisrecept (een AeroPress omgekeerd
+  // op 1:8,6 blijft dan ook echt een AeroPress omgekeerd)
+  r.ratio=esp?Math.max(1.2,Math.min(3.5,r.ratio)):Math.round(Math.max(t.ratio*0.9,Math.min(t.ratio*1.1,r.ratio))*100)/100;
   const uit=Math.round(r.dose*r.ratio),tUit=Math.round(t.dose*t.ratio);
-  // gramgetallen in de stapteksten horen bij het basisrecept: meeschuiven
-  const tekst=s=>s.replace(new RegExp('\\b'+tUit+' g\\b','g'),uit+' g').replace(new RegExp('\\b'+t.dose+' g\\b','g'),r.dose+' g');
+  /* gramgetallen in de stapteksten horen bij het basisrecept: de dosis wordt
+     de nieuwe dosis, de rest schaalt mee met het water, net als de kolom in
+     de coach (schaalGrammen, app/01).                                     */
+  const tekst=s=>schaalGrammen(String(s).replace(new RegExp('\\b'+t.dose+' g\\b','g'),'\u0000'),uit/tUit).replace(/\u0000/g,r.dose+' g');
   const stappen=(t.stappen||[]).map((st,i)=>{
     const n={t:st.t,p:st.p,k:st.k,d:tekst(st.d)};if(st.klep)n.klep=st.klep;
     if(bloom&&i===0&&st.k==='bloom'){n.p=Math.min(.35,surGram(bloom.mult*r.dose)/uit);n.d='giet '+String(bloom.mult).replace('.',',')+'× je dose op en laat '+bloom.sec+' s bloeien';}
@@ -124,11 +131,12 @@ function surVoorstel(){
   return null;
 }
 function surpriseOpen(){
+  if(!featOn('surprise'))return;
   if(!state.methods.some(m=>m.on)){toast('turn on a method first under methods');return;}
   if(!state.beans.some(b=>b.inStock!==false)){toast('add a bean first — every brew belongs to a bean');go('beans');return;}
   surprise.fout='';surprise.bezig=false;
   surprise.voorstel=surVoorstel();
-  if(!surprise.voorstel){toast('no recipe fits your methods yet');return;}
+  if(!surprise.voorstel){toast('surprise me needs a method you brew with your own beans (not pads or moka)');return;}
   surRender();
 }
 function surpriseAnder(){surprise.fout='';surprise.voorstel=surVoorstel()||surprise.voorstel;surRender();}
@@ -165,7 +173,8 @@ async function surpriseAI(){
     if(esp&&t&&t.pre)rec.pre={...t.pre};
     surprise.voorstel={...v,recept:rec,waarom:[rec.over||'AI recipe for this bean'].filter(Boolean),ai:true};
   }catch(e){
-    surprise.fout='The AI recipe didn’t come through ('+(e&&e.message?e.message:'unknown error')+'). The recipe below still works.';
+    try{console.warn('surprise AI',e);}catch(_){}
+    surprise.fout='The AI recipe didn’t come through — try again, or brew the recipe below.';
   }finally{surprise.bezig=false;surRender();}
 }
 function surRender(){

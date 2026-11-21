@@ -31,11 +31,11 @@ function beanFreshness(b,atTs){
 const PEAK_MIN_BEAN=5, PEAK_MIN_ALL=8;
 function freshPeakDefault(b){return {start:(b&&b.fam==='filter')?4:7,end:21,learned:false,n:0,from:'curve'};}
 function freshPeakPunten(beanId){
-  const per={};
+  const per={},bonen=new Map((state.beans||[]).map(x=>[x.id,x]));
   (state.brews||[]).forEach(br=>{
     if(!br||!br.beanId||br.score==null||br.score==='')return;
     if(beanId&&br.beanId!==beanId)return;
-    const bean=(state.beans||[]).find(x=>x.id===br.beanId);
+    const bean=bonen.get(br.beanId);
     const d=roastDays(bean,br.ts);const sc=+br.score;
     if(d==null||d>60||!isFinite(sc))return;
     (per[br.beanId]||(per[br.beanId]=[])).push({d,sc});

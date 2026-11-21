@@ -117,3 +117,26 @@ test('AI budget: price follows the model, estimates include your own context, ol
  expect(r.tok).toBeCloseTo((3000*3e-6+900*15e-6)/3,10);       // tokens × huidige prijs
  expect(r.tokHaiku).toBeCloseTo((3000*0.1e-6+900*0.5e-6)/3,10); // na wissel: nieuwe prijs
 });
+
+test('surprise me keeps the character of the base recipe: AeroPress inverted scales its steps, moka and pads stay out',async({page})=>{
+ await open(page,()=>{if(localStorage.getItem('kkC'))return;localStorage.setItem('kkC','1');
+  localStorage.setItem('scc_state',JSON.stringify({methods:[{id:'aeropress',name:'AeroPress',family:'filter',on:true},{id:'perculator',name:'Mokka pot',family:'filter',on:false},{id:'senseo',name:'Senseo',family:'filter',on:false}],
+   beans:[{id:'col',name:'Colombia',inStock:true,methods:['aeropress']}],brews:[],gear:[]}));});
+ const r=await page.evaluate(()=>{state.methods.forEach(m=>m.on=['aeropress'].includes(m.id));Math.random=()=>0.999999;surpriseOpen();return surprise.voorstel&&surprise.voorstel.recept;});
+ // Tay omgekeerd 18 g / 155 g, draai "kortere verhouding" ×0,96 → 1:8,27 → 149 g
+ expect(r.naam).toContain('Tay omgekeerd');
+ expect(r.dose).toBe(18);expect(r.ratio).toBeCloseTo(8.27,2);
+ const uit=Math.round(18*8.27);expect(uit).toBe(149);
+ const teksten=r.stappen.map(s=>s.d).join(' | ');
+ expect(teksten).toContain('giet '+Math.round(100*149/155)+' g water');   // 96 g
+ expect(teksten).toContain('tot '+Math.round(115*149/155)+' g');          // 111 g
+ expect(teksten).toContain('tot 149 g');
+ await expect(page.locator('#surprise-pop')).toContainText('149 g');
+ // alleen mokapot of pads aan: geen recept, wel een melding
+ const leeg=await page.evaluate(()=>{surpriseWeg();state.methods.forEach(m=>m.on=['perculator','senseo'].includes(m.id));surpriseOpen();return surprise.voorstel;});
+ expect(leeg).toBeNull();await expect(page.locator('#surprise-pop')).toBeHidden();
+ // vlag uit: ook een melding of link opent hem niet
+ const uit2=await page.evaluate(()=>{state.methods.forEach(m=>m.on=m.id==='aeropress');toggleFeature('surprise');go('home');quickBrew();return surprise.voorstel;});
+ expect(uit2).toBeNull();
+ await expect(page.locator('#surprise-btn')).toBeHidden();
+});
