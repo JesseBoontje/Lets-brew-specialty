@@ -5,10 +5,11 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
-| Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | goedgekeurd (ronde 2), PR open | Jesse testen en akkoord, dan mergen |
+| Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | goedgekeurd (ronde 2), PR #14 met preview | Jesse testen en akkoord, dan mergen |
 | Delen als pagina/PDF (brews en bonen) | nog niemand | nog geen | wacht | volgende klus (volgorde Jesse) |
 | Oude app weghalen | nog niemand | nog geen | apart (niet in deze sessie) | eigen sessie |
 | Vraag doorlooptijd/filterkompas/slim invullen ("update voor nieuwe app versie") | nog niemand | geen | wacht op Jesse | betekenis navragen |
+| Oude Cloudflare-koppelingen (7d5fa36f, 237620b0) loskoppelen: geven rode checks | nog niemand | geen | wacht op Jesse | in dashboard de Git-koppeling van die twee Workers weghalen |
 | Logboek Worker: wordt de sleutel-header gelogd? (bestond al) | nog niemand | nog geen | wacht op Jesse | dashboard nakijken of invocation logs uit |
 | Later: ElevenLabs voor live spraakcoach en AI-coach voorlezen | nog niemand | nog geen | later (besluit Jesse) | eigen klus |
 | Inlog Face ID + D1 + Claude-koppeling (MCP), AI-coach centraal | nog niemand | nog geen | later (besluit Jesse) | grote klus |

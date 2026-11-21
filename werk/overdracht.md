@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-21 (kleine klussen goedgekeurd, PR open)
+Laatst bijgewerkt: 2026-11-21 (kleine klussen goedgekeurd, PR #14 open met preview)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -312,3 +312,12 @@ Claude. Nog ideeën?"
 - 21-11: ronde 1 afgekeurd, hersteld in c98c699, ronde 2 GOEDGEKEURD
   (werk/archief/2026-11-21-kleine-klussen.md). CACHE scc-v114. PR naar main
   geopend; wacht op Jesse. Na akkoord: mergen en handleiding bijwerken.
+- PR #14: https://github.com/JesseBoontje/Lets-brew-specialty/pull/14
+  Preview (live account): https://functie-kleine-klussen-lets-brew-specialty.jesseboontje-1aa.workers.dev
+- Valkuil: Cloudflare maakt PR-previews met `npx wrangler preview`; die eist een
+  "previews"-blok in wrangler.jsonc (toegevoegd, eigen rem-nummers 430284726/728).
+- Valkuil: twee oude koppelingen (7d5fa36f letsbrewspecialty, 237620b0
+  lets-brew-specialty) blijven rood. GitHub toont bij gelijke checknaam alleen de
+  laatste. Echte stand van het live account: Cloudflare API
+  /accounts/1aaa91af.../builds/workers/8040b219eaf14594aeb8d1e9841b7bdf/builds
+  (preview-trigger) en .../workers/f0e271eb8e4f4062bf24443941d7c835/builds (main).
