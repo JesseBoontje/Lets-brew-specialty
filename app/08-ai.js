@@ -59,13 +59,46 @@ function aiAanbieder(id){return AI_AANBIEDERS.find(x=>x.id===(id||aiProv()))||AI
 // de sleutel van Anthropic stond er al onder de oude naam -- die laten we staan
 function aiSleutelNaam(id){id=id||aiProv();return id==='anthropic'?'scc_ai_key':'scc_ai_key_'+id;}
 function aiModel(id){id=id||aiProv();return (localStorage.getItem('scc_ai_model_'+id)||'').trim()||aiAanbieder(id).model;}
-// dollar per token; wat jij in de app zet wint van wat de app dacht te weten
+/* Prijzen per model, in dollar per miljoen tokens (in, uit). Peil: zie
+   AI_PRIJZEN_PEIL; Anthropic uit de officiële prijslijst, OpenAI uit de
+   bekende lijst (niet live nagekeken, daarom kun je hem in de app
+   overschrijven). denkt: dit model denkt altijd eerst na; dat denkwerk wordt
+   als uitvoer betaald, dus een schatting vooraf rekent met meer uitvoer.
+   Een model met een datum erachter (claude-x-20260101) valt onder zijn naam. */
+const AI_PRIJZEN_PEIL='Nov 2026';
+const AI_PRIJZEN={
+  'claude-fable-5-2':{in:8,uit:40,denkt:true},'claude-fable-5-1':{in:10,uit:50,denkt:true},
+  'claude-fable-5':{in:10,uit:50,denkt:true},'claude-opus-5-5':{in:4,uit:20,denkt:true},
+  'claude-opus-5':{in:5,uit:25,denkt:true},'claude-opus-4-8':{in:5,uit:25},'claude-opus-4-7':{in:5,uit:25},
+  'claude-opus-4-6':{in:5,uit:25},'claude-sonnet-5-5':{in:2,uit:10,denkt:true},
+  'claude-sonnet-5':{in:2,uit:10,denkt:true},'claude-sonnet-4-6':{in:3,uit:15},
+  'claude-haiku-5-5':{in:0.1,uit:0.5,denkt:true},'claude-haiku-4-5':{in:1,uit:5},
+  'gpt-4o-mini':{in:0.15,uit:0.6},'gpt-4o':{in:2.5,uit:10},'gpt-4.1-nano':{in:0.1,uit:0.4},
+  'gpt-4.1-mini':{in:0.4,uit:1.6},'gpt-4.1':{in:2,uit:8},'gpt-5-nano':{in:0.05,uit:0.4,denkt:true},
+  'gpt-5-mini':{in:0.25,uit:2,denkt:true},'gpt-5':{in:1.25,uit:10,denkt:true},
+};
+// de langste naam in de lijst waar het model mee begint (gpt-4o-mini voor gpt-4o)
+function aiModelPrijs(model){
+  model=(model||'').toLowerCase().trim();let best=null;
+  for(const k in AI_PRIJZEN)if((model===k||model.startsWith(k+'-'))&&(!best||k.length>best.length))best=k;
+  return best?AI_PRIJZEN[best]:null;
+}
+function aiPrijsSleutel(id,model){return 'scc_ai_prijs_'+id+':'+(model||'').toLowerCase().trim();}
+/* dollar per token. Volgorde: wat jij voor dit model invulde, dan de lijst,
+   dan wat je vroeger voor de aanbieder invulde (toen gold één prijs voor elk
+   model), en anders de standaard van de aanbieder.                       */
 function aiTarief(id){
   id=id||aiProv();
-  try{const t=JSON.parse(localStorage.getItem('scc_ai_prijs_'+id)||'null');
-    if(t&&t.in>=0&&t.uit>=0)return {in:t.in/1e6,uit:t.uit/1e6};}catch(e){}
+  const model=aiModel(id),lees=k=>{try{const t=JSON.parse(localStorage.getItem(k)||'null');
+    if(t&&t.in>=0&&t.uit>=0)return t;}catch(e){}return null;};
+  const eigen=lees(aiPrijsSleutel(id,model));
+  if(eigen)return {in:eigen.in/1e6,uit:eigen.uit/1e6,bron:'own'};
+  const lijst=aiModelPrijs(model);
+  if(lijst)return {in:lijst.in/1e6,uit:lijst.uit/1e6,bron:'list',denkt:!!lijst.denkt};
+  const oud=lees('scc_ai_prijs_'+id);
+  if(oud)return {in:oud.in/1e6,uit:oud.uit/1e6,bron:'own'};
   const p=aiAanbieder(id).prijs;
-  return {in:p.in/1e6,uit:p.uit/1e6};
+  return {in:p.in/1e6,uit:p.uit/1e6,bron:'guess'};
 }
 
 /* ---------------- AI: één aanroep, welke aanbieder er ook staat ---------- */

@@ -4,18 +4,94 @@ let extraKastOpen=false;
 function toggleBeanCard(id){ if(expandedBeans.has(id))expandedBeans.delete(id); else expandedBeans.add(id); renderBeans(); }
 function toggleExtraKast(){ extraKastOpen=!extraKastOpen; renderBeans(); }
 // subtiele versheid op basis van roastdate (YYYY-MM-DD)
-function beanFreshness(b,atTs){
+function roastDays(b,atTs){
   if(!b||!b.roastdate)return null;
   const d=new Date(b.roastdate+'T00:00:00');if(isNaN(d.getTime()))return null;
   const days=Math.floor(((atTs||Date.now())-d.getTime())/86400000);
-  if(days<0)return null;
+  return days<0?null:days;
+}
+function beanFreshness(b,atTs){
+  const days=roastDays(b,atTs);if(days==null)return null;
+  const pk=freshPeak(b);
   let label;
   if(days===0)label='roasted today — let it rest';
-  else if(days<=3)label=days+' days — still resting';
-  else if(days<=21)label=days+' days fresh';
-  else if(days<=35)label=days+' days — past peak';
+  else if(days<pk.start)label=days+' days — still resting';
+  else if(days<=pk.end)label=days+' days fresh';
+  else if(days<=pk.end+14)label=days+' days — past peak';
   else label=days+' days — over the hill';
   return {days,label};
+}
+/* Wanneer is een boon op z'n best? Eerst wat jouw eigen cijfers zeggen, anders
+   de gewone curve (filter rust korter dan espresso).
+   Leren: per kop het cijfer min het gemiddelde van die boon (zo telt een
+   betere boon niet als "betere dag"), dan per dag na branden een glad
+   gemiddelde (gewicht valt weg over ~3 dagen). De piek is de dag met het
+   hoogste gemiddelde; het venster loopt zolang het niet meer dan 0,4 punt
+   onder die piek zakt. Te weinig cijfers: de gewone curve.            */
+const PEAK_MIN_BEAN=5, PEAK_MIN_ALL=8;
+function freshPeakDefault(b){return {start:(b&&b.fam==='filter')?4:7,end:21,learned:false,n:0,from:'curve'};}
+function freshPeakPunten(beanId){
+  const per={};
+  (state.brews||[]).forEach(br=>{
+    if(!br||!br.beanId||br.score==null||br.score==='')return;
+    if(beanId&&br.beanId!==beanId)return;
+    const bean=(state.beans||[]).find(x=>x.id===br.beanId);
+    const d=roastDays(bean,br.ts);const sc=+br.score;
+    if(d==null||d>60||!isFinite(sc))return;
+    (per[br.beanId]||(per[br.beanId]=[])).push({d,sc});
+  });
+  const pts=[];
+  for(const k in per){const l=per[k],gem=l.reduce((t,x)=>t+x.sc,0)/l.length;
+    l.forEach(x=>pts.push({d:x.d,rel:x.sc-gem,bean:k}));}
+  return pts;
+}
+function freshPeakLeer(pts){
+  const ds=pts.map(p=>p.d),span=Math.max(...ds)-Math.min(...ds);
+  if(span<6)return null;
+  const glad=[];
+  for(let d=0;d<=45;d++){
+    let w=0,t=0;
+    pts.forEach(p=>{const g=Math.exp(-((p.d-d)**2)/18);w+=g;t+=g*p.rel;});
+    glad[d]=w>=1.5?t/w:null;
+  }
+  let best=-1;
+  glad.forEach((v,d)=>{if(v!=null&&(best<0||v>glad[best]))best=d;});
+  if(best<0)return null;
+  let a=best,z=best;
+  while(a>0&&glad[a-1]!=null&&glad[a-1]>=glad[best]-.4)a--;
+  while(z<45&&glad[z+1]!=null&&glad[z+1]>=glad[best]-.4)z++;
+  a=Math.max(2,a);
+  if(z-a<3)z=a+3;
+  return {start:a,end:z,best};
+}
+function freshPeak(b){
+  const def=freshPeakDefault(b);
+  if(!b)return def;
+  const eigen=freshPeakPunten(b.id);
+  if(eigen.length>=PEAK_MIN_BEAN){const r=freshPeakLeer(eigen);
+    if(r)return {...r,learned:true,n:eigen.length,from:'bean'};}
+  const alle=freshPeakPunten(null);
+  if(alle.length>=PEAK_MIN_ALL&&new Set(alle.map(p=>p.bean)).size>=2){const r=freshPeakLeer(alle);
+    if(r)return {...r,learned:true,n:alle.length,from:'you'};}
+  return def;
+}
+/* De rustige regel op home: een boon in huis die net op z'n best is, of
+   waarvan de beste dagen bijna om zijn. Hoogstens één regel.          */
+function peakLineFor(beans){
+  let kandidaat=null;
+  (beans||[]).forEach(b=>{
+    if(b.inStock===false)return;
+    const d=roastDays(b);if(d==null)return;
+    const pk=freshPeak(b);
+    let t=null,prio=9;
+    if(d>=pk.start&&d<=pk.start+2){
+      t=b.name+(d===pk.start?' is at its best from today':d===pk.start+1?' reached its best yesterday':' reached its best 2 days ago');prio=d-pk.start;}
+    else if(d<=pk.end&&pk.end-d<=2){
+      const rest=pk.end-d;
+      t=b.name+(rest===0?': last day at its best':': '+(rest+1)+' more days at its best');prio=3+rest;}
+    if(t&&(!kandidaat||prio<kandidaat.prio))kandidaat={t,prio,id:b.id,learned:pk.learned};
+  });
+  return kandidaat;
 }
 /* Wat versheid met je maling doet.
    Vers gebrande bonen zitten vol CO2. Dat gas komt in de puck vrij en houdt het

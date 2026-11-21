@@ -442,6 +442,11 @@
   .fgauge .fd{font-family:'Caveat',cursive;font-weight:700;font-size:19px;fill:var(--ink);}
   .fg-lab{text-align:center;font-size:15px;color:var(--ink-soft);margin-top:-2px;}
   .fg-hint{font-size:15.5px;line-height:1.4;color:var(--ink-soft);margin:8px 2px 0;}
+  .fg-peak{text-align:center;font-size:15px;line-height:1.35;color:var(--ink);margin:4px 6px 0;}
+  .peak-line{display:flex;align-items:center;gap:9px;width:100%;margin:-6px 0 14px;padding:10px 12px;
+    min-height:48px;background:none;border:1.5px dashed var(--line);border-radius:16px;filter:url(#wobble);
+    font-family:'Patrick Hand',cursive;font-size:17px;color:var(--ink);text-align:left;cursor:pointer;}
+  .peak-line svg{width:22px;height:22px;flex:none;stroke:#5c7a4f;fill:none;stroke-width:2;stroke-linecap:round;}
   .wheel-ro{width:172px;display:block;margin:8px auto 2px;}
   .wheel-ro path{stroke:var(--ink);stroke-width:1.6;fill:var(--card-2);filter:url(#wobble-rough);}
   .wheel-ro path.sel{fill:var(--accent-soft);}
@@ -1632,3 +1637,15 @@ body.gc-open{overflow:hidden;}
 #stem-card input.stem-veld{font-family:monospace;}
 #stem-card select.stem-veld{font-family:inherit;margin-top:2px;}
 #stem-card .stem-veld:focus{outline:none;border-color:var(--ink);}
+
+/* surprise me (app/04-surprise.js) */
+.sur-pop{max-height:calc(100vh - 44px);overflow-y:auto;}
+.sur-wie{font-family:'Caveat',cursive;font-weight:700;font-size:24px;margin-top:6px;}
+.sur-wie span{font-family:'Patrick Hand',cursive;font-weight:400;font-size:15px;color:var(--ink-soft);}
+.sur-hoe{display:flex;align-items:center;gap:8px;font-size:16px;margin:4px 0 8px;}
+.sur-getal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 4px;}
+.sur-getal div{border:1.5px solid var(--line);border-radius:12px;filter:url(#wobble);padding:6px 2px;text-align:center;}
+.sur-getal b{display:block;font-family:'Caveat',cursive;font-size:21px;line-height:1;}
+.sur-getal span{font-size:12.5px;color:var(--ink-soft);}
+.sur-waarom{margin:8px 0 2px 18px;padding:0;font-size:15.5px;line-height:1.4;}
+.sur-pop .aib-knoppen button{min-height:48px;}

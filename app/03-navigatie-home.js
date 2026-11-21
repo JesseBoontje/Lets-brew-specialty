@@ -80,12 +80,21 @@ function renderHome(){
   document.getElementById('recent-list').innerHTML =
     recent.length?recent.map(brewCard).join(''):'<div class="empty-note">no brews yet.<br>tap ＋ new brew to get started.</div>';
   try{refreshWeather();}catch(e){}
-  const bn=document.getElementById('brew-now-btn');
-  if(bn)bn.style.display=(featOn('brewnow')&&state.brews.length)?'block':'none';
+  renderPeakLine();
+  const sb=document.getElementById('surprise-btn');if(sb)sb.style.display=featOn('surprise')?'':'none';
   const ms=document.getElementById('methods-scroll');
   ms.innerHTML=state.methods.filter(m=>m.on).map(m=>
     `<button class="method" onclick="showMethodBrews('${m.id}')"><div class="ic">${iconHTML(m,46)}</div><div class="nm">${esc(m.name)}</div></button>`
   ).join('');
+}
+// rustige regel: welke boon in huis is net op z'n best (of bijna voorbij)
+function renderPeakLine(){
+  const el=document.getElementById('peak-line');if(!el)return;
+  const k=featOn('peakalert')?peakLineFor(state.beans):null;
+  if(!k){el.style.display='none';el.innerHTML='';el.onclick=null;return;}
+  el.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 17.5 Q8 6.5 12 6.8 Q16 6.6 20.5 17.3"/><path d="M12 6.8 L12.2 3.2"/><path d="M8.6 20.6 Q12 19.9 15.4 20.5"/></svg><span>'+esc(k.t)+'</span>';
+  el.onclick=()=>{expandedBeans.add(k.id);go('beans');};
+  el.style.display='flex';
 }
 // beveel een zetmethode (die aanstaat) + boon uit voorraad aan, op basis van
 // je eigen brews: de methode met het hoogste gemiddelde cijfer wint
@@ -110,74 +119,8 @@ function recommendBrew(){
           || inStock[0] || null;
   return {method,bean};
 }
-async function quickBrew(){
-  const r=recommendBrew();
-  if(!r){toast('turn on a method first under methods');return;}
-  const method=r.method; const esp=methodFamily(method)==='espresso';
-  beginBrew(method.id);   // espresso -> dial-in-scherm, filter -> formulier (beide leeg)
-  // zonder AI: eenvoudige voorvulling (methode + boon uit voorraad)
-  if(!aiReady()){
-    if(r.bean){formBean=r.bean.id;esp?renderDiBeans():renderFormBeans();}
-    toast(r.bean?('recommended: '+method.name+' with '+r.bean.name+' — turn on AI for an invented recipe')
-                :('recommended: '+method.name+' — turn on AI for an invented recipe'));
-    return;
-  }
-  toast('AI is inventing a brew for '+method.name+'…');
-  const inStock=state.beans.filter(b=>b.inStock);
-  try{
-    const beansList=inStock.length
-      ? inStock.map(b=>{
-          const f=beanFreshness(b);
-          const extra=[f?f.days+' dagen na branden':'',b.fam?('zak zegt: '+(b.fam==='both'?'omni':b.fam)):''].filter(Boolean);
-          return `- ${b.name}${b.origin?' — '+b.origin:''}${b.process?' ('+b.process+')':''}`+
-                 `${b.roasternotes?'; smaak: '+b.roasternotes:''}${extra.length?'; '+extra.join(', '):''}`;
-        }).join('\n')
-      : '(geen bonen in voorraad)';
-    const milk=esp?` Je mag (als espresso) een melkdrank kiezen: espresso, flat white, cappuccino, latte, cortado, macchiato of americano. Kies je een melkdrank, zet dan de melkstappen (opschuimen, hoeveelheid, textuur, temperatuur) in "steps" en de dranknaam in "drink".`:'';
-    const wx=featOn('weather')?JSON.parse(localStorage.getItem('scc_weather')||'null'):null;
-    const wxLine=wx?` Het is nu ${Math.round(wx.t)}°C${wx.rain?' en het regent':''}; weeg dat mee (warm→verfrissend/iced, koud/regen→troostend).`:'';
-    const prompt=`Je bent een specialty-barista. Bedenk één concrete, nieuwe brew voor de methode "${method.name}".`+wxLine+milk+
-      (inStock.length?` Kies uit deze bonen in voorraad de best passende bij deze methode en dit recept. Sla een boon over waarvan de zak een andere familie noemt dan deze methode:\n${beansList}\n`
-                     :` Er zijn geen bonen in voorraad; kies een passend boontype.\n`)+
-      gearPromptBlock(method.id)+
-      ('\n'+APP_RULES+'\n'+BEAN_GRIND_RULES+'\n'+(esp?ESPRESSO_RULES:FILTER_RULES)+'\n')+
-      `Geef ALLEEN JSON terug zonder markdown: {"bean":"","title":"","drink":"","dose":"","yield":"","ratio":"","grind":"","grindNote":"","temp":"","time":"","tags":["",""],"steps":["",""],"tip":""}. `+
-      `bean = exacte naam van de gekozen boon uit de lijst (of korte omschrijving als er geen voorraad is). title = korte pakkende naam. drink = melkdranknaam of "espresso" (laat leeg bij filter). grind = KORTE maalstand voor het invulveld (alleen getal/klikken of één woord — GEEN uitleg of merknaam). grindNote = korte uitleg over de maling (mag molen noemen). dose/yield in gram, temp in °C, ratio als 1:x, time als mm:ss. Kort en praktisch, in het Nederlands.`;
-    const txt=await askAI([{role:"user",content:prompt}],900,'brew');
-    const d=extractJSON(txt);
-    let bean=null;
-    if(d.bean){const bn=(''+d.bean).toLowerCase().trim();
-      bean=inStock.find(b=>b.name.toLowerCase()===bn)||inStock.find(b=>bn.includes(b.name.toLowerCase())||b.name.toLowerCase().includes(bn));}
-    if(!bean)bean=r.bean||inStock[0]||null;
-    if(bean)formBean=bean.id;
-    const gShort=conciseGrind(d.grind);
-    const gNote=(d.grindNote||'').trim()||((''+(d.grind||'')).trim()!==gShort?(''+d.grind).trim():'');
-    let guide='';
-    if(Array.isArray(d.steps)&&d.steps.length)guide=d.steps.map((st,i)=>(i+1)+'. '+st).join('\n');
-    if(gNote)guide=(guide?guide+'\n\n':'')+'maling: '+gNote;
-    if(d.tip)guide=(guide?guide+'\n':'')+'💡 tip: '+d.tip;
-    pendingTarget={dose:numOf(d.dose),grind:gShort,time:cleanTime(d.time),yield:numOf(d.yield)};
-    const drink=(d.drink||'').trim();
-    pendingRecipe={guide,drink,title:(d.title||'').trim()};
-    if(esp){
-      setVal('di-dose',numOf(d.dose));setVal('di-yield',numOf(d.yield));
-      renderDialIn();
-      toast('✓ '+(drink||'espresso')+(bean?' · '+bean.name:'')+' — measure your shot & save');
-    }else{
-      setText('f-title',d.title||'');renderFormBeans();
-      setText('f-dose',numOf(d.dose));setText('f-yield',numOf(d.yield));
-      if(d.ratio)setText('f-ratio',numOf((''+d.ratio).split(':').pop()));
-      setText('f-time',cleanTime(d.time));setText('f-temp',numOf(d.temp));
-      if(gShort)setText('f-grind',gShort);
-      if(Array.isArray(d.tags)){formTags=d.tags.filter(Boolean).map(t=>(''+t).toLowerCase());renderFormTags();}
-      renderDialInHint();
-      toast('✓ '+method.name+(bean?' with '+bean.name:'')+' — check & save');
-    }
-  }catch(e){
-    if(r.bean){formBean=r.bean.id;esp?renderDiBeans():renderFormBeans();}
-    toast('couldn\'t make an AI brew — fill in the rest yourself');
-  }
-}
+// surprise me: een nieuw recept voor een boon uit je kast (app/04-surprise.js)
+function quickBrew(){surpriseOpen();}
 let brewSort='date', filterMethod='all';
 /* Sorteren van je brews. De volgorde waarin je ze zette is de standaard; op
    methode groepeert per zetter, op score zet je beste bovenaan.            */
