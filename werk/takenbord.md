@@ -10,6 +10,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Oude app weghalen | nog niemand | nog geen | apart (niet in deze sessie) | eigen sessie |
 | Vraag doorlooptijd/filterkompas/slim invullen ("update voor nieuwe app versie") | nog niemand | geen | wacht op Jesse | betekenis navragen |
 | Oude Cloudflare-koppelingen (7d5fa36f, 237620b0) loskoppelen: geven rode checks | nog niemand | geen | wacht op Jesse | in dashboard de Git-koppeling van die twee Workers weghalen |
+| 6 WebKit-tests rood op main sinds #12 (shotclock.spec 2, stem.spec 4) | nog niemand | geen | wacht | eigen klus; WebKit niet in de cloudomgeving, logs via GitHub-check |
 | Logboek Worker: wordt de sleutel-header gelogd? (bestond al) | nog niemand | nog geen | wacht op Jesse | dashboard nakijken of invocation logs uit |
 | Later: ElevenLabs voor live spraakcoach en AI-coach voorlezen | nog niemand | nog geen | later (besluit Jesse) | eigen klus |
 | Inlog Face ID + D1 + Claude-koppeling (MCP), AI-coach centraal | nog niemand | nog geen | later (besluit Jesse) | grote klus |

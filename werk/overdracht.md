@@ -321,3 +321,6 @@ Claude. Nog ideeën?"
   laatste. Echte stand van het live account: Cloudflare API
   /accounts/1aaa91af.../builds/workers/8040b219eaf14594aeb8d1e9841b7bdf/builds
   (preview-trigger) en .../workers/f0e271eb8e4f4062bf24443941d7c835/builds (main).
+- GitHub-check `checks` is rood op PR #14 door 6 WebKit-tests (shotclock.spec 2,
+  stem.spec 4) die op main (10c3653) precies zo falen. Niet door deze PR;
+  eigen klus op het takenbord.
