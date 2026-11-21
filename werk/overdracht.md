@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-20 (klus 4)
+Laatst bijgewerkt: 2026-11-21 (kleine klussen, bij keurmeester)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -284,3 +284,28 @@ Claude. Nog ideeën?"
 - Volgende klussen (volgorde Jesse): versheidsmeter met piekmelding, surprise me,
   delen als pagina/PDF, AI-budget realistischer; later ElevenLabs voor
   spraakcoach en AI-coach. Per klus een sessie. Niet mergen zonder akkoord.
+
+## Stand 21-11: kleine klussen (branch functie/kleine-klussen)
+- Opdracht Jesse: alle kleine klussen in één sessie: (1) versheidsmeter met
+  piekmelding (geen zak-teller, natuurlijke plek), (2) nu zetten-knop wordt
+  surprise me, (3) AI-budget realistischer. Niet: oude app weghalen, vraag
+  doorlooptijd/filterkompas/slim invullen.
+- Gebouwd (commit op functie/kleine-klussen, CACHE scc-v113):
+  - app/07-bonen.js: roastDays, freshPeak (leert uit eigen scores: cijfer min
+    gemiddelde van die boon, glad per dag, venster binnen 0,4 van de top;
+    ≥5 cijfers van de boon of ≥8 over ≥2 bonen, spreiding ≥6 dagen; anders
+    filter dag 4-21, espresso/onbekend dag 7-21), peakLineFor. beanFreshness
+    gebruikt nu het venster voor zijn label.
+  - Meter (app/11 freshGaugeHTML) tekent het venster en een zin eronder
+    (freshPeakText, niet op het brew-detail). Home: #peak-line, renderPeakLine
+    in app/03, vlag peakalert. Tik = naar bonen met die boon open.
+  - app/04-surprise.js (nieuw, in index.html en service-worker): surpriseOpen,
+    surMaak (zonder AI), surpriseAI (BrewModel.validateRecipe, bron 'surprise'),
+    surpriseZet bewaart als eigen recept en start via BrewWorkspace.startRecipe.
+    Brew-now-knop + brewNow + quickBrew-override in brew-workspace.js weg.
+    Vlag surprise (oude vlag brewnow doet niets meer). Senseo doet niet mee;
+    recepten met klep-stappen alleen op de Switch.
+  - AI-budget: zie werk/keuze-ai-budget-2026-11-21.md.
+  - Test: tests/kleine-klussen.spec.cjs. Lokaal 39 Playwright (chromium) + 20 node groen.
+- Volgende stap: keurrapport lezen, fouten laten herstellen, PR naar main
+  openen, Cloudflare-preview melden (of lokaal getest). Niet mergen zonder Jesse.
