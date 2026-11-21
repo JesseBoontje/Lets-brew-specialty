@@ -57,11 +57,11 @@
       <h1 class="title hand" id="home-greeting">hi there</h1>
       <div class="subtitle">what are we brewing today?</div>
       <div class="set-d" id="weather-line" style="display:none;margin:-8px 0 12px;color:var(--ink)"></div>
-      <button class="btn-reco" onclick="quickBrew()">
+      <button type="button" class="peak-line" id="peak-line" style="display:none"></button>
+      <button class="btn-reco" id="surprise-btn" onclick="quickBrew()">
         <span class="reco-ic"><svg viewBox="0 0 32 32"><path d="M6.5 11.5 Q6.4 17 6.8 22.3 Q7 26.4 12 26.5 Q15.6 26.7 19.2 26.4 Q24.3 26.2 24.2 21.7 Q24.5 16.8 24.1 11.6 M6.1 11.9 Q15.5 10.6 24.7 12 M24.1 13.6 Q29.4 13.5 29.3 18 Q29.2 22.4 23.8 22.2 M5.3 30.1 Q16 30.8 26.7 29.9"/><path d="M10.9 5.6 Q9.7 8 11.5 9.8 M15.9 4.5 Q14.7 7 16.6 8.8 M20.9 5.6 Q19.7 8 21.5 9.8" opacity="0.8"/></svg></span>
-        <span class="reco-txt"><span class="reco-h hand">surprise me</span><span class="reco-sub">a surprise brew with a bean from your shelf</span></span>
+        <span class="reco-txt"><span class="reco-h hand">surprise me</span><span class="reco-sub">a new recipe for a bean on your shelf</span></span>
       </button>
-      <button class="btn-add sketch soft" id="brew-now-btn" onclick="brewNow()" style="display:none;margin-bottom:16px"><svg viewBox="0 0 24 24" class="acic btn-svg"><path d="M4.7 9.7 Q4.6 16.2 8 18.3 Q12 20.6 16.2 18.1 Q19.4 16.1 19.3 9.6 M4.3 10.2 Q12 8.3 19.7 10.1 M19.1 10.9 Q22.4 10.7 22.3 13.5 Q22.2 16.4 18.8 16.1 M3 21.4 Q12 22.1 21.1 21.3"/><path d="M8.9 5.9 Q8.1 7.6 9.5 8.8 M12.4 5.1 Q11.4 6.9 12.8 8.1 M15.7 5.9 Q14.8 7.6 16.2 8.8" opacity="0.7"/></svg>brew now — your usual, prefilled</button>
       <div class="methods sketch soft">
         <div class="lbl"><span>brew methods</span><a class="hand" onclick="go('methods')">manage</a></div>
         <div class="methods-scroll" id="methods-scroll"></div>
@@ -929,6 +929,7 @@
   </div>
 </div>
 <div id="aibud-pop" class="aib-laag hidden"></div>
+<div id="surprise-pop" class="aib-laag hidden" onclick="if(event.target===this)surpriseWeg()"></div>
 <div class="toast" id="toast"></div>
 <div id="print-area"></div>
 
@@ -941,6 +942,7 @@
 <script src="app/04-brew-formulier.js"></script>
 <script src="app/04-gietcoach.js"></script>
 <script src="app/04-aeropress.js"></script>
+<script src="app/04-surprise.js"></script>
 <script src="app/05-espresso-dial-in.js"></script>
 <script src="app/05-shotclock.js"></script>
 <script src="app/06-detail-en-methodes.js"></script>
