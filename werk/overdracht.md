@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-21 (kleine klussen, bij keurmeester)
+Laatst bijgewerkt: 2026-11-21 (kleine klussen goedgekeurd, PR open)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -309,3 +309,6 @@ Claude. Nog ideeën?"
   - Test: tests/kleine-klussen.spec.cjs. Lokaal 39 Playwright (chromium) + 20 node groen.
 - Volgende stap: keurrapport lezen, fouten laten herstellen, PR naar main
   openen, Cloudflare-preview melden (of lokaal getest). Niet mergen zonder Jesse.
+- 21-11: ronde 1 afgekeurd, hersteld in c98c699, ronde 2 GOEDGEKEURD
+  (werk/archief/2026-11-21-kleine-klussen.md). CACHE scc-v114. PR naar main
+  geopend; wacht op Jesse. Na akkoord: mergen en handleiding bijwerken.

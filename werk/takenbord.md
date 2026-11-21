@@ -5,7 +5,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
-| Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | bij keurmeester | na keuring PR naar main, Jesse testen en akkoord |
+| Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | goedgekeurd (ronde 2), PR open | Jesse testen en akkoord, dan mergen |
 | Delen als pagina/PDF (brews en bonen) | nog niemand | nog geen | wacht | volgende klus (volgorde Jesse) |
 | Oude app weghalen | nog niemand | nog geen | apart (niet in deze sessie) | eigen sessie |
 | Vraag doorlooptijd/filterkompas/slim invullen ("update voor nieuwe app versie") | nog niemand | geen | wacht op Jesse | betekenis navragen |
