@@ -379,3 +379,22 @@ Claude. Nog ideeën?"
   - docs/gietcoach-tekening.svg.html = de statische versie van de gietcoach-tekening.
   Wacht op akkoord Jesse. Bij inbouwen: icon-192/512.png en apple-touch-icon uit
   het merk maken (Playwright-screenshot van de tegel), manifest.json bijwerken.
+
+## 24-11 avond: startscherm ingebouwd (besluit Jesse via hoofdsessie)
+- Letterlijk: "Nieuwe logo is lelijk, ga terug naar oude logo en bouw app, zet live."
+  Nieuw logo vervalt; oude logo.png en app-iconen blijven.
+- Gebouwd (CACHE scc-v115):
+  - app/11-randen.js (nieuw, in index.html en SW): getekende dubbele randen met
+    ronde hoeken op .sketch, .ws-card, .ws-actions>button, .ws-filters>button,
+    .lp, home-methodes, .btn-reco, .peak-line; vlag drawnedges; hertekent alleen
+    als de maat verandert, hooguit 4x per seconde (MutationObserver).
+    Niet op <details> (dichtgeklapt toont alleen summary).
+  - Splash: splash-1..3 elk 0,75 s, daarna logo.png 2 s (4,25 s); tik = overslaan;
+    meteen door bij een link naar een ander scherm, quickbrew of brew-parameter,
+    en onder webdriver (tests) tenzij window.__splashTest. Daarvoor sprong de app
+    direct naar home zodra de data geladen was.
+  - Home: logo linksboven weg; surprise me = statische gietcoach-tekening (zonder
+    id's, anders vindt de gietcoach dubbele id's) + logo.png; methodeknoppen in
+    hun eigen tint; kop "start with"; brew-kaart als zin (brewZin).
+  - Tests: tests/startscherm.spec.cjs. Lokaal 42 Playwright (chromium) + 20 node groen.
+- Volgende stap: één keuring, dan (na akkoord) mergen PR #14, live controleren.

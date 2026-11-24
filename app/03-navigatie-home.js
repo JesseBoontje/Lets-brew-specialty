@@ -61,13 +61,21 @@ function goBack(){
 /* ---------------- home ---------------- */
 function timeAgo(ts){const d=(Date.now()-ts)/86400e3;
   if(d<1)return'today';if(d<2)return'yesterday';return Math.floor(d)+' days ago';}
+// een brew als gewone zin: "V60 with Kenya, 15 g to 250 g, 2:45"
+function brewZin(b,m){
+  const delen=[(b.title&&b.title.trim()?m.name+' with ':'')+(b.beans||m.name)];
+  if(b.dose)delen.push(b.dose+' g'+(b.yield?' to '+b.yield+' g':''));
+  if(b.time)delen.push(b.time);
+  if(b.temp)delen.push(b.temp+' °C');
+  return delen.join(', ');
+}
 function brewCard(b){
   const m=methodById(b.method);
   const heading=(b.title&&b.title.trim())?b.title:m.name;
   return `<div class="card sketch row" style="background:var(${m.tint});cursor:pointer" onclick="openDetail('${b.id}')">
     <div class="brew-thumb">${iconHTML(m,44)}</div>
     <div class="brew-main"><div class="name hand">${esc(heading)}</div>
-      <div class="meta">${b.title&&b.title.trim()?esc(m.name)+' · ':''}${esc(b.beans||'—')} · ${b.dose||'?'}g<br>${esc(b.time||'')} · ${b.temp?b.temp+'°C':''}</div></div>
+      <div class="meta">${esc(brewZin(b,m))}</div></div>
     <div class="brew-side"><div class="when">${timeAgo(b.ts)}</div>
       <div class="score hand">${(+b.score).toFixed(1)}<span>/10</span></div></div></div>`;
 }

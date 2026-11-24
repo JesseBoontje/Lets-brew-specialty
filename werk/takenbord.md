@@ -14,5 +14,5 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Logboek Worker: wordt de sleutel-header gelogd? (bestond al) | nog niemand | nog geen | wacht op Jesse | dashboard nakijken of invocation logs uit |
 | Later: ElevenLabs voor live spraakcoach en AI-coach voorlezen | nog niemand | nog geen | later (besluit Jesse) | eigen klus |
 | Inlog Face ID + D1 + Claude-koppeling (MCP), AI-coach centraal | nog niemand | nog geen | later (besluit Jesse) | grote klus |
-| Ontwerpronde startscherm (frontend-design + dubbele lijnen overal) | architect | functie/kleine-klussen (docs/opzet-startscherm.html) | wacht op Jesse | opzet https://claude.ai/artifact/8TzG92J7TX7k2xz6NuDnGv ; na akkoord inbouwen op eigen branch, één keuring |
+| Startscherm + getekende randen overal (oude logo) | architect | functie/kleine-klussen | gebouwd, bij keurmeester | keuring, dan mergen en live controleren |
 | Handleiding bijwerken voor klus 2-5 en de kleine klussen | architect | geen | na akkoord | skill lets-brew-handleiding |

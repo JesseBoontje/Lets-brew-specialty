@@ -144,6 +144,7 @@ const FEATURES=[
   {id:'finderai', n:'ask the finder', d:'ask a real question and get a real answer — on the map, as an explanation, or just in words', def:true, cat:'people'},
   {id:'beanpick', n:'bean chooser', d:'a drawn world map: from a coffee country down to a region, and what to look for on the bag', def:true, cat:'people'},
   {id:'wheelbig', n:'big flavour wheel', d:'tap a family and the wheel opens up — berry becomes blueberry, raspberry, cherry', def:false, cat:'app'},
+  {id:'drawnedges', n:'drawn edges', d:'every card and button edged with two loose pencil lines', def:true, cat:'app'},
   {id:'freshgauge', n:'freshness gauge', d:'rest → peak → fading as a dial on each bean', def:true, cat:'app'},
   {id:'smartdefaults', n:'smart defaults', d:'last dose, grind & temp prefilled — never retype', def:true, cat:'app'},
   {id:'peakalert', n:'peak heads-up', d:'a quiet line on home when a bean in stock reaches its best days', def:true, cat:'app'},
