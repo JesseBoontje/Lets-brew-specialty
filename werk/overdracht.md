@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-24 (oude adres vervangen; PR #14 wacht op Jesse)
+Laatst bijgewerkt: 2026-11-24 21:55 UTC (PR #14 gemerged en live)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -398,3 +398,13 @@ Claude. Nog ideeën?"
     hun eigen tint; kop "start with"; brew-kaart als zin (brewZin).
   - Tests: tests/startscherm.spec.cjs. Lokaal 42 Playwright (chromium) + 20 node groen.
 - Volgende stap: één keuring, dan (na akkoord) mergen PR #14, live controleren.
+
+## 24-11 21:50 UTC: LIVE
+- Jesse koos in de bouwsessie "Ja, zet live". PR #14 squash-merged (main 4394164),
+  Workers Builds account 1aaa91af geslaagd; letsbrew.djez.app geeft scc-v116.
+- Live doorgeklikt (chromium, iPhone 13): splash, home, randen, surprise me,
+  methodeknop naar dial-in, bonen. Console: alleen Cloudflare Web Analytics-
+  beacon door CSP geweigerd (bestond al).
+- Zelf testen door Jesse: iPhone Safari (splash-tik, randen, beginschermicoon).
+- Deze bon staat op branch werk/na-live-2026-11-24 (vanaf main); meenemen in de
+  volgende PR.
