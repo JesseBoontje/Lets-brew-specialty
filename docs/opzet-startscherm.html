@@ -14,12 +14,12 @@
 .rand.vol>svg.r path{stroke:var(--ink);}
 .phone .screen{padding:14px 16px 0;}
 .st-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
-.st-logo{font-family:'Caveat',cursive;font-weight:700;font-size:19px;line-height:.9;color:var(--ink-soft);}
+.st-logo{height:40px;width:auto;mix-blend-mode:multiply;}
 .st-hi{font-family:'Caveat',cursive;font-weight:700;font-size:42px;line-height:.95;margin:2px 0 0;}
 .st-sub{font-size:15.5px;color:var(--ink-soft);margin:0 0 8px;}
 .st-piek{display:flex;gap:8px;align-items:center;font-size:15.5px;margin:0 0 10px;}
 .st-piek svg{width:22px;height:22px;flex:none;fill:none;stroke:#5c7a4f;stroke-width:1.8;stroke-linecap:round;}
-.st-sur{display:block;width:100%;padding:12px 14px 10px;border:0;font:inherit;color:var(--ink);text-align:left;margin:2px 0 14px;border-radius:0;}
+.st-sur{display:block;width:100%;padding:12px 14px 10px;border:0;font:inherit;color:var(--ink);text-align:left;margin:2px 0 14px;border-radius:24px;background:var(--card);}
 .st-sur .h{font-family:'Caveat',cursive;font-weight:700;font-size:31px;line-height:1;}
 .st-sur .o{font-size:15px;color:var(--ink-soft);margin-top:2px;}
 .st-sur svg.tek{display:block;width:100%;height:84px;margin:0 0 2px;fill:none;stroke:var(--ink);stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
@@ -29,11 +29,12 @@
 .st-kop h2{font-family:'Caveat',cursive;font-weight:700;font-size:24px;margin:0;}
 .st-kop a{font-size:15px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;}
 .st-met{display:flex;gap:12px;margin:0 0 14px;}
-.st-met button{flex:1;min-height:58px;border:0;background:transparent;font:inherit;color:var(--ink);
+.st-met button{flex:1;min-height:72px;border-radius:18px;border:0;background:transparent;font:inherit;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0;font-size:14px;}
-.st-met svg:not(.r){width:28px;height:28px;fill:none;stroke:var(--ink);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
-.st-brew{display:flex;align-items:center;gap:10px;padding:7px 12px;margin:0 0 12px;}
+.st-met img{height:44px;width:auto;mix-blend-mode:multiply;}
+.st-brew{border-radius:20px;display:flex;align-items:center;gap:10px;padding:7px 12px;margin:0 0 12px;}
 .st-brew .t{flex:1;min-width:0;}
+.st-brew .th{height:38px;width:auto;mix-blend-mode:multiply;}
 .st-brew .n{font-family:'Caveat',cursive;font-weight:700;font-size:21px;line-height:1;}
 .st-brew .m{font-size:13.5px;color:var(--ink-soft);}
 .st-brew .s{font-family:'Caveat',cursive;font-weight:700;font-size:26px;}
@@ -46,14 +47,14 @@
 </style>
 
 <div class="mk-kop"><h1>Nieuw startscherm</h1>
-  <div class="mk-onder">Opzet, nog niet ingebouwd. Elk kader en elke knop heeft twee eigen getekende lijnen.</div></div>
+  <div class="mk-onder">Opzet versie 2, nog niet ingebouwd. Jouw tekeningen en de kleuren per methode terug; ronde hoeken met twee eigen lijnen per kader.</div></div>
 
 <div class="mk-rij">
   <figure class="mk-fig">
     <div class="phone">
       <div class="statusbar">9:41</div>
       <div class="screen">
-        <div class="st-top"><div class="st-logo">lets brew<br>specialty</div></div>
+        <div class="st-top"><img class="st-logo" src="../logo.png" alt="lets brew specialty"></div>
         <div class="st-hi">hi Jesse</div>
         <p class="st-sub">what are we brewing today?</p>
         <p class="st-piek"><svg viewBox="0 0 24 24"><path d="M3.5 17.5 Q8 6.5 12 6.8 Q16 6.6 20.5 17.3"/><path d="M12 6.8 L12.2 3.2"/></svg>Kenya is at its best from today</p>
@@ -88,17 +89,17 @@
 
         <div class="st-kop"><h2>start with</h2><a>manage</a></div>
         <div class="st-met">
-          <button class="rand zacht" type="button" data-seed="21"><svg viewBox="0 0 32 32"><path d="M6 9 Q16 8 26.4 9.2"/><path d="M6.2 9.4 Q11.6 18 15 23.6"/><path d="M26 9.2 Q20.6 18 17 23.8"/><path d="M13 27 Q16 27.6 19.2 26.8"/></svg>V60</button>
-          <button class="rand zacht" type="button" data-seed="22"><svg viewBox="0 0 32 32"><path d="M10 5 Q16 4.4 22.4 5.2"/><path d="M10.4 5.2 Q10 16 10.6 26.4"/><path d="M22 5.2 Q22.6 16 21.6 26.6"/><path d="M8.4 27 Q16 28 23.8 26.8"/></svg>AeroPress</button>
-          <button class="rand zacht" type="button" data-seed="23"><svg viewBox="0 0 32 32"><path d="M7 13 Q7.4 22 9.6 25.4 Q16 27.6 22.6 25 Q24.6 21 24.4 13"/><path d="M6 12.6 Q16 11.4 25.6 12.8"/><path d="M24.4 15 Q28.6 15.2 28.4 18.4 Q28 21.4 24 21"/><path d="M12 9 Q11 7 12.6 5.4 M17 9 Q16 7 17.6 5.4" opacity=".7"/></svg>espresso</button>
+          <button class="rand zacht" type="button" data-seed="21" style="background:var(--v60)"><img src="../m-v60.png" alt="">V60</button>
+          <button class="rand zacht" type="button" data-seed="22" style="background:var(--aeropress)"><img src="../m-aeropress.png" alt="">AeroPress</button>
+          <button class="rand zacht" type="button" data-seed="23" style="background:var(--espresso)"><img src="../m-espresso.png" alt="">espresso</button>
         </div>
 
         <div class="st-kop"><h2>last brewed</h2><a>see all</a></div>
-        <div class="st-brew rand zacht" data-seed="31">
+        <div class="st-brew rand zacht" data-seed="31" style="background:var(--v60)"><img class="th" src="../m-v60.png" alt="">
           <div class="t"><div class="n">Kenya Nyeri</div><div class="m">V60, 15 g to 250 g, yesterday</div></div>
           <div class="s">8.5<small>/10</small></div>
         </div>
-        <div class="st-brew rand zacht" data-seed="32">
+        <div class="st-brew rand zacht" data-seed="32" style="background:var(--espresso)"><img class="th" src="../m-espresso.png" alt="">
           <div class="t"><div class="n">Brazil Cerrado</div><div class="m">espresso, 18 g to 36 g in 28 s, 2 days ago</div></div>
           <div class="s">7<small>/10</small></div>
         </div>
@@ -111,11 +112,11 @@
   <div class="mk-sect mk-uitleg">
     <h2>Wat anders is</h2>
     <ul>
-      <li>Elk kader, elke kaart en elke knop: twee eigen lijnen per rand, die bij de hoeken kruisen. Geen gekopieerde lijn met een verschuiving.</li>
-      <li>Eén opvallend ding: de getekende surprise-me-kaart. Daarboven alleen tekst.</li>
-      <li>De piekmelding is een gewone zin met een klein boogje, geen extra kader.</li>
-      <li>Geen hoofdletterlabels, geen pijltjes achter knoppen, geen rijtjes met puntjes. Bij een brew staat een gewone zin: "V60, 15 g to 250 g, yesterday".</li>
-      <li>De drie methodes staan als drie getekende knoppen naast elkaar, zonder horizontaal scrollen.</li>
+      <li>Elk kader, elke kaart en elke knop: twee eigen getekende lijnen, nu met ronde hoeken. De twee lijnen lopen elk hun eigen weg en sluiten niet netjes.</li>
+      <li>Jouw eigen tekeningen van de V60, AeroPress en espressomachine zijn terug, en het logo bovenaan.</li>
+      <li>De kleuren per methode blijven: V60-roze, AeroPress-groengrijs, espresso-zand, net als in de app.</li>
+      <li>Eén opvallend ding: de surprise-me-kaart met ketel, V60 en boon.</li>
+      <li>Geen hoofdletterlabels, geen pijltjes, geen rijtjes met puntjes.</li>
     </ul>
     <p class="zacht">Kleuren en lettertypes blijven die van de huisstijl.</p>
   </div>
@@ -125,31 +126,39 @@
 /* Twee onafhankelijke lijnen per rand, per kader met een eigen seed. */
 (function(){
   function rng(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
-  function lijn(r,x1,y1,x2,y2,ver){
-    const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy)||1,ux=dx/l,uy=dy/l,nx=-uy,ny=ux;
-    const o1=5+r()*5,o2=5+r()*5;                      // overschot voorbij de hoek
-    const a=[x1-ux*o1+nx*(r()-.5)*2*ver, y1-uy*o1+ny*(r()-.5)*2*ver];
-    const b=[x2+ux*o2+nx*(r()-.5)*2*ver, y2+uy*o2+ny*(r()-.5)*2*ver];
-    const bow=(r()-.5)*4;
-    const m=[(a[0]+b[0])/2+nx*bow+(r()-.5)*8*ux,(a[1]+b[1])/2+ny*bow+(r()-.5)*8*uy];
-    return 'M'+a[0].toFixed(1)+' '+a[1].toFixed(1)+' Q'+m[0].toFixed(1)+' '+m[1].toFixed(1)+' '+b[0].toFixed(1)+' '+b[1].toFixed(1);
+  /* Eén pass = één open contour rond een afgeronde rechthoek: begint ergens
+     op de bovenrand, loopt rond en schiet 8-14 px voorbij zijn begin. Hoeken
+     en randen krijgen per pass een eigen afwijking, dus twee passes lopen
+     nooit evenwijdig. */
+  function pass(r,x,y,w,h,R,ver){
+    const j=()=>(r()-.5)*2*ver, rr=()=>Math.max(6,R+(r()-.5)*R*.5);
+    const a=rr(),b=rr(),c=rr(),d=rr();
+    const sx=x+a+(w-a-b)*(.15+r()*.5), f=v=>v.toFixed(1);
+    let p='M'+f(sx)+' '+f(y+j());
+    p+=' Q'+f(x+w*.75)+' '+f(y+j()*1.4)+' '+f(x+w-b+j())+' '+f(y+j());
+    p+=' Q'+f(x+w+j()*.6)+' '+f(y+j()*.6)+' '+f(x+w+j())+' '+f(y+b+j());
+    p+=' Q'+f(x+w+j()*1.4)+' '+f(y+h/2)+' '+f(x+w+j())+' '+f(y+h-c+j());
+    p+=' Q'+f(x+w+j()*.6)+' '+f(y+h+j()*.6)+' '+f(x+w-c+j())+' '+f(y+h+j());
+    p+=' Q'+f(x+w/2)+' '+f(y+h+j()*1.4)+' '+f(x+d+j())+' '+f(y+h+j());
+    p+=' Q'+f(x+j()*.6)+' '+f(y+h+j()*.6)+' '+f(x+j())+' '+f(y+h-d+j());
+    p+=' Q'+f(x+j()*1.4)+' '+f(y+h/2)+' '+f(x+j())+' '+f(y+a+j());
+    p+=' Q'+f(x+j()*.6)+' '+f(y+j()*.6)+' '+f(x+a+j())+' '+f(y+j());
+    p+=' Q'+f((x+a+sx)/2)+' '+f(y+j())+' '+f(sx+8+r()*6)+' '+f(y+j()*1.6);
+    return p;
   }
   function teken(el){
     const old=el.querySelector(':scope>svg.r');if(old)old.remove();
     const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;
     const r=rng(+el.dataset.seed||7),p=8;
+    const R=parseFloat(getComputedStyle(el).borderTopLeftRadius)||16;
     const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
     svg.setAttribute('class','r');svg.setAttribute('width',w+2*p);svg.setAttribute('height',h+2*p);
     svg.setAttribute('viewBox','0 0 '+(w+2*p)+' '+(h+2*p));svg.setAttribute('aria-hidden','true');
-    const hoek=[[p,p],[p+w,p],[p+w,p+h],[p,p+h]];
-    for(let i=0;i<4;i++){
-      const A=hoek[i],B=hoek[(i+1)%4];
-      for(let k=0;k<2;k++){
-        const path=document.createElementNS(ns,'path');
-        path.setAttribute('d',lijn(r,A[0],A[1],B[0],B[1],k?2.6:1.2));
-        if(k)path.setAttribute('class','b');
-        svg.appendChild(path);
-      }
+    for(let k=0;k<2;k++){
+      const path=document.createElementNS(ns,'path');
+      path.setAttribute('d',k?pass(r,p-1.5,p-1.2,w+3,h+2.4,R+2,2.4):pass(r,p,p,w,h,R,1.1));
+      if(k)path.setAttribute('class','b');
+      svg.appendChild(path);
     }
     el.appendChild(svg);
   }

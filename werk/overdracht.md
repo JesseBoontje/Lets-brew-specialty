@@ -355,3 +355,12 @@ Claude. Nog ideeën?"
   uitgerekend (seed per kader, 4 zijden x 2 paden, overschot 5-10 px, kruisen
   bij de hoeken). Valkuil: een algemene svg-regel (.x svg{width}) raakt ook de
   rand-svg; gebruik svg:not(.r). Wacht op akkoord Jesse voor inbouwen.
+- 24-11 reactie Jesse (via hoofdsessie): "3 idee gaat goede kant op, behoud
+  kleurverschillen vanuit originele app, lijnen zijn goed maar maak de hoeken
+  rond. En iconen waren enkele versies terug nog veel mooier ... gemaakt met Canva."
+  Versie 2 op dezelfde link: de 'Canva-iconen' zijn Jesse's methodetekeningen
+  m-*.png (sinds juli ongewijzigd in de repo) + logo.png; methodetinten
+  (--v60/--aeropress/--espresso) als achtergrond; randen = per pass één open
+  contour rond een afgeronde rechthoek (radius uit CSS), twee passes met eigen
+  afwijking. Bouwen (docs-bestand verwijst naar ../m-*.png; bij bouwen van het
+  artifact worden die als data-URI ingevuld). Wacht op akkoord Jesse.
