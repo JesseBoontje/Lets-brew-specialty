@@ -1,0 +1,39 @@
+/* Zoekt de gegevens van de oude app op dit adres (dezelfde plek als de oude app
+   ze bewaarde) en biedt ze aan als back-up-bestand dat de nieuwe app kan
+   importeren (profiel > back-up > importeren). Er wordt niets gewist. */
+(function(){
+  if('serviceWorker'in navigator){
+    navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update().catch(()=>{}))).catch(()=>{});
+  }
+  const status=document.getElementById('status'),knop=document.getElementById('download');
+  function leesIDB(){
+    return new Promise(res=>{
+      let rq;try{rq=indexedDB.open('scc_db',1);}catch(e){return res(null);}
+      rq.onupgradeneeded=()=>{const db=rq.result;if(!db.objectStoreNames.contains('kv'))db.createObjectStore('kv');};
+      rq.onerror=()=>res(null);
+      rq.onsuccess=()=>{
+        const db=rq.result;
+        try{const g=db.transaction('kv','readonly').objectStore('kv').get('scc_state');
+          g.onsuccess=()=>{res(g.result||null);db.close();};
+          g.onerror=()=>{res(null);db.close();};
+        }catch(e){res(null);}
+      };
+    });
+  }
+  function leesLS(){try{const s=localStorage.getItem('scc_state');return s?JSON.parse(s):null;}catch(e){return null;}}
+  const tel=d=>({brews:Array.isArray(d.brews)?d.brews.length:0,beans:Array.isArray(d.beans)?d.beans.length:0});
+  leesIDB().then(d=>{
+    d=d||leesLS();
+    if(!d||typeof d!=='object'){status.textContent='Op dit apparaat staan geen gegevens van de oude app. Je kunt meteen naar het nieuwe adres.';return;}
+    const t=tel(d);
+    status.textContent='Op dit apparaat staan nog gegevens van de oude app: '+t.brews+' brews en '+t.beans+' bonen. Download ze en importeer het bestand in de nieuwe app (Instellingen > back-up & transfer).';
+    knop.hidden=false;
+    knop.onclick=()=>{
+      const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download='lets-brew-specialty-backup.json';document.body.appendChild(a);a.click();
+      setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+      status.textContent='Gedownload. Open de nieuwe app, ga naar Instellingen > back-up & transfer en kies importeren.';
+    };
+  });
+})();

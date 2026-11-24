@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-21 (kleine klussen goedgekeurd, PR #14 open met preview)
+Laatst bijgewerkt: 2026-11-24 (oude adres vervangen; PR #14 wacht op Jesse)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -324,3 +324,19 @@ Claude. Nog ideeën?"
 - GitHub-check `checks` is rood op PR #14 door 6 WebKit-tests (shotclock.spec 2,
   stem.spec 4) die op main (10c3653) precies zo falen. Niet door deze PR;
   eigen klus op het takenbord.
+
+## 24-11: oude app vervangen (besluit Jesse: "Oude app mag vervangen worden back up is gedaan")
+- Oude adres https://letsbrewspecialty.jesseboontje.workers.dev (account 7d5fa36f,
+  Worker letsbrewspecialty) toont nu een verhuispagina (map oud-adres/, eigen
+  wrangler.jsonc, uitrollen met `npx wrangler deploy` in die map; versie 846b2874).
+  - Leest de oude gegevens op dezelfde plek (IndexedDB scc_db/kv/scc_state, anders
+    localStorage scc_state) en biedt ze als lets-brew-specialty-backup.json aan;
+    nieuwe app importeert dat (getest). Er wordt niets gewist: terug te draaien
+    door de oude versie 68bcda9b weer uit te rollen in het dashboard.
+  - /service-worker.js ruimt de oude service worker en caches op.
+  - Bestanden als tekst in het script (assets-upload werkt niet via de proxy:
+    die gebruikt een eigen sleutel die de proxy overschrijft).
+- Git-triggers van account 7d5fa36f verwijderd (geen rode checks meer van
+  "letsbrewspecialty"). Account 237620b0: geen toegang, Jesse moet loskoppelen.
+- Nog onbekend: of Bart en Ralph hun data al hebben overgezet; de pagina laat
+  ze dat zelf doen.

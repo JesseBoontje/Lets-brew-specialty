@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lets Brew is verhuisd</title>
+<style>
+  :root{--paper:#f2ead9;--ink:#3a302a;--soft:#6e6258;--accent:#7a5c45;--line:#b9a88f}
+  @media (prefers-color-scheme:dark){:root{--paper:#2b2420;--ink:#f2ead9;--soft:#cbbba6;--accent:#c8a577;--line:#6e6258}}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--paper);color:var(--ink);font:18px/1.5 Georgia,'Times New Roman',serif;}
+  main{max-width:430px;margin:0 auto;padding:36px 16px 48px}
+  h1{font-size:34px;line-height:1.1;margin:0 0 6px}
+  p{margin:10px 0}
+  .kader{position:relative;padding:18px 18px 16px;margin:22px 0}
+  .kader svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .kader path{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+  .kader path+path{stroke-width:1.1;opacity:.75}
+  .knop{display:flex;align-items:center;justify-content:center;min-height:52px;width:100%;margin-top:12px;
+    font:inherit;font-weight:bold;color:var(--paper);background:var(--accent);border:0;border-radius:16px;text-decoration:none;cursor:pointer}
+  .knop.licht{background:none;color:var(--ink);border:2px solid var(--line)}
+  .zacht{color:var(--soft);font-size:16px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Lets Brew is verhuisd</h1>
+  <p>De app staat nu op een nieuw adres. Zet hem daar opnieuw op je beginscherm.</p>
+  <div class="kader">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path vector-effect="non-scaling-stroke" d="M3 4 Q50 2.4 97 3.6 Q98.4 50 96.8 96.6 Q50 98.2 3.4 96.2 Q1.8 50 3 4"/>
+      <path vector-effect="non-scaling-stroke" d="M2.2 5.2 Q48 3.6 97.8 4.8 Q97.2 52 97.6 97.4 Q52 96.6 2.6 97.4 Q2.8 48 2.2 5.2"/>
+    </svg>
+    <p id="status">Even kijken of hier nog gegevens van de oude app staan…</p>
+    <button class="knop licht" id="download" type="button" hidden>Download mijn gegevens</button>
+    <a class="knop" href="https://letsbrew.djez.app/">Naar de nieuwe app</a>
+  </div>
+  <p class="zacht">Je gegevens blijven op dit apparaat staan tot je ze zelf weghaalt. Lukt het niet? Vraag Jesse.</p>
+</main>
+<script src="verhuisd.js"></script>
+</body>
+</html>
