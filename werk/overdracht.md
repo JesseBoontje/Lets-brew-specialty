@@ -364,3 +364,18 @@ Claude. Nog ideeën?"
   contour rond een afgeronde rechthoek (radius uit CSS), twee passes met eigen
   afwijking. Bouwen (docs-bestand verwijst naar ../m-*.png; bij bouwen van het
   artifact worden die als data-URI ingevuld). Wacht op akkoord Jesse.
+- 24-11 Jesse over v2 (via hoofdsessie): "Dit is heel goed. Maak redesign van
+  app-icoon/logo in zelfde stijl en maak startscherm iets langer zichtbaar, maak
+  die ook met nieuwe logo. Tekening bij surprise me is anders dan pourcoach ...
+  Misschien bij surprise me nieuwe logo plaatsen, linksboven weghalen. Graag
+  eerst mockup." Versie 3 op dezelfde link:
+  - nieuw merk (kop op schotel, open lussen, twee halen per lijn, koffie-arcering
+    in accent-soft), als woordmerk, als tegel 512/192/iPhone/klein met ronde
+    dubbele rand in --card;
+  - splash: splash-1..3 blijven (0,75 s), splash-4 wordt het nieuwe logo dat zich
+    tekent (stroke-dashoffset 1,1 s) en 2 s blijft; samen 4,25 s; tik = overslaan;
+  - surprise me: GC_TEKENING uit app/04-gietcoach.js (statisch, straal en wat
+    koffie in de server), merk erbij; logo linksboven weg.
+  - docs/gietcoach-tekening.svg.html = de statische versie van de gietcoach-tekening.
+  Wacht op akkoord Jesse. Bij inbouwen: icon-192/512.png en apple-touch-icon uit
+  het merk maken (Playwright-screenshot van de tegel), manifest.json bijwerken.
