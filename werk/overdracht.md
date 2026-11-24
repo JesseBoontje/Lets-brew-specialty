@@ -340,3 +340,18 @@ Claude. Nog ideeën?"
   "letsbrewspecialty"). Account 237620b0: geen toegang, Jesse moet loskoppelen.
 - Nog onbekend: of Bart en Ralph hun data al hebben overgezet; de pagina laat
   ze dat zelf doen.
+
+## 24-11: opdracht via hoofdsessie (Jesse): zuinig werken, antislop-ontwerp
+- Letterlijk (doorgegeven): "Beperk usage ... Stop bij 95% ... Maar wat uiterlijk en
+  startscherm betreft wordt het nu AI-slop. Houd tekenstijl met dubbele
+  onafhankelijke lijnen in stand overal rond alle kaders. Zoek antislop design
+  skills, voeg toe en maak op die manier de app af."
+- 95% kan Claude niet meten (verbruik niet zichtbaar). Zuinig: zelf doen, max één
+  aannemer, één keuring per klus, bon na elke klus pushen.
+- Skill .claude/skills/frontend-design toegevoegd (uit anthropics/skills) met
+  bovenaan: huisstijl Lets Brew gaat voor; elke rand twee eigen paden.
+- Opzet startscherm: docs/opzet-startscherm.html, artifact
+  https://claude.ai/artifact/8TzG92J7TX7k2xz6NuDnGv . Randen per kader met JS
+  uitgerekend (seed per kader, 4 zijden x 2 paden, overschot 5-10 px, kruisen
+  bij de hoeken). Valkuil: een algemene svg-regel (.x svg{width}) raakt ook de
+  rand-svg; gebruik svg:not(.r). Wacht op akkoord Jesse voor inbouwen.
