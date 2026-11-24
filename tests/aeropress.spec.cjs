@@ -51,9 +51,14 @@ test('regular (Hoffmann): one pour, plunger, swirl, press; done fills the brew',
  // start: eerst 3 tellen af
  await page.locator('#ap-b-start').tap();
  await expect(page.locator('#ap-tijd')).toHaveText(/^[123]$/);
+ // de swirl duurt 5 s; op 30x is dat 0,17 s en mist een trage browser (WebKit)
+ // hem. Rond de swirl dus even op gewone snelheid, daarna weer snel.
  await page.evaluate(()=>ap.snelheid(30));
+ await page.waitForFunction(()=>ap.stand().t>=115);
+ await page.evaluate(()=>ap.snelheid(1));
  await page.waitForFunction(()=>ap.stand().t>=121);
  await expect(page.locator('#ap-r-nu')).toContainText('swirl');
+ await page.evaluate(()=>ap.snelheid(30));
  await page.waitForFunction(()=>ap.stand().t>=151);
  await expect(page.locator('#ap-r-nu')).toContainText('press');
  await page.waitForFunction(()=>ap.stand().eindOp!=null);

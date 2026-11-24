@@ -10,7 +10,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |
 | Vraag doorlooptijd/filterkompas/slim invullen ("update voor nieuwe app versie") | nog niemand | geen | wacht op Jesse | betekenis navragen |
 | Oude Cloudflare-koppeling 237620b0 (lege Worker lets-brew-specialty) loskoppelen | Jesse | geen | wacht op Jesse | Claude heeft geen toegang tot dat account; in dashboard Settings > Builds > Disconnect (7d5fa36f is al weg) |
-| 6 WebKit-tests rood op main sinds #12 (shotclock.spec 2, stem.spec 4); aeropress.spec "regular (Hoffmann)" faalt in WebKit soms (2 van 4 runs, ook op commits zonder app-wijziging) | nog niemand | geen | wacht | eigen klus; WebKit niet in de cloudomgeving, logs via GitHub-check |
+| 6 WebKit-tests rood op main sinds #12 (shotclock.spec 2, stem.spec 4); aeropress.spec "regular (Hoffmann)" miste in WebKit de 5 s swirl op 30x (testfout, hersteld 24-11: swirl op 1x). Shotclock-tests: zelfde soort timing (WebKit-klok trager, 34 s gemeten bij verwacht 28-30) | nog niemand | geen | wacht | eigen klus; WebKit niet in de cloudomgeving, logs via GitHub-check |
 | Logboek Worker: wordt de sleutel-header gelogd? (bestond al) | nog niemand | nog geen | wacht op Jesse | dashboard nakijken of invocation logs uit |
 | Later: ElevenLabs voor live spraakcoach en AI-coach voorlezen | nog niemand | nog geen | later (besluit Jesse) | eigen klus |
 | Inlog Face ID + D1 + Claude-koppeling (MCP), AI-coach centraal | nog niemand | nog geen | later (besluit Jesse) | grote klus |
