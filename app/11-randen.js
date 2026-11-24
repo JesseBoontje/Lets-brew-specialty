@@ -70,7 +70,7 @@ function randStart(){
   try{new MutationObserver(ms=>{
     // alleen reageren op wat er écht bijkomt, niet op onze eigen svg's
     if(ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&!(n.classList&&n.classList.contains('rand-svg')))||m.type==='attributes'))randStraks();
-  }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style','hidden']});}catch(e){}
+  }).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});}catch(e){}
   addEventListener('resize',randStraks);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(randStraks).catch(()=>{});
 }

@@ -19,8 +19,22 @@ test('splash: drawings then the old logo, about 4 s, a tap skips it',async({page
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>typeof currentPage!=='undefined'&&document.getElementById('page-welcome'));
  await page.waitForTimeout(300);
- await page.locator('#page-welcome').tap();
+ // tik precies waar straks de surprise-kaart ligt: die mag niet mee-opengaan
+ const kaart={x:195,y:206};
+ await page.evaluate(()=>{window.__qb=0;const o=window.quickBrew;window.quickBrew=function(){window.__qb++;return o.apply(this,arguments);};});
+ await page.touchscreen.tap(kaart.x,kaart.y);
  await page.waitForFunction(()=>currentPage==='home',null,{timeout:1500});
+ await page.waitForTimeout(500);
+ expect(await page.evaluate(()=>window.__qb)).toBe(0);
+ await expect(page.locator('#surprise-pop')).toBeHidden();
+ // en op de plek van een methodeknop: blijft op home
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>typeof currentPage!=='undefined'&&currentPage==='welcome');
+ await page.waitForTimeout(300);
+ await page.touchscreen.tap(79,557);
+ await page.waitForFunction(()=>currentPage==='home',null,{timeout:1500});
+ await page.waitForTimeout(500);
+ expect(await page.evaluate(()=>currentPage)).toBe('home');
 });
 test('drawn edges: two separate passes per frame, off switch removes them',async({page})=>{
  await open(page,false);

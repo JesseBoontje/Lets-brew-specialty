@@ -65,10 +65,16 @@ function splashWacht(eerst){
   const rest=SPLASH_MS-performance.now();
   if(rest<=0)return Promise.resolve();
   return new Promise(res=>{
+    // op 'click' (na het loslaten), niet op pointerdown: anders landt de klik
+    // van dezelfde tik op de knop die op home onder je vinger ligt. Voor de
+    // zekerheid slikt de app daarna nog 400 ms elke klik in.
     const el=document.getElementById('page-welcome');let klaar=false;
-    const door=()=>{if(klaar)return;klaar=true;if(el)el.removeEventListener('pointerdown',door);res();};
-    if(el)el.addEventListener('pointerdown',door);
-    setTimeout(door,rest);
+    const slik=e=>{e.stopPropagation();e.preventDefault();};
+    const door=e=>{if(klaar)return;klaar=true;if(el)el.removeEventListener('click',door);
+      if(e){document.addEventListener('click',slik,true);setTimeout(()=>document.removeEventListener('click',slik,true),400);}
+      res();};
+    if(el)el.addEventListener('click',door);
+    setTimeout(()=>door(),rest);
   });
 }
 window.addEventListener('DOMContentLoaded',()=>Promise.resolve(loadPromise).catch(()=>{}).then(async()=>{

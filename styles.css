@@ -1678,6 +1678,7 @@ html.randen .sketch.rand-on{filter:none;}
 #surprise-btn .reco-h{font-size:31px;}
 #surprise-btn .reco-sub{opacity:1;color:var(--ink-soft);}
 #page-home .method{border:1.5px solid var(--line);}
+#page-home .methods-scroll{padding-top:6px;padding-bottom:8px;}
 #page-home .method .nm{color:var(--ink);}
 /* beginscherm: 3 tekeningen x 0,75 s, dan het logo 2 s = 4,25 s */
 #sf1{animation:f1 4.25s linear forwards;}
