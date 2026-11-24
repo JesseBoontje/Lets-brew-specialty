@@ -45,7 +45,7 @@
       <img src="splash-1.png" class="splash-frame" id="sf1" alt="">
       <img src="splash-2.png" class="splash-frame" id="sf2" alt="">
       <img src="splash-3.png" class="splash-frame" id="sf3" alt="">
-      <img src="splash-4.png" class="splash-frame" id="sf4" alt="">
+      <img src="logo.png" class="splash-frame" id="sf4" alt="lets brew specialty">
     </div>
   </div>
 
@@ -53,15 +53,121 @@
   <div id="page-home" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="home-logo"><img src="logo.png" alt="lets brew specialty" onerror="this.style.display='none'"></div>
       <h1 class="title hand" id="home-greeting">hi there</h1>
       <div class="subtitle">what are we brewing today?</div>
       <div class="set-d" id="weather-line" style="display:none;margin:-8px 0 12px;color:var(--ink)"></div>
-      <button class="btn-reco" onclick="quickBrew()">
-        <span class="reco-ic"><svg viewBox="0 0 32 32"><path d="M6.5 11.5 Q6.4 17 6.8 22.3 Q7 26.4 12 26.5 Q15.6 26.7 19.2 26.4 Q24.3 26.2 24.2 21.7 Q24.5 16.8 24.1 11.6 M6.1 11.9 Q15.5 10.6 24.7 12 M24.1 13.6 Q29.4 13.5 29.3 18 Q29.2 22.4 23.8 22.2 M5.3 30.1 Q16 30.8 26.7 29.9"/><path d="M10.9 5.6 Q9.7 8 11.5 9.8 M15.9 4.5 Q14.7 7 16.6 8.8 M20.9 5.6 Q19.7 8 21.5 9.8" opacity="0.8"/></svg></span>
-        <span class="reco-txt"><span class="reco-h hand">surprise me</span><span class="reco-sub">a surprise brew with a bean from your shelf</span></span>
+      <button type="button" class="peak-line" id="peak-line" style="display:none"></button>
+      <button class="btn-reco sur-kaart" id="surprise-btn" onclick="quickBrew()">
+        <span class="sur-tek"><svg class="sur-gc" aria-hidden="true" viewBox="-28 -16 328 370" preserveAspectRatio="xMidYMid meet" >
+<defs>
+<clipPath id="hgc-cl-kegel"><path d="M106 122 L238 122 L178 213 L166 213 Z"/></clipPath>
+<clipPath id="hgc-cl-bed"><rect x="90" y="172" width="170" height="60"/></clipPath>
+<clipPath id="hgc-cl-server"><path d="M118 250 L226 250 Q230 290 234 318 Q236 338 214 344 Q172 349 130 344 Q108 338 110 318 Q114 290 118 250 Z"/></clipPath>
+</defs>
+<g clip-path="url(#hgc-cl-server)">
+<rect class="koffie" x="100" y="318" width="150" height="40" opacity=".9"/>
+<rect class="crema" x="100" y="360" width="150" height="0"/>
+<g class="rimpel"><path d="M-9 0 Q0 3 9 0"/><path d="M-15 1 Q0 5 15 1"/></g>
+</g>
+<path class="drip" d="" opacity="0"/>
+<g class="lijn glas">
+<path d="M112 247 Q172 241 233 248"/>
+<path class="b" d="M116 250 Q172 245 229 251"/>
+<path d="M115 247 Q106 244 101 248 Q107 251 116 253"/>
+<path d="M116 245 Q110 290 106 318 Q103 340 128 346"/>
+<path class="b" d="M120 250 Q114 292 111 318 Q109 336 130 342"/>
+<path d="M229 245 Q235 290 238 318 Q241 340 216 346"/>
+<path class="b" d="M225 250 Q231 292 233 318 Q235 336 214 342"/>
+<path d="M122 345 Q172 352 222 345"/>
+<path class="b" d="M130 348 Q172 351 214 348"/>
+<path d="M228 254 Q272 250 274 286 Q275 320 236 330"/>
+<path class="b" d="M229 261 Q264 258 265 287 Q266 314 237 322"/>
+<path class="z" d="M50 353 Q172 357 296 352"/>
+</g>
+<g>
+<g clip-path="url(#hgc-cl-kegel)">
+<rect class="grond" x="90" y="172" width="170" height="60" opacity=".25"/>
+<g clip-path="url(#hgc-cl-bed)"><g class="arcering"></g></g>
+<rect class="koffie" x="90" y="213" width="170" height="0" opacity=".62"/>
+<rect class="crema" x="90" y="213" width="170" height="0"/>
+<path class="opp" d=""/>
+<path class="bedlijn" d=""/>
+<g class="bel">
+<path d="M153 -4 Q153.5 -1 150.5 -.6 Q147.6 -1 148 -4 Q148.7 -6.6 151.6 -6.4 Q153.8 -5.6 153.4 -3"/>
+<path d="M174 -6 Q174.6 -2.4 171 -2 Q167.6 -2.4 168 -5.8 Q168.8 -8.8 172.2 -8.6 Q174.8 -7.8 174.4 -5"/>
+<path d="M193 -3.5 Q193.4 -1 190.8 -.7 Q188.4 -1 188.7 -3.5 Q189.3 -5.6 191.6 -5.4 Q193.4 -4.8 193.1 -2.8"/>
+</g>
+</g>
+<g class="lijn">
+<path d="M97 120 Q170 102 247 118"/>
+<path class="b" d="M102 117 Q174 106 243 121"/>
+<path d="M100 117 Q172 135 245 122"/>
+<path class="b" d="M105 121 Q169 131 240 117"/>
+<path d="M95 121 Q98 126 107 126"/>
+<path d="M249 119 Q246 125 237 126"/>
+<path d="M102 121 Q132 168 168 218"/>
+<path class="b" d="M107 124 Q137 171 170 214"/>
+<path d="M242 121 Q210 168 177 218"/>
+<path class="b" d="M237 124 Q206 170 175 214"/>
+<path d="M162 212 Q172 218 183 212"/>
+<path d="M166 213 Q164 226 166 239"/>
+<path d="M178 213 Q180 226 178 239"/>
+<path class="b" d="M169 215 Q168 226 169 237"/>
+<path d="M114 239 Q172 232 230 240"/>
+<path class="b" d="M119 241 Q172 235 225 242"/>
+<path d="M116 238 Q112 242 119 245"/>
+<path d="M228 239 Q232 243 225 246"/>
+<path d="M117 245 Q172 240 227 246"/>
+<path d="M230 128 Q268 124 266 152 Q263 182 214 180"/>
+<path class="b" d="M226 135 Q258 133 257 153 Q255 174 217 173"/>
+<path class="z" d="M121 128 Q138 160 160 204"/>
+<path class="z" d="M146 128 Q154 164 166 206"/>
+<path class="z" d="M199 128 Q190 164 178 206"/>
+<path class="z" d="M224 128 Q206 160 184 204"/>
+</g>
+
+<g class="zacht" opacity="0">
+<path d="M108 160 Q172 188 238 158"/>
+<path d="M230 152 Q238 158 233 165"/>
+</g>
+</g>
+<path class="straal" d="M187 25 Q181 62 175 112"/>
+
+<g class="damp"><path d="M185 6 Q180 -1 185 -8 Q190 -14 186 -19"/><path d="M193 8 Q189 2 193 -4 Q196 -9 194 -14"/></g>
+<g>
+<g class="lijn">
+<path d="M41 23 Q74 14 107 22"/>
+<path class="b" d="M45 21 Q76 17 104 24"/>
+<path d="M42 21 Q74 32 106 24"/>
+<path class="b" d="M46 25 Q72 30 103 21"/>
+<path class="b" d="M49 24 Q74 19 99 24"/>
+<path d="M44 20 Q40 58 37 90 Q37 104 49 110"/>
+<path class="b" d="M47 24 Q43 60 41 90 Q41 102 51 107"/>
+<path d="M104 20 Q108 58 111 90 Q111 104 99 110"/>
+<path class="b" d="M101 24 Q105 60 107 90 Q107 102 97 107"/>
+<path d="M44 109 Q74 114 104 109"/>
+<path class="b" d="M48 111 Q74 114 100 111"/>
+<path class="z" d="M56 33 Q55 68 57 104"/>
+<path class="z" d="M63 32 Q62 68 64 105"/>
+<path class="z" d="M95 31 Q97 68 95 104"/>
+<path d="M106 92 Q110 96 106 102"/>
+<path d="M107 100 Q122 101 129 92 Q137 78 142 50 Q146 26 160 19 Q172 14 186 22"/>
+<path d="M108 95 Q120 96 126 88 Q134 74 139 48 Q143 23 158 15 Q172 9 187 20"/>
+<path class="b" d="M110 98 Q123 98 128 90 Q135 76 140 52"/>
+<path d="M186 19 Q189 22 187 26"/>
+<path d="M47 27 Q27 25 8 27"/>
+<path d="M10 23 Q9 42 14 61"/>
+<path d="M11 57 Q25 72 41 86"/>
+<path class="b" d="M44 33 Q28 32 15 33"/>
+<path class="b" d="M16 31 Q15 45 19 57"/>
+<path class="b" d="M18 55 Q29 66 40 77"/>
+<path d="M41 24 Q39 30 42 36"/>
+<path d="M37 74 Q36 82 39 89"/>
+</g>
+</g>
+</svg></span>
+        <span class="reco-txt"><img class="sur-logo" src="logo.png" alt=""><span class="reco-h hand">surprise me</span><span class="reco-sub">a new recipe for a bean on your shelf</span></span>
       </button>
-      <button class="btn-add sketch soft" id="brew-now-btn" onclick="brewNow()" style="display:none;margin-bottom:16px"><svg viewBox="0 0 24 24" class="acic btn-svg"><path d="M4.7 9.7 Q4.6 16.2 8 18.3 Q12 20.6 16.2 18.1 Q19.4 16.1 19.3 9.6 M4.3 10.2 Q12 8.3 19.7 10.1 M19.1 10.9 Q22.4 10.7 22.3 13.5 Q22.2 16.4 18.8 16.1 M3 21.4 Q12 22.1 21.1 21.3"/><path d="M8.9 5.9 Q8.1 7.6 9.5 8.8 M12.4 5.1 Q11.4 6.9 12.8 8.1 M15.7 5.9 Q14.8 7.6 16.2 8.8" opacity="0.7"/></svg>brew now — your usual, prefilled</button>
       <div class="methods sketch soft">
         <div class="lbl"><span>brew methods</span><a class="hand" onclick="go('methods')">manage</a></div>
         <div class="methods-scroll" id="methods-scroll"></div>
@@ -929,6 +1035,7 @@
   </div>
 </div>
 <div id="aibud-pop" class="aib-laag hidden"></div>
+<div id="surprise-pop" class="aib-laag hidden" onclick="if(event.target===this)surpriseWeg()"></div>
 <div class="toast" id="toast"></div>
 <div id="print-area"></div>
 
@@ -941,6 +1048,7 @@
 <script src="app/04-brew-formulier.js"></script>
 <script src="app/04-gietcoach.js"></script>
 <script src="app/04-aeropress.js"></script>
+<script src="app/04-surprise.js"></script>
 <script src="app/05-espresso-dial-in.js"></script>
 <script src="app/05-shotclock.js"></script>
 <script src="app/06-detail-en-methodes.js"></script>
@@ -949,6 +1057,7 @@
 <script src="app/09-leren-en-extra.js"></script>
 <script src="app/10-bonenkeuzehulp.js"></script>
 <script src="app/11-profiel-en-instellingen.js"></script>
+<script src="app/11-randen.js"></script>
 <script src="app/12-hulp-en-start.js"></script>
 <script src="brew-workspace.js"></script>
 <script src="brew-voice.js"></script>

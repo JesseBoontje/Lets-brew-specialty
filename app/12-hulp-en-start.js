@@ -53,9 +53,36 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 })();
 
 // Start after all controllers are loaded; stored data is never replaced on read failure.
-window.addEventListener('DOMContentLoaded',()=>Promise.resolve(loadPromise).catch(()=>{}).then(()=>{
+/* Het beginscherm: drie tekeningen van 0,75 s en dan het logo 2 s (samen
+   4,25 s, zie de keyframes in styles.css). Een tik slaat over. Wie de app via
+   een link naar een ander scherm, een snelkoppeling of een melding opent,
+   gaat meteen door. Onder automatische tests ook meteen, tenzij een test
+   window.__splashTest zet. */
+const SPLASH_MS=4250;
+function splashWacht(eerst){
+  if(eerst!=='home'||pendingQuickBrew||pendingBrewParam)return Promise.resolve();
+  if(navigator.webdriver&&!window.__splashTest)return Promise.resolve();
+  const rest=SPLASH_MS-performance.now();
+  if(rest<=0)return Promise.resolve();
+  return new Promise(res=>{
+    // op 'click' (na het loslaten), niet op pointerdown: anders landt de klik
+    // van dezelfde tik op de knop die op home onder je vinger ligt. Voor de
+    // zekerheid slikt de app daarna nog 400 ms elke klik in.
+    const el=document.getElementById('page-welcome');let klaar=false;
+    const slik=e=>{e.stopPropagation();e.preventDefault();};
+    const door=e=>{if(klaar)return;klaar=true;if(el)el.removeEventListener('click',door);
+      if(e){document.addEventListener('click',slik,true);setTimeout(()=>document.removeEventListener('click',slik,true),400);}
+      res();};
+    if(el)el.addEventListener('click',door);
+    setTimeout(()=>door(),rest);
+  });
+}
+window.addEventListener('DOMContentLoaded',()=>Promise.resolve(loadPromise).catch(()=>{}).then(async()=>{
   if(lbApiMode)return;
-  go(typeof BrewWorkspace!=='undefined'?BrewWorkspace.initialPage():'home');
+  const eerst=typeof BrewWorkspace!=='undefined'?BrewWorkspace.initialPage():'home';
+  await splashWacht(eerst);
+  go(eerst);
+  try{randStart();}catch(e){}
   if(pendingQuickBrew){pendingQuickBrew=false;try{quickBrew();}catch{}}
   if(pendingBrewParam){const mid=decodeURIComponent(pendingBrewParam);pendingBrewParam=null;try{beginBrew(mid);}catch{}}
 }),{once:true});

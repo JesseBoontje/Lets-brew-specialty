@@ -442,6 +442,11 @@
   .fgauge .fd{font-family:'Caveat',cursive;font-weight:700;font-size:19px;fill:var(--ink);}
   .fg-lab{text-align:center;font-size:15px;color:var(--ink-soft);margin-top:-2px;}
   .fg-hint{font-size:15.5px;line-height:1.4;color:var(--ink-soft);margin:8px 2px 0;}
+  .fg-peak{text-align:center;font-size:15px;line-height:1.35;color:var(--ink);margin:4px 6px 0;}
+  .peak-line{display:flex;align-items:center;gap:9px;width:100%;margin:-6px 0 14px;padding:10px 12px;
+    min-height:48px;background:none;border:1.5px dashed var(--line);border-radius:16px;filter:url(#wobble);
+    font-family:'Patrick Hand',cursive;font-size:17px;color:var(--ink);text-align:left;cursor:pointer;}
+  .peak-line svg{width:22px;height:22px;flex:none;stroke:#5c7a4f;fill:none;stroke-width:2;stroke-linecap:round;}
   .wheel-ro{width:172px;display:block;margin:8px auto 2px;}
   .wheel-ro path{stroke:var(--ink);stroke-width:1.6;fill:var(--card-2);filter:url(#wobble-rough);}
   .wheel-ro path.sel{fill:var(--accent-soft);}
@@ -1632,3 +1637,55 @@ body.gc-open{overflow:hidden;}
 #stem-card input.stem-veld{font-family:monospace;}
 #stem-card select.stem-veld{font-family:inherit;margin-top:2px;}
 #stem-card .stem-veld:focus{outline:none;border-color:var(--ink);}
+
+/* surprise me (app/04-surprise.js) */
+.sur-pop{max-height:calc(100vh - 44px);overflow-y:auto;}
+.sur-wie{font-family:'Caveat',cursive;font-weight:700;font-size:24px;margin-top:6px;}
+.sur-wie span{font-family:'Patrick Hand',cursive;font-weight:400;font-size:15px;color:var(--ink-soft);}
+.sur-hoe{display:flex;align-items:center;gap:8px;font-size:16px;margin:4px 0 8px;}
+.sur-getal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 4px;}
+.sur-getal div{border:1.5px solid var(--line);border-radius:12px;filter:url(#wobble);padding:6px 2px;text-align:center;}
+.sur-getal b{display:block;font-family:'Caveat',cursive;font-size:21px;line-height:1;}
+.sur-getal span{font-size:12.5px;color:var(--ink-soft);}
+.sur-waarom{margin:8px 0 2px 18px;padding:0;font-size:15.5px;line-height:1.4;}
+.sur-pop .aib-knoppen button{min-height:48px;}
+
+/* getekende randen (app/11-randen.js, vlag drawnedges) */
+.rand-on{position:relative;}
+.rand-svg{position:absolute;left:-8px;top:-8px;pointer-events:none;overflow:visible;fill:none;
+  stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
+.rand-svg .b{stroke-width:1.15;opacity:.6;}
+.sketch.soft>.rand-svg,.method>.rand-svg,.peak-line>.rand-svg,.ws-actions>button>.rand-svg,.ws-filters>button>.rand-svg,.lp>.rand-svg{stroke:var(--ink-soft);}
+/* een gekozen chip is gevuld; zijn rand in inkt */
+.lp.sel>.rand-svg,.ws-filters>button.selected>.rand-svg{stroke:var(--ink);}
+html.randen .sketch.rand-on::before{display:none;}
+html.randen .rand-on:is(.ws-card,.ws-actions>button,.ws-filters>button,.lp,.method,.btn-reco,.peak-line){border-color:transparent;filter:none;}
+html.randen .sketch.rand-on{filter:none;}
+/* home: surprise me in de stijl van de gietcoach (keuze Jesse 24-11) */
+#surprise-btn.sur-kaart{background:var(--card);color:var(--ink);align-items:stretch;padding:12px 14px 12px 8px;gap:8px;}
+#surprise-btn .sur-tek{flex:0 0 92px;height:112px;display:block;}
+#surprise-btn .sur-gc{width:100%;height:100%;display:block;}
+#surprise-btn .sur-gc .lijn{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
+#surprise-btn .sur-gc .lijn .b{opacity:.58;stroke-width:2;}
+#surprise-btn .sur-gc .lijn .z{opacity:.3;stroke-width:2;}
+#surprise-btn .sur-gc .glas{stroke-width:2;}
+#surprise-btn .sur-gc .koffie{fill:var(--accent-soft);stroke:none;}
+#surprise-btn .sur-gc :is(.crema,.grond,.arcering,.rimpel,.bel,.opp,.bedlijn,.drip,.zacht){display:none;}
+#surprise-btn .sur-gc .straal{fill:none;stroke:var(--accent-soft);stroke-width:4;stroke-linecap:round;stroke-dasharray:13 3;}
+#surprise-btn .sur-gc .damp path{fill:none;stroke:var(--ink-soft);stroke-width:2;stroke-linecap:round;}
+#surprise-btn .reco-txt{flex:1;justify-content:flex-end;}
+#surprise-btn .sur-logo{width:96px;height:auto;mix-blend-mode:multiply;margin:0 0 auto -2px;}
+#surprise-btn .reco-h{font-size:31px;}
+#surprise-btn .reco-sub{opacity:1;color:var(--ink-soft);}
+#page-home .method{border:1.5px solid var(--line);}
+#page-home .methods-scroll{padding-top:6px;padding-bottom:8px;}
+#page-home .method .nm{color:var(--ink);}
+/* beginscherm: 3 tekeningen x 0,75 s, dan het logo 2 s = 4,25 s */
+#sf1{animation:f1 4.25s linear forwards;}
+#sf2{animation:f2 4.25s linear forwards;}
+#sf3{animation:f3 4.25s linear forwards;}
+#sf4{animation:f4 4.25s linear forwards;max-width:78%;}
+@keyframes f1{0%{opacity:1}17.6%{opacity:1}17.7%{opacity:0}100%{opacity:0}}
+@keyframes f2{0%{opacity:0}17.6%{opacity:0}17.7%{opacity:1}35.2%{opacity:1}35.3%{opacity:0}100%{opacity:0}}
+@keyframes f3{0%{opacity:0}35.2%{opacity:0}35.3%{opacity:1}52.8%{opacity:1}52.9%{opacity:0}100%{opacity:0}}
+@keyframes f4{0%{opacity:0}52.8%{opacity:0}52.9%{opacity:1}100%{opacity:1}}

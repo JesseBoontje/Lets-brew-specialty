@@ -1,0 +1,14 @@
+{
+  // Het oude adres van Lets Brew (letsbrewspecialty.jesseboontje.workers.dev,
+  // Cloudflare-account 7d5fa36f). Alleen een verhuispagina: verwijzing naar
+  // letsbrew.djez.app plus een knop om je oude gegevens als back-up te
+  // downloaden. De gegevens in de browser worden NIET gewist.
+  // Uitrollen: in deze map `npx wrangler deploy` (los van de echte app).
+  "name": "letsbrewspecialty",
+  "account_id": "7d5fa36f0987a01dcf47b34791495fa6",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-24",
+  "workers_dev": true,
+  "preview_urls": false,
+  "rules": [{"type": "Text", "globs": ["**/*.html", "**/*.txt"], "fallthrough": false}]
+}

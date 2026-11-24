@@ -101,6 +101,7 @@ function freshGaugeHTML(b,atTs,label){
   if(!featOn('freshgauge'))return '';
   const fr=beanFreshness(b,atTs);if(!fr)return '';
   const hint=freshGrindHint(fr.days);
+  const pk=freshPeak(b),ps=Math.min(pk.start,38),pe=Math.min(Math.max(pk.end,ps+3),41);
   const days=Math.min(fr.days,42);
   const cx=150,cy=104,R=78;
   const P=fr2=>[cx+R*Math.cos(Math.PI+fr2*Math.PI),cy+R*Math.sin(Math.PI+fr2*Math.PI)];
@@ -108,35 +109,28 @@ function freshGaugeHTML(b,atTs,label){
     return `<path class="zone" stroke="${col}" d="M${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}"/>`;};
   const[nx,ny]=P(days/42);
   return `<svg class="fgauge" viewBox="0 0 300 118">
-    ${arc(0,3,'#a5673a')}${arc(3,21,'#5c7a4f')}${arc(21,42,'var(--line)')}
+    ${arc(0,ps,'#a5673a')}${arc(ps,pe,'#5c7a4f')}${arc(pe,42,'var(--line)')}
     <text x="${P(0.6/42)[0]-7}" y="${P(0.6/42)[1]-9}" text-anchor="end">rest</text>
-    <text x="${P(12/42)[0]}" y="${P(12/42)[1]-12}" text-anchor="middle">peak</text>
-    <text x="${P(31/42)[0]}" y="${P(31/42)[1]-12}" text-anchor="middle">fading</text>
+    <text x="${P((ps+pe)/84)[0]}" y="${P((ps+pe)/84)[1]-12}" text-anchor="middle">${pk.learned?'your peak':'peak'}</text>
+    <text x="${P((pe+42)/84)[0]}" y="${P((pe+42)/84)[1]-12}" text-anchor="middle">fading</text>
     <line class="needle" x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}"/>
     <circle cx="${cx}" cy="${cy}" r="4" fill="var(--ink)"/>
     <text class="fd" x="${cx}" y="${cy-22}" text-anchor="middle">day ${fr.days}</text>
   </svg>${label?'<div class="fg-lab">'+esc(label)+'</div>':''}
+  ${atTs?'':'<div class="fg-peak">'+esc(freshPeakText(b,pk,fr.days))+'</div>'}
   ${hint?'<div class="fg-hint">'+esc(hint.s)+' — '+esc(hint.t)+'</div>':''}`;
 }
-/* ---------------- brew now: jouw vaste bak, voor-ingevuld ---------------- */
-function brewNow(){
-  const r=recommendBrew();
-  if(!r){toast('turn on a method first under methods');return;}
-  const mid=r.method.id;
-  if(methodFamily(mid)==='espresso'){
-    formBean=r.bean?r.bean.id:null;pendingRecipe=null;
-    const last=state.brews.filter(x=>x.method===mid).sort((a,b)=>b.ts-a.ts)[0];
-    pendingTarget=last?(last.target||{dose:last.dose?String(last.dose):'',yield:last.yield?String(last.yield):'',time:last.time||'',grind:last.grind||''}):null;
-    formPrep=(last&&last.prep)?JSON.parse(JSON.stringify(last.prep)):{};
-    openDialIn(mid);
-    if(r.bean)setTimeout(()=>pickDiBean(r.bean.id),0);
-  }else{
-    openForm(mid);
-    if(r.bean)setTimeout(()=>pickBean(r.bean.id),0);
-  }
-  toast('☕ your usual: '+r.method.name+(r.bean?' · '+r.bean.name:'')+' — check & go');
+// één zin onder de meter: wanneer hij op z'n best is en waar dat vandaan komt
+function freshPeakText(b,pk,days){
+  const bron=pk.learned?(pk.from==='bean'?'learned from your '+pk.n+' scores of this bean'
+    :'learned from your '+pk.n+' scores across beans'):'the usual curve — your scores will refine it';
+  const roast=new Date(b.roastdate+'T00:00:00');
+  const dag=n=>{const d=new Date(roast.getTime()+n*86400000);return d.toLocaleDateString('en-GB',d.getFullYear()===new Date().getFullYear()?{day:'numeric',month:'short'}:{day:'numeric',month:'short',year:'numeric'});};
+  const wanneer=days==null||days<pk.start?'at its best from '+dag(pk.start)+' (day '+pk.start+')'
+    :days<=pk.end?'at its best now, until '+dag(pk.end)+' (day '+pk.end+')'
+    :'its best days were '+dag(pk.start)+' – '+dag(pk.end);
+  return wanneer+' · '+bron;
 }
-
 /* ---------------- features: het schakelbord ---------------- */
 // alles wat nieuw bijgebouwd wordt staat hier, met eigen aan/uit-knop in profiel.
 const FEATURES=[
@@ -150,9 +144,11 @@ const FEATURES=[
   {id:'finderai', n:'ask the finder', d:'ask a real question and get a real answer — on the map, as an explanation, or just in words', def:true, cat:'people'},
   {id:'beanpick', n:'bean chooser', d:'a drawn world map: from a coffee country down to a region, and what to look for on the bag', def:true, cat:'people'},
   {id:'wheelbig', n:'big flavour wheel', d:'tap a family and the wheel opens up — berry becomes blueberry, raspberry, cherry', def:false, cat:'app'},
+  {id:'drawnedges', n:'drawn edges', d:'every card and button edged with two loose pencil lines', def:true, cat:'app'},
   {id:'freshgauge', n:'freshness gauge', d:'rest → peak → fading as a dial on each bean', def:true, cat:'app'},
   {id:'smartdefaults', n:'smart defaults', d:'last dose, grind & temp prefilled — never retype', def:true, cat:'app'},
-  {id:'brewnow', n:'brew now button', d:'one tap on home: your usual, prefilled — confirm & go', def:true, cat:'app'},
+  {id:'peakalert', n:'peak heads-up', d:'a quiet line on home when a bean in stock reaches its best days', def:true, cat:'app'},
+  {id:'surprise', n:'surprise me', d:'a new recipe for a bean on your shelf — you look it over first, AI makes it smarter', def:true, cat:'app'},
   {id:'cost', n:'cost per cup', d:'price & bag size on a bean → what a cup costs you', def:true, cat:'app'},
   {id:'aibudget', n:'AI budget', d:'what the AI cost you this month, and one heads-up at 20% and 10%', def:true, cat:'smart'},
   {id:'sharecards', n:'share cards', d:'any brew as a hand-drawn image card to send to friends', def:true, cat:'app'},
@@ -513,15 +509,25 @@ function stemTest(){BrewStem.zeg('Over drie tellen bloom, naar 45 gram.');}
    en zet dat af tegen een plafond dat jij zelf kiest. De lijn loopt dus naar jouw
    plafond, niet naar je echte saldo -- dat laatste zou verzonnen zijn.        */
 const AI_BRONNEN=[['finder','ask the finder'],['bean','beans & labels'],
-  ['brew','brew tips & recipes'],['learn','learn: tell me more'],
+  ['brew','brew tips & recipes'],['surprise','surprise recipes'],['learn','learn: tell me more'],
   ['pour','pour photos'],['recap','weekly recap'],['other','other answers']];
-const AI_KORT={finder:'finder<br>questions',bean:'label<br>scans',brew:'brew<br>tips',
+const AI_KORT={finder:'finder<br>questions',bean:'label<br>scans',brew:'brew<br>tips',surprise:'surprise<br>recipes',
   learn:'learn<br>answers',pour:'pour<br>photos',recap:'recaps',other:'other<br>answers'};
-// hoe groot zo'n vraag ongeveer is, zolang je er zelf nog te weinig van gedaan
-// hebt om een gemiddelde te vertrouwen. In tekens, niet in geld -- wat het kost
-// hangt af van de aanbieder die je koos
-const AI_SCHAT={finder:[4000,700],bean:[1600,280],brew:[600,280],learn:[900,350],
-  pour:[1800,570],recap:[700,320],other:[900,350]};
+/* hoe groot zo'n vraag ongeveer is (tokens in, tokens uit), zolang je er zelf
+   nog te weinig van gedaan hebt om een gemiddelde te vertrouwen. Nagemeten op
+   de prompts in de app (nov 2026): een brew-vraag stuurt drie regelblokken
+   mee (~1000 tokens) plus de vraag; een foto is ~1600 tokens. De oude
+   schatting (600 in voor een brew-vraag) vergat die blokken. Bij finder,
+   brew, recap en surprise komt je eigen lokale context (bonen, recepten,
+   brews) er nog bij: die meet aiContextTok() op het moment zelf.         */
+const AI_SCHAT={finder:[4000,900],bean:[2200,450],brew:[1500,450],learn:[900,450],
+  pour:[2000,600],recap:[900,400],surprise:[1700,700],other:[1000,400]};
+const AI_MET_CONTEXT=['finder','brew','recap','surprise'];
+// ongeveer 3,2 tekens per token voor Nederlandse tekst en JSON
+function aiContextTok(){
+  try{return Math.round(JSON.stringify(BrewModel.context(state,ALLE_RECEPTEN(),{})).length/3.2)+60;}
+  catch(e){return 0;}
+}
 const AI_PLAFONDS=[2,5,10];
 
 const aiGeld=v=>'$'+(Math.round(v*100)/100).toFixed(2);
@@ -540,13 +546,17 @@ function aiBud(){
 }
 function aiBesteed(){const d=aiBud().dagen;let t=0;for(const k in d)t+=d[k];return t;}
 function aiOver(){const a=aiBud();return a.budget==null?null:Math.max(0,a.budget-aiBesteed());}
-// de prijs van zo'n vraag: eerst je eigen cijfers, en pas een schatting zolang
-// je er nog te weinig gedaan hebt om een gemiddelde te vertrouwen
+/* de prijs van zo'n vraag: eerst je eigen cijfers, en pas een schatting zolang
+   je er nog te weinig gedaan hebt om een gemiddelde te vertrouwen. Je eigen
+   cijfers staan in tokens, zodat ze na een modelwissel tegen de nieuwe prijs
+   gerekend worden. Oude tellingen (alleen dollars) tellen tot er tokens zijn. */
 function aiPerVraag(bron){
-  const b=aiBud().bron[aiProv()+':'+bron];
-  if(b&&b.n>=3&&b.d>0)return b.d/b.n;
-  const t=aiTarief(),g=AI_SCHAT[bron]||AI_SCHAT.other;
-  return g[0]*t.in+g[1]*t.uit;
+  const b=aiBud().bron[aiProv()+':'+bron],t=aiTarief();
+  if(b&&b.tn>=3&&b.ti>0)return (b.ti*t.in+b.tu*t.uit)/b.tn;
+  if(b&&b.n>=3&&b.d>0&&!b.tn)return b.d/b.n;
+  const g=AI_SCHAT[bron]||AI_SCHAT.other;
+  const inTok=g[0]+(AI_MET_CONTEXT.includes(bron)?aiContextTok():0);
+  return inTok*t.in+g[1]*(t.denkt?1.8:1)*t.uit;
 }
 function aiTel(usage,bron){
   if(!usage)return;
@@ -562,9 +572,13 @@ function aiTel(usage,bron){
   a.dagen[dag]=(a.dagen[dag]||0)+d;
   // per aanbieder apart bijhouden: een vraag aan de een kost iets heel anders
   // dan dezelfde vraag aan de ander
-  const k=aiProv()+':'+(AI_BRONNEN.some(x=>x[0]===bron)?bron:'other');
+  const naam=AI_BRONNEN.some(x=>x[0]===bron)?bron:'other';
+  const k=aiProv()+':'+naam;
   if(!a.bron[k])a.bron[k]={n:0,d:0};
-  a.bron[k].n++;a.bron[k].d+=d;
+  const r=a.bron[k];
+  r.n++;r.d+=d;
+  r.tn=(r.tn||0)+1;r.ti=(r.ti||0)+inTok;r.tu=(r.tu||0)+(usage.output_tokens||0);
+  a.laatste=naam;
   save();
   if(currentPage==='profile'){try{renderAiBudget();}catch(e){}}
 }
@@ -587,7 +601,7 @@ function aiMeldNa(){
 function aiPop(n){
   const el=document.getElementById('aibud-pop');if(!el)return;
   const a=aiBud(),over=aiOver(),deel=a.budget?over/a.budget:0;
-  const v=Math.max(0,Math.round(over/aiPerVraag('finder')));
+  const v=Math.max(0,Math.round(over/aiPerVraag(a.laatste||'finder')));
   const e=new Date();e.setDate(1);e.setMonth(e.getMonth()+1);
   const nieuw=e.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   el.innerHTML='<div class="aib-pop">'+
@@ -619,12 +633,15 @@ function renderAiProv(){
   if(!m)return;
   if(!getKey()){m.innerHTML='';return;}
   const t=aiTarief();
+  const herkomst=t.bron==='list'?'from the app’s price list ('+AI_PRIJZEN_PEIL+') for this model'
+    :t.bron==='own'?'your own numbers for this model'
+    :'the app doesn’t know this model — these are a guess, please fill in the real price';
   m.innerHTML='<div class="set-d" style="margin:13px 0 4px">which model answers</div>'+
     '<input class="ai-veld" id="ai-model" value="'+esc(aiModel())+'" placeholder="'+
       esc(a.model)+'" onchange="setAiModel(this.value)">'+
-    '<div class="set-d" style="margin:13px 0 4px">what that model costs per million tokens. '+
-      'the app counts your spending with these two numbers — check them at '+esc(a.waar)+
-      ' and correct them here.</div>'+
+    '<div class="set-d" style="margin:13px 0 4px">what that model costs per million tokens — '+
+      esc(herkomst)+'. The app counts your spending with these two numbers; check them at '+esc(a.waar)+
+      ' and correct them here.'+(t.denkt?' This model thinks before it answers; that thinking is billed as output and is counted.':'')+'</div>'+
     '<div class="aib-prijs">'+
       '<label>in <input class="ai-veld" id="ai-prijs-in" type="number" inputmode="decimal" '+
         'step="0.01" min="0" value="'+(t.in*1e6)+'" onchange="setAiPrijs()"></label>'+
@@ -646,8 +663,8 @@ function setAiPrijs(){
   if(!i||!u)return;
   const a=parseFloat(i.value),b=parseFloat(u.value);
   if(!(a>=0)||!(b>=0)){toast('those need to be numbers');return;}
-  localStorage.setItem('scc_ai_prijs_'+aiProv(),JSON.stringify({in:a,uit:b}));
-  renderAiBudget();toast('✓ rate saved');
+  localStorage.setItem(aiPrijsSleutel(aiProv(),aiModel()),JSON.stringify({in:a,uit:b}));
+  renderAiProv();renderAiBudget();toast('✓ rate saved for '+aiModel());
 }
 function setAiBudget(v){
   const a=aiBud();
@@ -746,9 +763,11 @@ function renderAiBudget(){
      '<div class="aib-chips">'+AI_PLAFONDS.map(v=>'<button class="lp'+(bud===v?' sel':'')+
        '" onclick="setAiBudget('+v+')">$'+v+'</button>').join('')+
      '<button class="lp'+(bud==null?' sel':'')+'" onclick="setAiBudget(null)">no ceiling</button></div>';
+  const naamA=aiAanbieder().naam;
   h+='<div class="set-d" style="margin-top:8px">Resets on the 1st. Counted on this device only, '+
-     'from what Anthropic sends back with each answer — your real credit at Anthropic '+
-     'can’t be read with an ordinary key.</div>';
+     'from the token counts '+esc(naamA)+' sends back with each answer, priced at the rate above — '+
+     'your real credit at '+esc(naamA)+' can’t be read with an ordinary key. '+
+     'The live voice coach and the ElevenLabs voice are billed separately and are not in this count.</div>';
   el.innerHTML=h;
 }
 

@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-20 (klus 4)
+Laatst bijgewerkt: 2026-11-24 (oude adres vervangen; PR #14 wacht op Jesse)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -284,3 +284,117 @@ Claude. Nog ideeën?"
 - Volgende klussen (volgorde Jesse): versheidsmeter met piekmelding, surprise me,
   delen als pagina/PDF, AI-budget realistischer; later ElevenLabs voor
   spraakcoach en AI-coach. Per klus een sessie. Niet mergen zonder akkoord.
+
+## Stand 21-11: kleine klussen (branch functie/kleine-klussen)
+- Opdracht Jesse: alle kleine klussen in één sessie: (1) versheidsmeter met
+  piekmelding (geen zak-teller, natuurlijke plek), (2) nu zetten-knop wordt
+  surprise me, (3) AI-budget realistischer. Niet: oude app weghalen, vraag
+  doorlooptijd/filterkompas/slim invullen.
+- Gebouwd (commit op functie/kleine-klussen, CACHE scc-v113):
+  - app/07-bonen.js: roastDays, freshPeak (leert uit eigen scores: cijfer min
+    gemiddelde van die boon, glad per dag, venster binnen 0,4 van de top;
+    ≥5 cijfers van de boon of ≥8 over ≥2 bonen, spreiding ≥6 dagen; anders
+    filter dag 4-21, espresso/onbekend dag 7-21), peakLineFor. beanFreshness
+    gebruikt nu het venster voor zijn label.
+  - Meter (app/11 freshGaugeHTML) tekent het venster en een zin eronder
+    (freshPeakText, niet op het brew-detail). Home: #peak-line, renderPeakLine
+    in app/03, vlag peakalert. Tik = naar bonen met die boon open.
+  - app/04-surprise.js (nieuw, in index.html en service-worker): surpriseOpen,
+    surMaak (zonder AI), surpriseAI (BrewModel.validateRecipe, bron 'surprise'),
+    surpriseZet bewaart als eigen recept en start via BrewWorkspace.startRecipe.
+    Brew-now-knop + brewNow + quickBrew-override in brew-workspace.js weg.
+    Vlag surprise (oude vlag brewnow doet niets meer). Senseo doet niet mee;
+    recepten met klep-stappen alleen op de Switch.
+  - AI-budget: zie werk/keuze-ai-budget-2026-11-21.md.
+  - Test: tests/kleine-klussen.spec.cjs. Lokaal 39 Playwright (chromium) + 20 node groen.
+- Volgende stap: keurrapport lezen, fouten laten herstellen, PR naar main
+  openen, Cloudflare-preview melden (of lokaal getest). Niet mergen zonder Jesse.
+- 21-11: ronde 1 afgekeurd, hersteld in c98c699, ronde 2 GOEDGEKEURD
+  (werk/archief/2026-11-21-kleine-klussen.md). CACHE scc-v114. PR naar main
+  geopend; wacht op Jesse. Na akkoord: mergen en handleiding bijwerken.
+- PR #14: https://github.com/JesseBoontje/Lets-brew-specialty/pull/14
+  Preview (live account): https://functie-kleine-klussen-lets-brew-specialty.jesseboontje-1aa.workers.dev
+- Valkuil: Cloudflare maakt PR-previews met `npx wrangler preview`; die eist een
+  "previews"-blok in wrangler.jsonc (toegevoegd, eigen rem-nummers 430284726/728).
+- Valkuil: twee oude koppelingen (7d5fa36f letsbrewspecialty, 237620b0
+  lets-brew-specialty) blijven rood. GitHub toont bij gelijke checknaam alleen de
+  laatste. Echte stand van het live account: Cloudflare API
+  /accounts/1aaa91af.../builds/workers/8040b219eaf14594aeb8d1e9841b7bdf/builds
+  (preview-trigger) en .../workers/f0e271eb8e4f4062bf24443941d7c835/builds (main).
+- GitHub-check `checks` is rood op PR #14 door 6 WebKit-tests (shotclock.spec 2,
+  stem.spec 4) die op main (10c3653) precies zo falen. Niet door deze PR;
+  eigen klus op het takenbord.
+
+## 24-11: oude app vervangen (besluit Jesse: "Oude app mag vervangen worden back up is gedaan")
+- Oude adres https://letsbrewspecialty.jesseboontje.workers.dev (account 7d5fa36f,
+  Worker letsbrewspecialty) toont nu een verhuispagina (map oud-adres/, eigen
+  wrangler.jsonc, uitrollen met `npx wrangler deploy` in die map; versie 846b2874).
+  - Leest de oude gegevens op dezelfde plek (IndexedDB scc_db/kv/scc_state, anders
+    localStorage scc_state) en biedt ze als lets-brew-specialty-backup.json aan;
+    nieuwe app importeert dat (getest). Er wordt niets gewist: terug te draaien
+    door de oude versie 68bcda9b weer uit te rollen in het dashboard.
+  - /service-worker.js ruimt de oude service worker en caches op.
+  - Bestanden als tekst in het script (assets-upload werkt niet via de proxy:
+    die gebruikt een eigen sleutel die de proxy overschrijft).
+- Git-triggers van account 7d5fa36f verwijderd (geen rode checks meer van
+  "letsbrewspecialty"). Account 237620b0: geen toegang, Jesse moet loskoppelen.
+- Nog onbekend: of Bart en Ralph hun data al hebben overgezet; de pagina laat
+  ze dat zelf doen.
+
+## 24-11: opdracht via hoofdsessie (Jesse): zuinig werken, antislop-ontwerp
+- Letterlijk (doorgegeven): "Beperk usage ... Stop bij 95% ... Maar wat uiterlijk en
+  startscherm betreft wordt het nu AI-slop. Houd tekenstijl met dubbele
+  onafhankelijke lijnen in stand overal rond alle kaders. Zoek antislop design
+  skills, voeg toe en maak op die manier de app af."
+- 95% kan Claude niet meten (verbruik niet zichtbaar). Zuinig: zelf doen, max één
+  aannemer, één keuring per klus, bon na elke klus pushen.
+- Skill .claude/skills/frontend-design toegevoegd (uit anthropics/skills) met
+  bovenaan: huisstijl Lets Brew gaat voor; elke rand twee eigen paden.
+- Opzet startscherm: docs/opzet-startscherm.html, artifact
+  https://claude.ai/artifact/8TzG92J7TX7k2xz6NuDnGv . Randen per kader met JS
+  uitgerekend (seed per kader, 4 zijden x 2 paden, overschot 5-10 px, kruisen
+  bij de hoeken). Valkuil: een algemene svg-regel (.x svg{width}) raakt ook de
+  rand-svg; gebruik svg:not(.r). Wacht op akkoord Jesse voor inbouwen.
+- 24-11 reactie Jesse (via hoofdsessie): "3 idee gaat goede kant op, behoud
+  kleurverschillen vanuit originele app, lijnen zijn goed maar maak de hoeken
+  rond. En iconen waren enkele versies terug nog veel mooier ... gemaakt met Canva."
+  Versie 2 op dezelfde link: de 'Canva-iconen' zijn Jesse's methodetekeningen
+  m-*.png (sinds juli ongewijzigd in de repo) + logo.png; methodetinten
+  (--v60/--aeropress/--espresso) als achtergrond; randen = per pass één open
+  contour rond een afgeronde rechthoek (radius uit CSS), twee passes met eigen
+  afwijking. Bouwen (docs-bestand verwijst naar ../m-*.png; bij bouwen van het
+  artifact worden die als data-URI ingevuld). Wacht op akkoord Jesse.
+- 24-11 Jesse over v2 (via hoofdsessie): "Dit is heel goed. Maak redesign van
+  app-icoon/logo in zelfde stijl en maak startscherm iets langer zichtbaar, maak
+  die ook met nieuwe logo. Tekening bij surprise me is anders dan pourcoach ...
+  Misschien bij surprise me nieuwe logo plaatsen, linksboven weghalen. Graag
+  eerst mockup." Versie 3 op dezelfde link:
+  - nieuw merk (kop op schotel, open lussen, twee halen per lijn, koffie-arcering
+    in accent-soft), als woordmerk, als tegel 512/192/iPhone/klein met ronde
+    dubbele rand in --card;
+  - splash: splash-1..3 blijven (0,75 s), splash-4 wordt het nieuwe logo dat zich
+    tekent (stroke-dashoffset 1,1 s) en 2 s blijft; samen 4,25 s; tik = overslaan;
+  - surprise me: GC_TEKENING uit app/04-gietcoach.js (statisch, straal en wat
+    koffie in de server), merk erbij; logo linksboven weg.
+  - docs/gietcoach-tekening.svg.html = de statische versie van de gietcoach-tekening.
+  Wacht op akkoord Jesse. Bij inbouwen: icon-192/512.png en apple-touch-icon uit
+  het merk maken (Playwright-screenshot van de tegel), manifest.json bijwerken.
+
+## 24-11 avond: startscherm ingebouwd (besluit Jesse via hoofdsessie)
+- Letterlijk: "Nieuwe logo is lelijk, ga terug naar oude logo en bouw app, zet live."
+  Nieuw logo vervalt; oude logo.png en app-iconen blijven.
+- Gebouwd (CACHE scc-v115):
+  - app/11-randen.js (nieuw, in index.html en SW): getekende dubbele randen met
+    ronde hoeken op .sketch, .ws-card, .ws-actions>button, .ws-filters>button,
+    .lp, home-methodes, .btn-reco, .peak-line; vlag drawnedges; hertekent alleen
+    als de maat verandert, hooguit 4x per seconde (MutationObserver).
+    Niet op <details> (dichtgeklapt toont alleen summary).
+  - Splash: splash-1..3 elk 0,75 s, daarna logo.png 2 s (4,25 s); tik = overslaan;
+    meteen door bij een link naar een ander scherm, quickbrew of brew-parameter,
+    en onder webdriver (tests) tenzij window.__splashTest. Daarvoor sprong de app
+    direct naar home zodra de data geladen was.
+  - Home: logo linksboven weg; surprise me = statische gietcoach-tekening (zonder
+    id's, anders vindt de gietcoach dubbele id's) + logo.png; methodeknoppen in
+    hun eigen tint; kop "start with"; brew-kaart als zin (brewZin).
+  - Tests: tests/startscherm.spec.cjs. Lokaal 42 Playwright (chromium) + 20 node groen.
+- Volgende stap: één keuring, dan (na akkoord) mergen PR #14, live controleren.
