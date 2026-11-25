@@ -485,3 +485,19 @@ Valkuilen deze sessie:
   Nakijk-artifact publiceren vanuit een kopie in de scratchpad.
 - Force-push wordt geweigerd: na een merge een nieuwe branch vanaf main maken.
 - Werk zuinig: max één aannemer, één keuring per klus, bon na elke klus pushen.
+
+## 25-11 middag: stand na nakijkronde, route en Brews-tab
+Branch functie/nakijk-en-route, laatste app-commit 8e1c999, CACHE scc-v118. 45/45 chromium groen.
+Gebouwd (Jesse akkoord): nakijkpunten 1-5 (beide lettertypes houden, geen system-ui meer,
+surprise-tekening weg, methoderij alleen zijwaarts, alles Engels); route boon -> dial-in/pour coach
+(keuzescherm #route-pop bij omni of meer eigen methodes, b.lastMethod, feature 'route'); vijf tabs
+Home·Beans·Brews·Learn·Settings; tab Brews met knoppen "my brews" (=page-brews) en "brew ideas"
+(=page-recipes), keuze in localStorage scc_brews_kant.
+Jesse 25-11 letterlijk: "Bouw eerst de kleine klussen zet die live laat mij structuur controleren
+daarna grote klussen." -> na keuring mergen naar main (PR), Jesse controleert, dan pas grote klussen.
+Grote klussen later: inlog + D1 + AI-coach centraal (AI met database van alle brews/beans/gear en
+koffietheorie via websearch in de Worker); login-mail letsbrew@djez.app (EEN z; Email Routing zet
+Jesse zelf aan, token mag dat niet); delen als pagina/PDF.
+Schetsen: route https://claude.ai/artifact/VcgJSLkRAiirkc3AiNSatN , Brews-tab
+https://claude.ai/artifact/CgkKmjkyDxmo15kUK8xwy8 , nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7
+Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe branch, deze archiveren.
