@@ -14,7 +14,7 @@ test('pagina: alleen gewone webadressen, nooit eigen netwerk',async()=>{
  assert.equal(n,0);
 });
 test('pagina: haalt de tekst eruit zonder scripts',async()=>{
- const html='<html><head><title>Finca Los Angeles</title><meta property="og:description" content="Natural Pacamara"><script>steel()</script></head><!-- /* Compiled CSS */ .x{color:red} --><body><h1>El Salvador</h1><p>Melon, green grapes &amp; cane sugar</p></body></html>';
+ const html='<html><head><title>Finca Los Angeles</title><meta property="og:description" content="Natural Pacamara"><script>steel()</script></head><!-- kapot commentaar <style> -- End of the comment --> /* Compiled CSS */ @font-face { font-family: Work Sans; } </style><body><h1>El Salvador</h1><p>Melon, green grapes &amp; cane sugar</p></body></html>';
  const r=await met(async()=>new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}),()=>paginaRoute(vraag('https://singleestatecoffee.nl/el-salvador')));
  assert.equal(r.status,200);
  const d=await r.json();
