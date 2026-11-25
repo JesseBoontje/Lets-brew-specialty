@@ -6,7 +6,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
 | Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | LIVE 24-11 via #14 | Jesse op iPhone testen |
-| Delen als pagina/PDF (brews en bonen) | nog niemand | nog geen | wacht | volgende klus (volgorde Jesse) |
+| Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | opzet klaar, wacht op Jesse | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; na akkoord bouwen in app/06, één keuring |
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |
 | Vraag doorlooptijd/filterkompas/slim invullen ("update voor nieuwe app versie") | nog niemand | geen | wacht op Jesse | betekenis navragen |
 | Oude Cloudflare-koppeling 237620b0 (lege Worker lets-brew-specialty) loskoppelen | Jesse | geen | wacht op Jesse | Claude heeft geen toegang tot dat account; in dashboard Settings > Builds > Disconnect (7d5fa36f is al weg) |

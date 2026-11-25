@@ -408,3 +408,11 @@ Claude. Nog ideeën?"
 - Zelf testen door Jesse: iPhone Safari (splash-tik, randen, beginschermicoon).
 - Deze bon staat op branch werk/na-live-2026-11-24 (vanaf main); meenemen in de
   volgende PR.
+
+## 25-11 02:10 UTC: wekker, volgende klus "delen als pagina/PDF"
+- Opzet docs/opzet-delen.html, artifact https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i
+  Menu op brew en boon: "send as a page" (los HTML-bestand met tekening, via
+  navigator.share als bestand), "save as PDF" (bestaand printBrew/runPrint, nu ook
+  voor bonen), "send to a Lets Brew user" (bestaand .lbsbrew/.lbsbeans).
+  Bestaande code: app/06 shareOneBrew, shareOneBean, brewSheetHTML, runPrint.
+- Wacht op akkoord Jesse; daarna bouwen (zelf, geen aannemer), één keuring.
