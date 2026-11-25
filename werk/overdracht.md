@@ -509,3 +509,5 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
 - Preview: handmatige build via trigger abb758cd (POST .../triggers/<id>/builds met branch). PATCH van
   branch_includes gaf 'Invalid request body': een nieuwe push maakt dus NIET vanzelf een preview, opnieuw handmatig starten.
 - Wacht op Jesse: live of aanpassen. Daarna klus beeldkeuring (functie/beeldkeuring), zie takenbord.
+- Jesse 25-11: "Kan je ook de v60 tekening in de giet coach zetten" -> V60-modus toont m-v60.png (masker, fill var(--ink)).
+  Maten per zetter in GEO (zetGeo): v60 x=173+(px-370)*0.233, y=138+(py-125)*0.233. Switch ongewijzigd. Preview opnieuw handmatig gebouwd.
