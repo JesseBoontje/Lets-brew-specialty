@@ -436,3 +436,5 @@ Claude. Nog ideeën?"
      beneden". Oorzaak: padding-top/-bottom op #methods-scroll (overflow-x:auto maakt
      overflow-y ook auto). Oplossing: overflow-y:hidden + touch-action:pan-x
      (verticaal scrollen van de pagina moet blijven werken: pan-x pan-y? test).
+  4. Methodeknoppen op home: namen in systeemletter (button zonder font:inherit).
+     Oplossing: .method{font:inherit} (en nalopen: andere knoppen zonder font).
