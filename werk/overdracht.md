@@ -416,3 +416,13 @@ Claude. Nog ideeën?"
   voor bonen), "send to a Lets Brew user" (bestaand .lbsbrew/.lbsbeans).
   Bestaande code: app/06 shareOneBrew, shareOneBean, brewSheetHTML, runPrint.
 - Wacht op akkoord Jesse; daarna bouwen (zelf, geen aannemer), één keuring.
+
+## 25-11: Jesse "1 bouw later" (delen als pagina/PDF: akkoord, later bouwen) en
+   "Kan je me een pagina geven waar ik weer aanpassingen aan kan noteren"
+- Nakijkversie opnieuw gebouwd en gepubliceerd op een NIEUWE link:
+  https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7 (de oude bestond niet meer).
+- Bouwer gerepareerd: build-preview.py plakt nu styles.css en alle lokale scripts
+  (app/01..12, brew-*.js) in de pagina en haalt de CSP-meta en manifest weg;
+  build-review.py zet SPLASH_MS op 300. Zonder dit was de nakijkversie sinds de
+  opsplitsing kapot.
+- Wacht op: Jesse's geplakte "Opdracht voor Lets Brew" (deel B van de skill).

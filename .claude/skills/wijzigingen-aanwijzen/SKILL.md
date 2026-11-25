@@ -22,9 +22,9 @@ Twee taken, en je kiest er precies één per keer:
 |---|---|
 | bouwer | `.claude/skills/wijzigingen-aanwijzen/build-review.py` |
 | de laag | `.claude/skills/wijzigingen-aanwijzen/annotate.html` |
-| artifact-URL | `https://claude.ai/code/artifact/dae0ee9a-ee5d-4514-90b3-c945a5612446` |
-| favicon | `✏️` (nooit veranderen — de gebruiker vindt zijn tab aan het icoon) |
-| werkbranch | `claude/app-customization-x6qg4o` |
+| artifact-URL | `https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7` (nieuw sinds 25-11; de oude link bestaat niet meer na de verhuizing) |
+| icoon | `pencil` (nooit veranderen — de gebruiker vindt zijn tab aan het icoon) |
+| werkbranch | de branch van de huidige klus (zie werk/takenbord.md) |
 | taal | Nederlands, ook de code-commentaren |
 
 ---
@@ -41,8 +41,9 @@ Twee taken, en je kiest er precies één per keer:
    *Lets Brew — nakijken*, kort de splash in tot 0,3 s en plakt de aanwijs-laag
    erachter. Resultaat: `/tmp/lets-brew-review.html`.
 
-2. Publiceer dat bestand met de `Artifact`-tool op de **bestaande** URL
-   hierboven, met `favicon` = `✏️`.
+2. Kopieer het naar de scratchpad en publiceer het met de `Artifact`-tool op de
+   **bestaande** URL hierboven (zelfde bestandspad in de sessie, of `url` vanuit
+   een andere sessie). Icoon `pencil` alleen bij een allereerste publicatie.
 
 3. Bouw altijd opnieuw vóór publiceren, ook als de URL al bestaat. Anders kijkt
    de gebruiker naar een oude versie van de app.

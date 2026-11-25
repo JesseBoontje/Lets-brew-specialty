@@ -6,7 +6,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
 | Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | LIVE 24-11 via #14 | Jesse op iPhone testen |
-| Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | opzet klaar, wacht op Jesse | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; na akkoord bouwen in app/06, één keuring |
+| Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | akkoord Jesse 25-11 ("bouw later") | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; bouwen in app/06 als Jesse zegt, één keuring |
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |
 | Vraag doorlooptijd/filterkompas/slim invullen ("update voor nieuwe app versie") | nog niemand | geen | wacht op Jesse | betekenis navragen |
 | Oude Cloudflare-koppeling 237620b0 (lege Worker lets-brew-specialty) loskoppelen | Jesse | geen | wacht op Jesse | Claude heeft geen toegang tot dat account; in dashboard Settings > Builds > Disconnect (7d5fa36f is al weg) |
@@ -18,3 +18,4 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Handleiding bijwerken voor klus 2-5 en de kleine klussen | architect | geen | na akkoord | skill lets-brew-handleiding |
 | Cloudflare Web Analytics-script wordt door de CSP geweigerd (bestond al) | Jesse | geen | wacht | in dashboard Web Analytics uitzetten, of script-src uitbreiden (static.cloudflareinsights.com) |
 | Randen: hertekenen bij alleen tekstwijziging (ResizeObserver) | nog niemand | geen | later | klein |
+| Nakijkronde (aanwijzen) | Jesse | geen | wacht op Jesse | nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7 ; geplakte opdracht afwerken (skill wijzigingen-aanwijzen deel B) |
