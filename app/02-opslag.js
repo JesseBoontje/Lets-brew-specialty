@@ -123,7 +123,7 @@ function save(){
   if(storageBlocked){toast('Stored data need checking. Export a backup before changing anything.');return Promise.resolve(false);}
   const snapshot=structuredClone(state);pendingSaves++;
   const task=saveQueue.catch(()=>{}).then(()=>idbSet(IDB_KEY,snapshot)).then(()=>{lastSaveError=null;document.getElementById('ws-save-error')?.remove();return true;}).catch(()=>{
-    lastSaveError=true;let el=document.getElementById('ws-save-error');if(!el){el=document.createElement('div');el.id='ws-save-error';el.setAttribute('role','alert');el.style.cssText='position:fixed;z-index:9999;top:0;left:0;right:0;background:#fff3d6;color:#6d321d;padding:12px;font:14px system-ui,sans-serif';document.body.append(el);}el.textContent='Opslaan is mislukt. Houd deze app open en maak een back-up via Instellingen → Gegevens en delen.';return false;
+    lastSaveError=true;let el=document.getElementById('ws-save-error');if(!el){el=document.createElement('div');el.id='ws-save-error';el.setAttribute('role','alert');el.style.cssText='position:fixed;z-index:9999;top:0;left:0;right:0;background:#fff3d6;color:#6d321d;padding:12px;font-size:14px';document.body.append(el);}el.textContent='Saving failed. Keep this app open and make a backup via Settings → Data and sharing.';return false;
   }).finally(()=>pendingSaves--);saveQueue=task;return task;
 }
 window.addEventListener('beforeunload',e=>{if(pendingSaves||lastSaveError){e.preventDefault();e.returnValue='';}});

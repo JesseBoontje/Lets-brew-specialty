@@ -48,12 +48,17 @@ test('drawn edges: two separate passes per frame, off switch removes them',async
   return{n:d.length,verschillend:d[0]!==d[1],open:!/Z/i.test(d.join('')),methodes,
    logoBoven:!!document.querySelector('#page-home .home-logo'),
    tekening:!!kaart.querySelector('.sur-gc .lijn'),logo:kaart.querySelector('.sur-logo').getAttribute('src'),
-   dubbeleIds:[...document.querySelectorAll('[id]')].map(e=>e.id).filter((v,i,a)=>a.indexOf(v)!==i)};
+   dubbeleIds:[...document.querySelectorAll('[id]')].map(e=>e.id).filter((v,i,a)=>a.indexOf(v)!==i),
+   rijY:getComputedStyle(document.getElementById('methods-scroll')).overflowY,
+   knopLetter:getComputedStyle(document.querySelector('#methods-scroll .method')).fontFamily,
+   systeem:[...document.querySelectorAll('button,input,select,textarea')].filter(e=>/system-ui|-apple-system|Arial|Helvetica/i.test(getComputedStyle(e).fontFamily)).length};
  });
  expect(r.n).toBe(2);expect(r.verschillend).toBe(true);expect(r.open).toBe(true);
  expect(r.methodes.length).toBeGreaterThan(0);
  expect(r.methodes.every(m=>m.rand&&/var\(--/.test(m.bg))).toBe(true);   // elke methode in zijn eigen kleur
- expect(r.logoBoven).toBe(false);expect(r.tekening).toBe(true);expect(r.logo).toBe('logo.png');
+ expect(r.logoBoven).toBe(false);expect(r.tekening).toBe(false);   // nakijkronde 25-11: tekening weg, logo blijft
+ expect(r.rijY).toBe('hidden');expect(r.knopLetter).toMatch(/Patrick Hand|Caveat/);expect(r.systeem).toBe(0);
+ expect(r.logo).toBe('logo.png');
  expect(r.dubbeleIds).toEqual([]);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.evaluate(()=>toggleFeature('drawnedges'));
