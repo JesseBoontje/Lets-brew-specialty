@@ -65,15 +65,29 @@ export async function stemRoute(request,env={}){
 }
 /* Pagina van een brander ophalen, zodat de AI echt leest wat er op de zak staat in plaats van te gokken.
    Alleen GET, alleen https/http naar een gewone domeinnaam, max 1,5 MB, 8 s; terug gaat platte tekst. */
-export async function paginaRoute(request){
- if(request.method!=='GET')return json({error:'Alleen GET.'},405);
- const doel=new URL(request.url).searchParams.get('url')||'';let u;
- try{u=new URL(doel);}catch{return json({error:'Geen geldige link.'},400);}
- if(!/^https?:$/.test(u.protocol)||u.username||u.password||(u.port&&!['80','443'].includes(u.port)))return json({error:'Deze link kan niet.'},400);
+const pagOk=raw=>{let u;try{u=new URL(raw);}catch{return null;}
+ if(!/^https?:$/.test(u.protocol)||u.username||u.password||(u.port&&!['80','443'].includes(u.port)))return null;
  const h=u.hostname.toLowerCase();
- if(!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(h)||/(^|\.)(localhost|local|internal|lan)$/.test(h))return json({error:'Deze link kan niet.'},400);
+ if(!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(h)||/(^|\.)(localhost|local|internal|lan)$/.test(h))return null;
+ return u;};
+export async function paginaRoute(request,env={}){
+ if(request.method!=='GET')return json({error:'Alleen GET.'},405);
+ // alleen vanuit de app zelf, en niet eindeloos: anders is dit een open proxy op ons domein
+ if(request.headers.get('Sec-Fetch-Site')!=='same-origin')return json({error:'Deze aanvraag hoort niet bij de app.'},403);
+ if(env.STEM_LIMITER){const l=await env.STEM_LIMITER.limit({key:'pagina:'+(request.headers.get('CF-Connecting-IP')||'unknown')});if(!l.success)return json({error:'Even wachten.'},429);}
+ let u=pagOk(new URL(request.url).searchParams.get('url')||'');
+ if(!u)return json({error:'Deze link kan niet.'},400);
  try{
-  const r=await fetch(u.toString(),{redirect:'follow',signal:AbortSignal.timeout(8000),headers:{'User-Agent':'Mozilla/5.0 (compatible; LetsBrew/1.0)','Accept':'text/html'}});
+  // doorverwijzingen zelf volgen en elk nieuw adres opnieuw keuren, max 3 stappen
+  let r;
+  for(let stap=0;;stap++){
+   r=await fetch(u.toString(),{redirect:'manual',signal:AbortSignal.timeout(8000),headers:{'User-Agent':'Mozilla/5.0 (compatible; LetsBrew/1.0)','Accept':'text/html'}});
+   if(r.status<300||r.status>=400)break;
+   if(stap>=3)return json({error:'Te veel doorverwijzingen.'},502);
+   const volgende=pagOk(new URL(r.headers.get('Location')||'',u).toString());
+   if(!volgende)return json({error:'Deze link kan niet.'},400);
+   u=volgende;
+  }
   if(!r.ok)return json({error:'De pagina gaf een fout ('+r.status+').'},502);
   if(!/text\/html|application\/xhtml/i.test(r.headers.get('Content-Type')||''))return json({error:'Dat is geen webpagina.'},415);
   const reader=r.body.getReader();const dec=new TextDecoder();let html='',size=0;
@@ -91,7 +105,7 @@ export default{async fetch(request,env){
  const path=new URL(request.url).pathname;
  if(path==='/api/realtime/session')return realtimeSession(request,env);
  if(path.startsWith('/api/stem/'))return stemRoute(request,env);
- if(path==='/api/pagina')return paginaRoute(request);
+ if(path==='/api/pagina')return paginaRoute(request,env);
  if(path.startsWith('/api/'))return json({error:'Niet gevonden.'},404);
  const response=await env.ASSETS.fetch(request),headers=new Headers(response.headers);
  headers.set('X-Content-Type-Options','nosniff');headers.set('X-Frame-Options','DENY');headers.set('Referrer-Policy','strict-origin-when-cross-origin');

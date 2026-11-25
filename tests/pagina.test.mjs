@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {paginaRoute} from '../site-worker.mjs';
 const o='https://letsbrew.djez.app';
-const vraag=(u,method='GET')=>new Request(o+'/api/pagina?url='+encodeURIComponent(u),{method});
+const vraag=(u,method='GET',site='same-origin')=>new Request(o+'/api/pagina?url='+encodeURIComponent(u),{method,headers:{'Sec-Fetch-Site':site}});
 const met=async(nep,fn)=>{const x=globalThis.fetch;globalThis.fetch=nep;try{return await fn();}finally{globalThis.fetch=x;}};
 test('pagina: alleen gewone webadressen, nooit eigen netwerk',async()=>{
  let n=0;
@@ -20,4 +20,16 @@ test('pagina: haalt de tekst eruit zonder scripts',async()=>{
  const d=await r.json();
  assert.equal(d.titel,'Finca Los Angeles');assert.equal(d.beschrijving,'Natural Pacamara');
  assert.match(d.tekst,/El Salvador/);assert.match(d.tekst,/green grapes & cane sugar/);assert.doesNotMatch(d.tekst,/steel/);
+});
+test('pagina: alleen vanuit de app, en een doorverwijzing naar binnen wordt geweigerd',async()=>{
+ let n=0;
+ await met(async()=>{n++;return new Response('x');},async()=>{
+  assert.equal((await paginaRoute(vraag('https://roaster.nl/','GET','cross-site'))).status,403);
+ });
+ assert.equal(n,0);
+ const r=await met(async()=>new Response(null,{status:302,headers:{Location:'http://127.0.0.1/admin'}}),()=>paginaRoute(vraag('https://roaster.nl/x')));
+ assert.equal(r.status,400);
+ let teller=0;
+ const r2=await met(async()=>{teller++;return new Response(null,{status:301,headers:{Location:'https://roaster.nl/'+teller}});},()=>paginaRoute(vraag('https://roaster.nl/0')));
+ assert.equal(r2.status,502);assert.equal(teller,4);
 });
