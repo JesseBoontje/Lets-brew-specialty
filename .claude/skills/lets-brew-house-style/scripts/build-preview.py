@@ -75,7 +75,9 @@ def main():
 
     # 2. swap the external font link for embedded faces
     src = re.sub(r"<link[^>]*fonts\.(googleapis|gstatic)\.com[^>]*>\s*", "", src)
-    src = src.replace("<style>", "<style>\n" + build_font_css() + "\n", 1)
+    # de lettertypes komen in een eigen <style> vooraan: index.html heeft zelf
+    # geen <style> meer sinds de opmaak in styles.css staat
+    src = "<style>\n" + build_font_css() + "\n</style>\n" + src
 
     # 2b. de app is opgesplitst in styles.css en losse scripts (app/01..12,
     #     brew-*.js): die moeten erin, want een artifact laadt geen eigen
