@@ -300,7 +300,7 @@ async function beanUitLink(){
   try{
     // eerst de pagina zelf ophalen via de eigen server; lukt dat niet, dan werkt de AI met de link alleen
     let pagina=null;
-    try{const r=await fetch('/api/pagina?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(12000)});if(r.ok){const p=await r.json();if(p&&p.tekst)pagina=p;}}catch(_){}
+    try{const r=await fetch('/api/pagina?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(12000)});if(r.ok){const p=await r.json();if(p&&(p.tekst||p.beschrijving))pagina=p;}}catch(_){}
     const landen=BP_LANDEN.filter(l=>BP_INFO[l.id]).map(l=>l.naam).join(', ');
     const alIn=['name','roaster','origin','process','variety','altitude']
       .map(k=>k+': '+(get('b-'+k)||'?')).join('; ');
@@ -313,8 +313,10 @@ async function beanUitLink(){
       'notes = twee zinnen over wat deze boon of deze streek bijzonder maakt.\n'+
       'land = het herkomstland; kies het uit deze lijst als het erbij staat: '+landen+'. '+
       'streek = de streek binnen dat land.\n'+
-      (pagina?'TEKST VAN DE PAGINA (dit is de bron; neem over wat er staat, verzin niets wat ermee in strijd is):\n'+
-        'Titel: '+pagina.titel+'\nOmschrijving: '+pagina.beschrijving+'\n'+pagina.tekst+'\n':LINK_RULES);
+      // genoeg tekst: dat is de bron. Weinig tekst (pagina bouwt zich met scripts op): titel en omschrijving als hint, verder de link-regels
+      (pagina&&pagina.tekst.length>300?'TEKST VAN DE PAGINA (dit is de bron; neem over wat er staat, verzin niets wat ermee in strijd is):\n'+
+        'Titel: '+pagina.titel+'\nOmschrijving: '+pagina.beschrijving+'\n'+pagina.tekst+'\n'
+       :(pagina?'Van de pagina kwam alleen: titel "'+pagina.titel+'", omschrijving "'+pagina.beschrijving+'".\n':'')+LINK_RULES);
     const d=extractJSON(await askAI([{role:"user",content:prompt}],900,'bean'));
     ['name','roaster','origin','process','variety','altitude'].forEach(k=>zetLeeg('b-'+k,d[k]));
     zetLeeg('b-roasternotes',d.roasternotes); zetLeeg('b-notes',d.notes);
@@ -335,7 +337,7 @@ async function beanUitLink(){
         plek=' · '+bpRegioTekst(beanFormRegions[0])+' on the map';
       }
     }
-    if(status)status.textContent='✓ filled in from '+(pagina?'the page':'the link (page not readable, so partly a guess)')+plek+' — check it';
+    if(status)status.textContent='✓ filled in from '+(pagina&&pagina.tekst.length>300?'the page':'the link (page gave little text, so partly a guess)')+plek+' — check it';
     const er=document.getElementById('enrich-row'); if(er)er.style.display='block';
   }catch(e){
     beanLinkBezig='';
