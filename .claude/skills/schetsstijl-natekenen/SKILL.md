@@ -59,71 +59,58 @@ gehaald.
   Specialty" in het logo), in dezelfde inktkleur. Letters niet natrekken, dat
   wordt rommelig; zet de tekst als tekst of als omgezette letterpaden.
 
-## Welke route
+## Werkwijze: eerst strak, dan overtrekken
 
-Kies er één. Twijfel je, begin dan met route B en werk hem af zoals bij A.
+Jesse keurde een automatisch overgetrokken foto af ("niet goed genoeg"): de tuit
+viel weg en het glimmen van staal gaf losse streepjes. Wat wel werkte: het
+voorwerp eerst **strak en juist** tekenen als schone SVG, en daarna door het
+script laten overtrekken met de hand-afwijkingen. Dus altijd zo:
 
-| Wat Jesse aanlevert | Route |
-|---|---|
-| Een icoon, logo, simpel voorwerp, of "teken een ..." zonder foto | A: met de hand als SVG |
-| Een foto of tekening van een apparaat of product | B: script als onderlegger, daarna met de hand af |
-| Hij wil veel varianten of een fotorealistische basis | C: beeldgenerator, alleen na zijn akkoord |
+1. **Kijk goed.** Bekijk de foto of het voorbeeld met de Read-tool. Schat de
+   verhoudingen in pixels van de foto: waar begint de tuit, hoe hoog zit het
+   handvat, hoe breed is de bodem tegenover de rand. Tekenen zonder te kijken
+   wordt clipart.
+2. **Teken schoon.** Schrijf een SVG met de viewBox om het voorwerp heen. Elke
+   rand een eigen pad, met absolute `M L Q C`, geen `Z`, geen vulling, geen
+   `<circle>` of `<rect>`. Neem op:
+   - de buitencontour in losse randen (een rechthoek is vier paden);
+   - dikte van dunne delen als twee lijnen (een tuit, een beugel, een buis);
+   - een rand bovenaan als twee halve ellipsen plus een binnenrand;
+   - één of twee rondingslijnen op een ronde romp, zoals de ribbels van de V60.
+     Geen glans of reflecties;
+   - kenmerkende details: wijzerplaten, knoppen, een klinkplaatje, een logo-ovaal;
+   - donker materiaal als gesloten pad met `class="arceer"`.
+   Reken op 12 tot 20 paden voor een eenvoudig voorwerp en 40 tot 60 voor een
+   machine.
+   Voorbeeld van een goedgekeurde schone SVG: `voorbeelden/schenkkan-schoon.svg`.
+3. **Overtrek.**
+   ```sh
+   python3 scripts/overtrek.py schoon.svg uit.png --svg uit-schets.svg --halen 5 --los 2.1
+   ```
+   Elk pad wordt vijf keer overgetrokken met eigen afwijking, doorlopende hoeken
+   en wisselende dikte. Arceerpaden worden losse schuine streepjes.
+   `--zaad` met een ander getal geeft een andere hand.
+4. **Vergelijk** met een voorbeeld (zie Keuren) en doe hooguit één ronde
+   bijstellen: vorm fout, dan de schone SVG aanpassen; te strak, dan `--los` hoger.
 
-### Route A: met de hand als SVG
+Getest op Jesse's foto van zijn schenkkan: zo kwam de tuit, het handvat en de
+open rand er goed uit, in dezelfde lijn als zijn V60-tekening.
 
-Werkt voor iconen van 24 px tot tekeningen van 800 px. Regels per formaat:
+**Kleine iconen (24 of 32 units)** teken je direct met de hand met één haal per
+rand, zonder het script: op dat formaat lopen meerdere halen in elkaar over.
+Overschot 0,5 tot 1 unit op de hoeken, open lussen in plaats van cirkels.
 
-- **Groot (tekening, 240 tot 1000 units):** schrijf elke contour twee keer zelf
-  uit, met eigen controlepunten per haal. Nooit kopiëren met `<use>` en een
-  verschuiving: dan krijg je twee precies evenwijdige lijnen, en dat leest als
-  een fotokopie in plaats van een pen. Dat is eerder afgekeurd.
-  ```html
-  <path d="M67.5 19.5 Q120 10.8 172 17.5 Q168.5 26 166 35"/>
-  <path class="b" d="M70 17.4 Q118.5 13.2 169.5 19.4 Q167 27 164.8 33.6"/>
-  ```
-  ```css
-  svg{fill:none;stroke:#3a302a;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  .b{opacity:.62;stroke-width:1.35}
-  ```
-  Reken op ongeveer 50 tot 60 paden voor een machine; met 11 paden wordt het
-  clipart.
-- **Klein (icoon 24 of 32 units):** dezelfde regels, maar met één haal, want twee
-  lijnen op 2 units afstand lopen op 20 px in elkaar over. Overschot 0,5 tot 1
-  unit op de hoeken. Ook hier geen `<circle>`, `<rect>` of `Z`: een cirkel is een
-  open lus die voorbij zijn begin loopt.
-- **Losser is beter:** Jesse heeft twee keer gevraagd het losser te maken en nooit
-  strakker. Ga bij twijfel voor meer overschot en meer verschil tussen de halen.
+**Losser is beter.** Jesse heeft twee keer gevraagd het losser te maken en nooit
+strakker. Overtrek nooit met `<use>` en een verschuiving: twee precies evenwijdige
+lijnen lezen als een fotokopie. Dat is eerder afgekeurd.
 
-### Route B: script als onderlegger
+### Hulpmiddel: schets.py voor een eerste indruk
 
-`scripts/schets.py` zoekt de randen in een foto en trekt elke rand drie of vier
-keer over met eigen afwijkingen, doorlopende hoeken en arcering op donkere delen.
-Uit komt een transparante PNG in `#3a302a` en desgewenst een SVG.
+`scripts/schets.py foto.jpg uit.png` spoort zelf randen op in een foto. Gebruik
+het alleen om snel te zien waar de hoofdlijnen liggen of voor een rommelige
+achtergrondschets. Als eindresultaat is het niet goed genoeg (afgekeurd).
 
-```sh
-python3 scripts/schets.py foto.jpg uit.png --svg uit.svg
-python3 scripts/schets.py logo.png uit.png --modus lijn --arcering 0
-```
-
-Instellingen die ertoe doen:
-- `--modus foto` voor foto's (standaard), `--modus lijn` voor bestaande lijntekeningen.
-- `--detail 0.6` als een foto vol reflecties of achtergrond staat; `1.2` als er
-  te weinig lijnen komen.
-- `--arcering 0` als er geen donker materiaal in zit, anders laten staan.
-- `--zaad 3` (ander getal) geeft een andere hand in dezelfde stijl.
-
-Het script is een **onderlegger, geen eindresultaat**. Getest op Jesse's foto
-van zijn schenkkan en van de V60 op de glazen server: de vorm staat goed en het
-voelt als potlood, maar dunne delen (een tuit) vallen soms weg en glas en staal
-geven losse lijnen van reflecties. Werk het daarom af:
-1. Open de SVG en haal losse reflectielijnen en ruis weg (paden korter dan een
-   paar procent van de tekening, en lijnen midden in een vlak glas of staal).
-2. Teken ontbrekende contouren erbij volgens route A, met twee eigen halen.
-3. Zet merklogo's en tekst er netjes in (zie Tekst).
-4. Zet de SVG om naar PNG op het gewenste formaat (met Playwright of `rsvg-convert`
-   als die er is), transparant.
-
-### Route C: beeldgenerator (Canva of ElevenLabs)
+### Ander hulpmiddel: beeldgenerator (Canva of ElevenLabs)
 
 Alleen als Jesse dat wil: het kost tegoed per afbeelding. Vraag het eerst en
 genereer nooit dubbel. Gebruik deze opdrachttekst en vul het voorwerp in:
@@ -135,8 +122,8 @@ genereer nooit dubbel. Gebruik deze opdrachttekst en vul het voorwerp in:
 > fine parallel hatching. Simplified but recognisable details. Isolated object,
 > no text, no background, no shadow.
 
-Een gegenereerd beeld haal je daarna altijd door route B (`--modus lijn`) zodat de
-lijnen dezelfde kleur en dikte krijgen als de rest.
+Een gegenereerd beeld gebruik je als voorbeeld om de schone SVG naar te tekenen
+(stap 1 en 2), zodat lijnkleur en dikte gelijk worden aan de rest.
 
 ## Keuren voor je oplevert
 
@@ -154,8 +141,8 @@ opnieuw. Eén verbeterronde, daarna laten zien.
 
 ## Opleveren
 
-- Transparante PNG, langste zijde 1000 px, plus de SVG als je die met de hand
-  maakte. Bestandsnaam zoals in de app: `m-<methode>.png` voor zetmethodes.
+- Transparante PNG, langste zijde 1000 px, plus de schone SVG en de geschetste
+  SVG, zodat een latere aanpassing bij de schone versie kan beginnen. Bestandsnaam zoals in de app: `m-<methode>.png` voor zetmethodes.
 - Voor een app-icoon: dezelfde tekening gecentreerd op het papier `#efe9dd` met
   ruimte eromheen, op 512 en 192 px. Een app-icoon heeft geen transparantie.
 - Laat Jesse het resultaat zien als plaatje naast het origineel. Niet de code.
