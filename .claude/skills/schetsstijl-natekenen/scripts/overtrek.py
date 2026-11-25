@@ -11,6 +11,7 @@ juistheid van jou en het handwerk van het script.
                         [--los 1.0] [--breedte 1000] [--zaad 7]
 
     --los      hoeveel de halen uit elkaar lopen (1.8 standaard, 2.5 losser)
+    --kriskras 0 = halen liggen netjes over elkaar; 1 standaard; 2 zoals Jesse's V60
 
 Een pad met class="arceer" wordt niet overgetrokken maar gevuld met losse,
 schuine streepjes (voor bakeliet, koffie, donkere openingen). Zo'n pad moet een
@@ -88,6 +89,21 @@ def bemonster(d, stap=2.0):
     return [np.array(s, float) for s in stukken]
 
 
+def kriskras(p, rnd, sterkte, schaal):
+    """Een haal die net scheef ligt en soms halverwege ophoudt, zoals bij Jesse."""
+    m = p.mean(axis=0)
+    hoek = math.radians(rnd.uniform(-1.6, 1.6) * sterkte)
+    c, s_ = math.cos(hoek), math.sin(hoek)
+    q = (p - m) @ np.array([[c, -s_], [s_, c]]).T + m
+    q = q + np.array([rnd.uniform(-2, 2), rnd.uniform(-2, 2)]) * schaal * sterkte
+    n = len(q)
+    if n > 10 and rnd.random() < 0.3 * sterkte:
+        a = rnd.randint(0, n // 3)
+        b = rnd.randint(2 * n // 3, n)
+        q = q[a:b]
+    return q
+
+
 def arceer_vorm(poly, w, h, rnd, schaal):
     masker = Image.new("L", (w, h), 0)
     ImageDraw.Draw(masker).polygon([tuple(p) for p in poly], fill=255)
@@ -105,6 +121,7 @@ def main():
     ap.add_argument("--breedte", type=int, default=1000)
     ap.add_argument("--kleur", default="3a302a")
     ap.add_argument("--zaad", type=int, default=7)
+    ap.add_argument("--kriskras", type=float, default=1.0)
     a = ap.parse_args()
 
     rnd = random.Random(a.zaad)
@@ -124,7 +141,10 @@ def main():
             for i in range(a.halen):
                 breed = (4.4 if i == 0 else rnd.uniform(2.3, 3.4)) * schaal
                 dek = 0.97 if i == 0 else rnd.uniform(0.6, 0.9)
-                strokes.append((schets.haal(poly, rnd, schaal * a.los, 18), breed, dek))
+                p = schets.haal(poly, rnd, schaal * a.los, 18 * max(1.0, a.kriskras))
+                if a.kriskras > 0 and i > 0:
+                    p = kriskras(p, rnd, a.kriskras, schaal)
+                strokes.append((p, breed, dek))
 
     kl = tuple(int(a.kleur[i:i + 2], 16) for i in (0, 2, 4))
     emmers = {}

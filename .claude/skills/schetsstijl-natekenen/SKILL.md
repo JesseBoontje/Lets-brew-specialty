@@ -85,13 +85,15 @@ script laten overtrekken met de hand-afwijkingen. Dus altijd zo:
    Voorbeeld van een goedgekeurde schone SVG: `voorbeelden/schenkkan-schoon.svg`.
 3. **Overtrek.**
    ```sh
-   python3 scripts/overtrek.py schoon.svg uit.png --svg uit-schets.svg --halen 5 --los 2.1
+   python3 scripts/overtrek.py schoon.svg uit.png --svg uit-schets.svg --halen 6 --los 2.8 --kriskras 2
    ```
-   Elk pad wordt vijf keer overgetrokken met eigen afwijking, doorlopende hoeken
-   en wisselende dikte. Arceerpaden worden losse schuine streepjes.
+   Dit zijn de instellingen die Jesse goedkeurde ("losser, meer kriskras zoals
+   mijn V60"). Elk pad wordt zes keer overgetrokken: elke haal net scheef, soms
+   halverwege gestopt, met doorlopende hoeken en wisselende dikte. Arceerpaden worden losse schuine streepjes.
    `--zaad` met een ander getal geeft een andere hand.
 4. **Vergelijk** met een voorbeeld (zie Keuren) en doe hooguit één ronde
-   bijstellen: vorm fout, dan de schone SVG aanpassen; te strak, dan `--los` hoger.
+   bijstellen: vorm fout, dan de schone SVG aanpassen; te strak, dan `--los` of
+   `--kriskras` hoger. Strakker dan deze instellingen niet zonder dat Jesse erom vraagt.
 
 Getest op Jesse's foto van zijn schenkkan: zo kwam de tuit, het handvat en de
 open rand er goed uit, in dezelfde lijn als zijn V60-tekening.
