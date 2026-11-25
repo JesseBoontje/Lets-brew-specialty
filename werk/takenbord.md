@@ -18,5 +18,5 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Handleiding bijwerken voor klus 2-5 en de kleine klussen | architect | geen | na akkoord | skill lets-brew-handleiding |
 | Cloudflare Web Analytics-script wordt door de CSP geweigerd (bestond al) | Jesse | geen | wacht | in dashboard Web Analytics uitzetten, of script-src uitbreiden (static.cloudflareinsights.com) |
 | Randen: hertekenen bij alleen tekstwijziging (ResizeObserver) | nog niemand | geen | later | klein |
-| Nakijkronde (aanwijzen): 5 punten genoteerd, zie overdracht | architect | functie/nakijk-en-route | wacht op lettertypekeuze Jesse | nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7 ; geplakte opdracht afwerken (skill wijzigingen-aanwijzen deel B) |
+| Nakijkronde (aanwijzen): 5 punten | architect | functie/nakijk-en-route | gebouwd 25-11 (scc-v117), keuring 1x afgekeurd op NL-resten, hersteld; 42/42 chromium groen; reacties resolved | Jesse test nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7 ; mergen pas na akkoord |
 | Route invullen beans -> brews -> dial-in / pour coach (filter, espresso, omni) | architect | functie/nakijk-en-route (docs/opzet-route.html) | opzet klaar 25-11, wacht op akkoord | https://claude.ai/artifact/VcgJSLkRAiirkc3AiNSatN ; voorstel: keuzevel bij omni en bij meerdere methodes, laatste keuze onthouden |
