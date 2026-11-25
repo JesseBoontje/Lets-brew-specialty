@@ -5,7 +5,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
-| Stap 1 grote klus: slot en sleutel (Cloudflare Access op letsbrew.djez.app + AI-sleutel als Worker-secret, /api/ai met JWT-check en daglimiet 50) | architect | functie/slot-en-sleutel (docs/opzet-slot-en-sleutel.html) | opzet klaar 25-11, wacht op akkoord. GET access/apps op account 1aaa…: 403 "Access is not enabled" | https://claude.ai/artifact/8DGiQhNF1Pd2F9pJuX26gX ; Jesse: Zero Trust aanzetten, dan opnieuw testen of token Access mag instellen |
+| Grote klus: account voor iedereen (Face ID/passkey) + D1 + delen privé/link/openbaar + AI alleen voor door Jesse goedgekeurde accounts (vervangt plan Access-slot; Access getest: "not enabled") | architect | functie/slot-en-sleutel (docs/opzet-account-en-delen.html, eerder docs/opzet-slot-en-sleutel.html) | opzet klaar 25-11, wacht op akkoord | https://claude.ai/artifact/JDrq9Y2MouPUdYnGRCR8Mw ; 3 stappen: 1 account+D1+sync, 2 delen (+R2 foto's, profielpagina /@naam), 3 AI-goedkeuring + sleutel als secret, 50/dag |
 | Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | LIVE 24-11 via #14 | Jesse op iPhone testen |
 | Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | akkoord Jesse 25-11 ("bouw later") | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; bouwen in app/06 als Jesse zegt, één keuring |
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |

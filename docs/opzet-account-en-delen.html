@@ -1,0 +1,116 @@
+<title>Lets Brew account en delen</title>
+<style>
+/* Opzet "eigen account + database + delen" (25-11). Alleen een schets. */
+.phone .screen{padding:12px 16px 0;position:relative;height:100%;box-sizing:border-box;}
+.k{font-family:'Caveat',cursive;font-weight:700;font-size:34px;line-height:1;margin:4px 0 8px;}
+.kaart{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:9px 13px;margin:0 0 10px;}
+.kaart b{font-family:'Caveat',cursive;font-size:24px;line-height:1.05;display:block;}
+.kaart span{font-size:14px;color:var(--ink-soft);}
+.knop{display:block;width:100%;border:0;border-radius:20px;background:var(--accent);color:var(--cream);font:inherit;font-family:'Caveat',cursive;font-size:24px;padding:7px;margin:2px 0 10px;}
+.knop2{display:block;width:100%;border:2px solid var(--line);border-radius:20px;background:var(--paper);color:var(--ink);font:inherit;font-size:16px;padding:6px;margin:0 0 10px;}
+.cf{font-size:13px;color:var(--ink-soft);margin:0 0 10px;}
+.keus{display:flex;gap:6px;margin:0 0 8px;}
+.keus button{flex:1;border:2px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);font:inherit;font-size:14px;padding:6px 0;}
+.keus button.sel{background:var(--accent);color:var(--cream);border-color:var(--accent);}
+.rij{display:flex;justify-content:space-between;align-items:center;border-bottom:1px dashed var(--line);padding:7px 0;font-size:15px;}
+.aan{border:2px solid var(--line);border-radius:12px;padding:1px 10px;font-size:13px;}
+.aan.on{background:var(--accent);color:var(--cream);border-color:var(--accent);}
+.route{max-width:440px;margin:0 auto 10px;}
+.route svg{display:block;width:100%;height:auto;}
+.route text{font-family:'Patrick Hand',cursive;fill:var(--ink);}
+.route .t{font-family:'Caveat',cursive;font-weight:700;font-size:22px;}
+.route .z{font-size:13px;fill:var(--ink-soft);}
+</style>
+
+<div class="mk-kop"><h1>Account en delen</h1>
+  <div class="mk-onder">Opzet, nog niet ingebouwd. Iedereen kan een eigen account maken. Je beans en brews staan dan ook veilig online, en per stuk kies je: privé, alleen voor wie de link heeft, of openbaar. AI krijg je alleen als Jesse je account goedkeurt.</div></div>
+
+<div class="route">
+<svg viewBox="0 0 400 300" role="img" aria-label="Drie stappen: account en database, delen, AI voor goedgekeurde accounts">
+  <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
+    <rect x="70" y="10" width="260" height="70" rx="18" fill="var(--card)"/>
+    <rect x="70" y="112" width="260" height="70" rx="18" fill="var(--cream)"/>
+    <rect x="70" y="214" width="260" height="70" rx="18" fill="var(--card)"/>
+    <path d="M200 80 V108 M193 100 L200 109 L207 100"/>
+    <path d="M200 182 V210 M193 202 L200 211 L207 202"/>
+  </g>
+  <text class="t" x="200" y="40" text-anchor="middle">stap 1 · account + database</text>
+  <text class="z" x="200" y="62" text-anchor="middle">inloggen met Face ID, beans en brews online bewaard</text>
+  <text class="t" x="200" y="142" text-anchor="middle">stap 2 · delen</text>
+  <text class="z" x="200" y="164" text-anchor="middle">per bean of brew: privé · link · openbaar</text>
+  <text class="t" x="200" y="244" text-anchor="middle">stap 3 · AI voor goedgekeurd</text>
+  <text class="z" x="200" y="266" text-anchor="middle">jij zet AI aan per account, 50 vragen per dag</text>
+</svg>
+</div>
+
+<div class="mk-rij">
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Your account</div>
+      <div class="cf">Keep your beans and brews safe, on every device.</div>
+      <button class="knop" type="button">sign in with Face ID</button>
+      <button class="knop2" type="button">not now, keep it on this phone</button>
+      <div class="cf">No password. Your iPhone keeps the key in iCloud Keychain.</div>
+    </div></div>
+    <figcaption><b>1 · account</b>: inloggen met Face ID (een passkey). Geen wachtwoord en geen mail nodig. Zonder account werkt de app gewoon zoals nu.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Ethiopia Guji</div>
+      <div class="kaart"><b>Who can see this?</b>
+        <div class="keus"><button type="button">private</button><button class="sel" type="button">link</button><button type="button">public</button></div>
+        <span>Anyone with the link can look. Not listed on your profile.</span></div>
+      <button class="knop2" type="button">copy link</button>
+      <div class="cf">Price, notes and photos: you choose per item what is shown.</div>
+    </div></div>
+    <figcaption><b>2 · delen</b>: standaard staat alles op privé. "Link" is voor vrienden. "Openbaar" komt op je profielpagina te staan.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">jesse's coffee</div>
+      <div class="cf">letsbrew.djez.app/@jesse</div>
+      <div class="kaart"><b>Ethiopia Guji</b><span>washed · 1950 m · ★ 8 · 4 brews</span></div>
+      <div class="kaart"><b>Hoffmann V60, sweet</b><span>15 g → 250 g · 94 °C · 2:45</span></div>
+      <button class="knop2" type="button">save to my brew ideas</button>
+    </div></div>
+    <figcaption><b>3 · zo zien anderen het</b>: een gewone webpagina. Een vreemde heeft geen account nodig om te kijken. Wie wel een account heeft, kan een recept bewaren.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Accounts</div>
+      <div class="cf">Only you see this screen.</div>
+      <div class="rij"><span>jesse</span><span class="aan on">AI on</span></div>
+      <div class="rij"><span>sanne</span><span class="aan on">AI on</span></div>
+      <div class="rij"><span>coffeefan_22</span><span class="aan">AI off</span></div>
+      <div class="cf" style="margin-top:10px">Today: 31 AI questions in total.</div>
+    </div></div>
+    <figcaption><b>4 · jouw beheer</b>: alleen jouw account ziet dit. Eén tik zet AI aan of uit. Zonder goedkeuring kan iemand nog wel een eigen sleutel gebruiken.</figcaption>
+  </figure>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat ik overneem</h2>
+  <ul>
+    <li>Iedereen een eigen account, met database (Cloudflare D1, gratis voor dit gebruik).</li>
+    <li>Per bean en per brew kiezen: privé of gedeeld, met vrienden of met vreemden.</li>
+    <li>AI alleen voor accounts die jij goedkeurt, met jouw sleutel veilig op de server.</li>
+  </ul>
+  <h2>Wat ik anders doe, en waarom</h2>
+  <ul>
+    <li><b>Face ID in plaats van een code per mail.</b> Cloudflare Access is gratis tot 50 mensen en is gemaakt om een slot te zijn, niet om iedereen te laten aanmelden. Codes mailen naar vreemden vraagt een extra maildienst. Een passkey (Face ID) heeft geen mail nodig, kent geen limiet en staat al op je wensenlijst.</li>
+    <li><b>Drie standen in plaats van twee:</b> privé, link en openbaar. "Link" is precies het delen met vrienden, zonder dat het voor de hele wereld te zien is.</li>
+    <li><b>Geen openbare tijdlijn van vreemden, voorlopig.</b> Openbaar betekent: op je eigen profielpagina. Een tijdlijn waarop vreemden posten vraagt om toezicht (spam, rare foto's). Die kan later, als het nodig blijkt.</li>
+    <li><b>Je telefoon blijft de basis.</b> De app werkt offline zoals nu, en het account houdt een kopie bij. Er raakt niets kwijt als je even geen bereik hebt.</li>
+    <li>De opzet "delen als pagina/PDF" valt hierin op: stand "link" maakt zo'n pagina.</li>
+  </ul>
+  <h2>Wat er niet kan, of wat je moet weten</h2>
+  <ul>
+    <li><b>Gegevens van anderen bewaren is een verantwoordelijkheid (AVG).</b> Er komen een korte privacytekst en een knop "account en alles wissen" bij. Dat bouw ik mee.</li>
+    <li><b>Foto's online</b> hebben opslag nodig (Cloudflare R2, gratis tot 10 GB). In stap 1 alleen tekst, foto's in stap 2.</li>
+    <li><b>Telefoon kwijt</b>: de passkey zit in iCloud Keychain, dus op een nieuwe iPhone kun je gewoon weer inloggen. Zonder iCloud Keychain ben je je account kwijt. Een reserve-inlog per mail kan later.</li>
+    <li>Dit is de grootste klus tot nu toe. Ik bouw hem in drie stappen, en elke stap krijgt een eigen testlink en jouw akkoord.</li>
+  </ul>
+</div>
