@@ -760,7 +760,7 @@ function bpPlek(){
   if(bpNiv==='wereld')return '<div class="bp-pad"><b>de wereld</b>'+
     '<span>'+Object.keys(BP_INFO).length+' landen met een verhaal</span></div>';
   if(bpNiv==='deel')return '<div class="bp-pad"><b>'+esc(BP_DELEN[bpDeel].kort)+'</b>'+
-    '<span>kies een land</span></div>';
+    '<span>pick a country</span></div>';
   const inf=BP_INFO[bpLandId];
   return '<div class="bp-pad"><b>'+esc(BP_LAND[bpLandId].naam)+'</b>'+
     '<span>'+esc(BP_DELEN[bpDeel].kort)+' · '+((inf.streken||[]).length)+' streken</span></div>';
@@ -874,7 +874,7 @@ function bpLandScherm(){
     '<button onclick="bpKies(\'deel\',\''+bpDeel+'\')">'+esc(D.kort)+
     '</button> › <b>'+esc(L.naam)+'</b></div>'+
     '<div class="bp-doos">'+bpKaartHTML()+bpPlek()+
-    '<div class="bp-tip">tik op een genummerde stip, of kies hieronder</div></div>'+
+    '<div class="bp-tip">tap a numbered dot, or pick below</div></div>'+
     '<div class="bp-blok vol"><h3>What this country is known for</h3>'+
     '<p>'+inf.bekend+'</p>'+
     '<div class="bp-et">The notes the roaster puts on the bag</div>'+bpSmaken(inf.smaak)+
@@ -1234,7 +1234,7 @@ function bpHerkomstKiezer(lijst,wegFn,kiesFn){
       '<button type="button" class="bh-knop" onclick="'+wegFn+'('+i+')">×</button></div>').join('');
   }
   h+='<div class="bh-rij" style="margin-top:6px"><button type="button" class="bh-knop aan" '+
-    'onclick="'+kiesFn+'()">'+(lijst.length?'＋ nog een herkomst':'kies op de kaart')+'</button></div>';
+    'onclick="'+kiesFn+'()">'+(lijst.length?'＋ another origin':'pick on the map')+'</button></div>';
   return h;
 }
 

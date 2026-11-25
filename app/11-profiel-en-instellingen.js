@@ -60,7 +60,7 @@ function renderTasteWheel(){
     // het hart is de weg terug naar de families
     out+=`<circle class="wheel-hart" cx="100" cy="100" r="40" onclick="wheelDicht()"/>`;
     out+=`<text class="wheel-hart-t" x="100" y="97" text-anchor="middle">${esc(wheelOpen)}</text>`;
-    out+=`<text class="wheel-hart-t" x="100" y="110" text-anchor="middle" style="font-size:8.5px">&#8592; terug</text>`;
+    out+=`<text class="wheel-hart-t" x="100" y="110" text-anchor="middle" style="font-size:8.5px">&#8592; back</text>`;
   }else{
     // een familie kleurt zodra er iets uit die familie gekozen is
     const aan=n=>formTags.some(t=>wheelHoortBij(n,t));

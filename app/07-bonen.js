@@ -182,7 +182,7 @@ function routeOpties(b){
 function brewBeanMet(beanId,mid){
   const b=beanById(beanId);if(!b)return;
   if(!mid)mid=(state.methods.filter(m=>m.on)[0]||{}).id||null;
-  if(mid&&b.lastMethod!==mid){b.lastMethod=mid;save();}
+  if(mid&&methodById(mid)?.on&&b.lastMethod!==mid){b.lastMethod=mid;save();}
   if(methodFamily(mid)==='espresso'){
     pendingTarget=null;formPrep={};pendingRecipe=null;openDialIn(mid);
     setTimeout(()=>{
@@ -190,7 +190,7 @@ function brewBeanMet(beanId,mid){
       // je laatste shot met deze boon op deze machine is het beste startpunt
       if(featOn('smartdefaults')){
         const l=state.brews.filter(x=>x.beanId===beanId&&x.method===mid).sort((x,y)=>(y.ts||0)-(x.ts||0))[0];
-        if(l){if(l.dose)setVal('di-dose',l.dose);if(l.yield)setVal('di-yield',l.yield);if(l.grind)setVal('di-grind',l.grind);}
+        if(l){if(l.dose)setVal('di-dose',l.dose);if(l.yield)setVal('di-yield',l.yield);if(l.grind)setVal('di-grind',l.grind);if(typeof diAdvice==='function')diAdvice();}
       }
     },0);
   }

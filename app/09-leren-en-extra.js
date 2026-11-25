@@ -938,7 +938,7 @@ function renderCupping(){
       h+='<div class="empty-note">je hebt twee bonen in huis nodig om te cuppen.<br>voeg nog een zak toe en kom terug.</div>';
       el.innerHTML=h;return;
     }
-    h+=`<div class="k" style="margin:18px 2px 6px">kies twee tot vier bonen</div><div class="link-pick">`+
+    h+=`<div class="k" style="margin:18px 2px 6px">pick two to four beans</div><div class="link-pick">`+
       beans.map(b=>`<button class="lp ${cup.picks.includes(b.id)?'sel':''}" onclick="cupPick('${b.id}')">${esc(b.name)}</button>`).join('')+'</div>';
     h+=`<div class="cup-recipe sketch">
         <div class="cr-h hand">Your recipe</div>
@@ -951,7 +951,7 @@ function renderCupping(){
       </div>`;
     h+=cup.picks.length>=2
       ? '<button class="save-btn" style="margin-top:14px" onclick="cupStart()">start de sessie →</button>'
-      : '<div class="cup-hint">kies er minstens twee.</div>';
+      : '<div class="cup-hint">pick at least two.</div>';
     el.innerHTML=h;return;
   }
 
