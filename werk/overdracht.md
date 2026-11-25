@@ -432,3 +432,7 @@ Claude. Nog ideeën?"
      "1 lettertype": vraag in de chat, advies Patrick Hand overal.
   2. Surprise-me-kaart: "Verwijder deze tekening" (gietcoach-tekening weg, logo en
      tekst blijven).
+  3. Methoderij op home: "mag alleen links rechts swipen, gaat nu ook naar boven
+     beneden". Oorzaak: padding-top/-bottom op #methods-scroll (overflow-x:auto maakt
+     overflow-y ook auto). Oplossing: overflow-y:hidden + touch-action:pan-x
+     (verticaal scrollen van de pagina moet blijven werken: pan-x pan-y? test).
