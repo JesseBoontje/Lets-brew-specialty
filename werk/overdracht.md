@@ -426,3 +426,9 @@ Claude. Nog ideeën?"
   build-review.py zet SPLASH_MS op 300. Zonder dit was de nakijkversie sinds de
   opsplitsing kapot.
 - Wacht op: Jesse's geplakte "Opdracht voor Lets Brew" (deel B van de skill).
+- Nakijkpunten van Jesse (opmerkingen op de nakijkpagina, 25-11), nog te bouwen in
+  één release:
+  1. Lettertypes: in de nakijkversie ontbraken ze (bouwerfout, hersteld). Jesse wil
+     "1 lettertype": vraag in de chat, advies Patrick Hand overal.
+  2. Surprise-me-kaart: "Verwijder deze tekening" (gietcoach-tekening weg, logo en
+     tekst blijven).
