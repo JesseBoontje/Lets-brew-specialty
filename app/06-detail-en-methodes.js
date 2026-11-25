@@ -477,9 +477,9 @@ function fileToDataURL(file,maxW,removeBg){
         // foto's zonder transparantie als JPEG bewaren: ~10x kleiner dan PNG
         res(c.toDataURL('image/jpeg',0.72));
       };
-      img.onerror=rej;img.src=r.result;
+      img.onerror=()=>rej(new Error('photo could not be read'));img.src=r.result;
     };
-    r.onerror=rej;r.readAsDataURL(file);
+    r.onerror=()=>rej(new Error('photo could not be read'));r.readAsDataURL(file);
   });
 }
 function cropTransparent(canvas){

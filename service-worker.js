@@ -1,4 +1,4 @@
-const CACHE = 'scc-v118';
+const CACHE = 'scc-v119';
 const ASSETS = [
   './','./index.html','./security.js','./app/01-kennis.js','./app/02-opslag.js','./app/03-navigatie-home.js','./app/04-brew-formulier.js','./app/04-gietcoach.js','./app/04-aeropress.js','./app/04-surprise.js','./app/05-espresso-dial-in.js','./app/05-shotclock.js','./app/06-detail-en-methodes.js','./app/07-bonen.js','./app/08-ai.js','./app/09-leren-en-extra.js','./app/10-bonenkeuzehulp.js','./app/11-profiel-en-instellingen.js','./app/11-randen.js','./app/12-hulp-en-start.js','./styles.css','./pwa.js','./brew-model.js','./brew-workspace.js','./brew-voice.js','./brew-stem.js','./voice-contract.mjs','./manifest.json',
   './icon-192.png','./icon-512.png','./logo.png',

@@ -1026,6 +1026,8 @@ function bpWijzigWens(id){
   zet('b-origin',w.origin||regs.map(bpRegioTekst).join(' · '));
   beanFormRegions=regs; renderBeanHerkomst();
   beanFormRoast=w.brand||null; renderBeanRoast();
+  const lp=document.getElementById('label-preview');
+  if(lp)lp.innerHTML=w.photo?'<img src="'+esc(BrewSecurity.imageUrl(w.photo))+'" style="max-height:140px;border-radius:14px;border:2px solid var(--line)">':'';
   renderBeanMode();
 }
 /* vanuit de kaart: de streek die je bekeek als wens wegschrijven */
