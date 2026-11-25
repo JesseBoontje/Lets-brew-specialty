@@ -5,6 +5,8 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
+| Schenkkan in de gietcoach (V60/Switch) i.p.v. de ketel | architect | functie/schenkkan | gebouwd 25-11 (scc-v120), 47/47 chromium groen, keuring loopt | PR met preview; live pas na akkoord Jesse |
+| Beeldkeuring: alle iconen, tekeningen, splash, artifacts tegen skill schetsstijl-natekenen (Jesse's eigen png's niet hertekenen); mockup voor/na eerst | architect | functie/beeldkeuring (nog niet aangemaakt) | doorgegeven 25-11 via andere sessie, na schenkkan | Jesse bevestigt, dan inventaris + mockup |
 | Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | LIVE 24-11 via #14 | Jesse op iPhone testen |
 | Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | akkoord Jesse 25-11 ("bouw later") | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; bouwen in app/06 als Jesse zegt, één keuring |
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |
