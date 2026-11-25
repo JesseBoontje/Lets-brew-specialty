@@ -73,7 +73,7 @@
   <div id="page-choosebean" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand">new brew</div><button onclick="goBack('home')">Annuleren</button></div>
+      <div class="form-head"><div class="h hand">new brew</div><button onclick="goBack('home')">Cancel</button></div>
       <div class="subtitle">Pick a bean</div>
       <div id="choosebean-list"></div>
       <button class="profile-btn" onclick="openBeanForm(false,'choosebean')" style="margin-top:6px">＋ add a new bean</button>
@@ -84,7 +84,7 @@
   <div id="page-form" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand" id="form-title">new brew</div><button onclick="cancelForm()">Annuleren</button></div>
+      <div class="form-head"><div class="h hand" id="form-title">new brew</div><button onclick="cancelForm()">Cancel</button></div>
 
       <div class="field"><label>title (optional)</label><input id="f-title" placeholder="e.g. sunday morning v60" maxlength="60"></div>
 
@@ -219,7 +219,7 @@
   <div id="page-dialin" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand">Dial in</div><button onclick="cancelForm()">Annuleren</button></div>
+      <div class="form-head"><div class="h hand">Dial in</div><button onclick="cancelForm()">Cancel</button></div>
       <div class="subtitle" id="di-sub">work towards your espresso shot</div>
 
       <div class="field"><label>beans</label><div class="link-pick" id="di-beans"></div></div>
@@ -367,7 +367,7 @@
   <div id="page-recipe" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>&#9636; &#9689; &#9646;</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand" id="rec-title">own recipe</div><button onclick="cancelRecipe()">Annuleren</button></div>
+      <div class="form-head"><div class="h hand" id="rec-title">own recipe</div><button onclick="cancelRecipe()">Cancel</button></div>
       <div class="subtitle">your own pour schedule &mdash; the coach will run it exactly like the built-in ones</div>
 
       <div class="field"><label>name</label><input id="rec-naam" placeholder="e.g. my sunday v60" maxlength="40"></div>
@@ -481,7 +481,7 @@
   <div id="page-beanform" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand" id="beanform-title">New Bean</div><button onclick="beanFormWeg()">Annuleren</button></div>
+      <div class="form-head"><div class="h hand" id="beanform-title">New Bean</div><button onclick="beanFormWeg()">Cancel</button></div>
       <div class="field"><label>Where does it go?</label>
         <div class="bp-chips" id="b-mode"></div>
         <div class="fx-note" id="b-mode-uitleg"></div></div>
@@ -923,7 +923,7 @@
     <div id="img-picker-grid" class="img-picker-grid"></div>
     <button class="profile-btn" onclick="document.getElementById('img-picker-file').click()"><svg viewBox="0 0 24 24" class="acic btn-svg"><path d="M4.4 5.8 Q12 5.2 19.8 5.6 M19.5 5.1 Q20.1 12 19.6 18.9 M19.9 18.5 Q12 19.1 4.2 18.6 M4.6 19 Q4 12 4.4 5.2"/><path d="M5.2 15.8 Q8 12 10.1 13.7 Q13 9.4 15.6 12.1 Q17.6 14.1 19.1 16.7" opacity="0.8"/><path d="M9.9 8.7 Q10.3 10.4 8.6 10.5 Q7.1 10.4 7.3 8.9 Q7.6 7.5 9.2 7.7 Q9.9 7.9 10.2 8.4" opacity="0.7"/></svg> upload your own drawing</button>
     <input type="file" id="img-picker-file" accept="image/*" style="display:none" onchange="pickerUpload(event)">
-    <button class="profile-btn" style="margin-bottom:0" onclick="closeImgPicker()">Annuleren</button>
+    <button class="profile-btn" style="margin-bottom:0" onclick="closeImgPicker()">Cancel</button>
   </div>
 </div>
 <div id="aibud-pop" class="aib-laag hidden"></div>

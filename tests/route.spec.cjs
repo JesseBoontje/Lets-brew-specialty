@@ -52,3 +52,20 @@ test('espresso and filter beans go straight on; two own methods ask; switch off 
  await expect(page.locator('#route-pop')).toBeHidden();
  await expect(page.locator('#page-dialin')).toBeVisible();
 });
+
+test('one Brews tab: five tabs, my brews and brew ideas, last choice remembered',async({page})=>{
+ await open(page,zet);
+ await expect(page.locator('#nav [data-p]')).toHaveCount(5);
+ await expect(page.locator('#nav')).toContainText('Home');
+ await page.locator('#nav [data-p="brews"]').tap();
+ await expect(page.locator('#page-brews')).toBeVisible();
+ await page.locator('#page-brews [data-ws="brews-kant"][data-value="ideas"]').tap();
+ await expect(page.locator('#page-recipes')).toBeVisible();
+ await expect(page.locator('#nav [data-p="brews"]')).toHaveClass(/on/);
+ await expect(page.locator('#page-recipes [data-ws="brews-kant"][data-value="ideas"]')).toHaveClass(/selected/);
+ await page.locator('#nav [data-p="home"]').tap();
+ await page.locator('#nav [data-p="brews"]').tap();
+ await expect(page.locator('#page-recipes')).toBeVisible();   // onthouden: brew ideas
+ await page.locator('#page-recipes [data-ws="brews-kant"][data-value="my"]').tap();
+ await expect(page.locator('#page-brews')).toBeVisible();
+});

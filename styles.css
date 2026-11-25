@@ -1691,3 +1691,7 @@ html.randen .sketch.rand-on{filter:none;}
 .route-knop span span{font-size:14px;color:var(--ink-soft);}
 .route-ic{flex:0 0 40px;display:flex;align-items:center;justify-content:center;}
 .route-ic img{max-height:40px;max-width:40px;mix-blend-mode:multiply;}
+
+/* Brews-tab: my brews / brew ideas, even breed */
+.brews-kant{margin:4px 0 14px;}
+.brews-kant button{flex:1;}
