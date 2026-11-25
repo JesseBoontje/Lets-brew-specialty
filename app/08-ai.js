@@ -199,6 +199,8 @@ function fillSearchLink(){
   toast(domein?'✓ link to '+domein:'✓ search link filled in');
 }
 let beanPhoto=null;
+// een korte, leesbare reden bij een mislukte AI-vraag
+function aiFoutKort(e){const m=String((e&&e.message)||e||'unknown').replace(/\s+/g,' ');return m.length>120?m.slice(0,117)+'…':m;}
 async function scanLabel(ev){
   const file=ev.target.files&&ev.target.files[0];if(!file)return;
   const status=document.getElementById('scan-status');
@@ -215,8 +217,9 @@ async function scanLabel(ev){
   // 3) AI aan: etiket uitlezen
   status.innerHTML='<span class="spin"></span>reading label…';
   try{
-    const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
-    const media=file.type||'image/jpeg';
+    // verkleind en als jpeg: een iPhone-foto of HEIC is te groot of wordt niet aangenomen
+    const b64=(await fileToDataURL(file,1500,false)).split(',')[1];
+    const media='image/jpeg';
     const prompt='Dit is een foto van een etiket van een zak specialty koffie. Lees alle informatie en geef ALLEEN een JSON-object terug, zonder uitleg, zonder markdown. Velden (laat leeg als onbekend): {"name":"","roaster":"","origin":"","process":"","variety":"","altitude":"","roasternotes":"","roast":"","fam":"","url":""}. roasternotes = de smaakomschrijving van de brander, komma-gescheiden. url = de officiele website van de brander: als die letterlijk op de zak staat gebruik die, anders geef de meest waarschijnlijke officiele website-URL van deze brander op basis van wat je weet (bv. https://merknaam.com). Laat url alleen leeg als je echt geen idee hebt welke brander het is.\n'+BEAN_RULES;
     const txt=await askAI([{role:"user",content:[
       {type:"image",source:{type:"base64",media_type:media,data:b64}},
@@ -249,7 +252,7 @@ async function scanLabel(ev){
     status.innerHTML='✓ filled in — check and adjust where needed';
     document.getElementById('enrich-row').style.display='block';
   }catch(e){
-    status.textContent='couldn\'t read the label automatically — fill in manually (the photo is saved)';
+    status.textContent='couldn\'t read the label ('+aiFoutKort(e)+') — fill in manually, the photo is saved';
   }
   ev.target.value='';
 }
@@ -293,8 +296,11 @@ async function beanUitLink(){
   const status=document.getElementById('scan-status');
   const get=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
   const zetLeeg=(id,v)=>{if(v&&!get(id))setText(id,v);};
-  if(status)status.innerHTML='<span class="spin"></span>de link uitlezen…';
+  if(status)status.innerHTML='<span class="spin"></span>reading the link…';
   try{
+    // eerst de pagina zelf ophalen via de eigen server; lukt dat niet, dan werkt de AI met de link alleen
+    let pagina=null;
+    try{const r=await fetch('/api/pagina?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(12000)});if(r.ok){const p=await r.json();if(p&&p.tekst)pagina=p;}}catch(_){}
     const landen=BP_LANDEN.filter(l=>BP_INFO[l.id]).map(l=>l.naam).join(', ');
     const alIn=['name','roaster','origin','process','variety','altitude']
       .map(k=>k+': '+(get('b-'+k)||'?')).join('; ');
@@ -306,7 +312,9 @@ async function beanUitLink(){
       'fam is "espresso", "filter" of "both" — alleen als duidelijk is waar de zak voor gebrand is.\n'+
       'notes = twee zinnen over wat deze boon of deze streek bijzonder maakt.\n'+
       'land = het herkomstland; kies het uit deze lijst als het erbij staat: '+landen+'. '+
-      'streek = de streek binnen dat land.\n'+LINK_RULES;
+      'streek = de streek binnen dat land.\n'+
+      (pagina?'TEKST VAN DE PAGINA (dit is de bron; neem over wat er staat, verzin niets wat ermee in strijd is):\n'+
+        'Titel: '+pagina.titel+'\nOmschrijving: '+pagina.beschrijving+'\n'+pagina.tekst+'\n':LINK_RULES);
     const d=extractJSON(await askAI([{role:"user",content:prompt}],900,'bean'));
     ['name','roaster','origin','process','variety','altitude'].forEach(k=>zetLeeg('b-'+k,d[k]));
     zetLeeg('b-roasternotes',d.roasternotes); zetLeeg('b-notes',d.notes);
@@ -324,14 +332,14 @@ async function beanUitLink(){
         const i=bpStreekVanBoon({origin:(d.streek||'')+' '+(d.origin||'')},landId);
         beanFormRegions=[{land:landId,i:(i!=null?i:null)}];
         renderBeanHerkomst();
-        plek=' · '+bpRegioTekst(beanFormRegions[0])+' op de kaart';
+        plek=' · '+bpRegioTekst(beanFormRegions[0])+' on the map';
       }
     }
-    if(status)status.textContent='✓ ingevuld vanaf de link'+plek+' — kijk het even na';
+    if(status)status.textContent='✓ filled in from '+(pagina?'the page':'the link (page not readable, so partly a guess)')+plek+' — check it';
     const er=document.getElementById('enrich-row'); if(er)er.style.display='block';
   }catch(e){
     beanLinkBezig='';
-    if(status)status.textContent='de link uitlezen lukte niet (werkt alleen met AI aan)';
+    if(status)status.textContent='couldn\'t read the link ('+aiFoutKort(e)+')';
   }
 }
 async function enrichBean(){

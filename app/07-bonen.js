@@ -344,8 +344,8 @@ let editingBean=null;
    velden er iets toe doen. Van gedachten veranderen mag: sla je een wens op
    als "op mijn plank", dan verhuist hij gewoon mee.                        */
 let beanFormWens=false, editingWens=null;
-const BEAN_MODES=[{w:false,n:'Bean shelf',u:'een zak die je in huis hebt — hij komt bij je bonen te staan en je kunt erop brouwen.'},
-                  {w:true, n:'Bean wishlist',u:'een zak die je nog wilt kopen — hij komt op je lijstje en op de wereldkaart.'}];
+const BEAN_MODES=[{w:false,n:'Bean shelf',u:'a bag you have at home — it goes with your beans and you can brew with it.'},
+                  {w:true, n:'Bean wishlist',u:'a bag you still want to buy — it goes on your list and on the world map.'}];
 function renderBeanMode(){
   const el=document.getElementById('b-mode'); if(!el)return;
   // staat de keuzehulp uit, dan is er geen lijstje om iets op te zetten
@@ -360,7 +360,7 @@ function renderBeanMode(){
   const sv=document.getElementById('b-save');
   if(sv)sv.textContent=beanFormWens?'Save on wishlist':'Save on shelf';
   // wat je pas weet als de zak er echt is, vraagt de app pas als hij er is
-  [['b-foto-rij',!beanFormWens],['label-preview',!beanFormWens],['b-roastdate-veld',!beanFormWens],
+  [['b-roastdate-veld',!beanFormWens],
    ['b-cost-row',!beanFormWens&&featOn('cost')],['b-fam-veld',!beanFormWens],
    ['b-methods-veld',!beanFormWens]].forEach(([id,aan])=>{
     const e=document.getElementById(id); if(e)e.style.display=aan?'':'none';
@@ -472,7 +472,7 @@ function saveBean(){
     if(ex){Object.assign(ex,data);if(beanPhoto)ex.photo=beanPhoto;}
     toast('✓ bean updated');
   }else{
-    data.id=uid();data.photo=beanPhoto||null;data.inStock=true;
+    data.id=uid();data.photo=beanPhoto||(editingWens&&((state.wishlist||[]).find(x=>x.id===editingWens)||{}).photo)||null;data.inStock=true;
     state.beans.push(data);
     // stond hij nog op je lijstje, dan is hij daar nu vanaf
     if(editingWens){state.wishlist=(state.wishlist||[]).filter(w=>w.id!==editingWens);
@@ -501,6 +501,7 @@ function saveBeanAlsWens(naam){
     altitude:g('b-altitude'),brand:beanFormRoast||'light',
     roasternotes:noten,smaak:noten?noten.split(',').map(x=>x.trim()).filter(Boolean):[],
     notitie:g('b-notes'),at:Date.now()};
+  if(beanPhoto)w.photo=beanPhoto;
   const i=state.wishlist.findIndex(x=>x.id===w.id);
   if(i>=0)state.wishlist[i]=Object.assign({},state.wishlist[i],w);
   else state.wishlist.push(w);
