@@ -1682,3 +1682,12 @@ html.randen .sketch.rand-on{filter:none;}
 @keyframes f2{0%{opacity:0}17.6%{opacity:0}17.7%{opacity:1}35.2%{opacity:1}35.3%{opacity:0}100%{opacity:0}}
 @keyframes f3{0%{opacity:0}35.2%{opacity:0}35.3%{opacity:1}52.8%{opacity:1}52.9%{opacity:0}100%{opacity:0}}
 @keyframes f4{0%{opacity:0}52.8%{opacity:0}52.9%{opacity:1}100%{opacity:1}}
+
+/* route: welke kant op met deze boon (omni of meer methodes) */
+.route-knop{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);
+  font:inherit;color:var(--ink);padding:9px 13px;margin:0 0 10px;border-radius:18px;min-height:60px;cursor:pointer;}
+.route-knop.eerst{border-color:var(--accent);border-width:3px;}
+.route-knop b{display:block;font-family:'Caveat',cursive;font-size:23px;line-height:1.05;}
+.route-knop span span{font-size:14px;color:var(--ink-soft);}
+.route-ic{flex:0 0 40px;display:flex;align-items:center;justify-content:center;}
+.route-ic img{max-height:40px;max-width:40px;mix-blend-mode:multiply;}

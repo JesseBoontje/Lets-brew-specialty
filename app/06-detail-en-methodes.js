@@ -347,7 +347,7 @@ function printBrew(id){
 function printLogbook(){
   if(!state.brews.length){toast('no brews to save yet');return;}
   const brews=[...state.brews].sort((a,b)=>(b.ts||0)-(a.ts||0));
-  const html='<div class="p-h1">mijn brew-logboek</div>'+
+  const html='<div class="p-h1">my brews</div>'+
     '<div class="p-sub">lets brew specialty · '+brews.length+' brews · '+state.beans.length+' beans · '+
     new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'})+'</div>'+
     brews.map(brewSheetHTML).join('');

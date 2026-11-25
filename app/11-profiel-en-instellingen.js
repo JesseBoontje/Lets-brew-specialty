@@ -148,6 +148,7 @@ const FEATURES=[
   {id:'freshgauge', n:'freshness gauge', d:'rest → peak → fading as a dial on each bean', def:true, cat:'app'},
   {id:'smartdefaults', n:'smart defaults', d:'last dose, grind & temp prefilled — never retype', def:true, cat:'app'},
   {id:'peakalert', n:'peak heads-up', d:'a quiet line on home when a bean in stock reaches its best days', def:true, cat:'app'},
+  {id:'route', n:'which way?', d:'an omni bean, or a bean with more methods: pick espresso or filter first, your last choice on top', def:true, cat:'app'},
   {id:'surprise', n:'surprise me', d:'a new recipe for a bean on your shelf — you look it over first, AI makes it smarter', def:true, cat:'app'},
   {id:'cost', n:'cost per cup', d:'price & bag size on a bean → what a cup costs you', def:true, cat:'app'},
   {id:'aibudget', n:'AI budget', d:'what the AI cost you this month, and one heads-up at 20% and 10%', def:true, cat:'smart'},
@@ -807,7 +808,7 @@ function lbBean(b){
     process:b.process||null,variety:b.variety||null,altitudeM:altitudeOf(b),
     roastLevel:b.roast||null,roastDate:b.roastdate||null,daysSinceRoast:f?f.days:null,
     roasterNotes:b.roasternotes||null,notes:b.notes||null,inStock:b.inStock!==false,
-    decaf:isDecaf(b),bagLabel:b.fam||null,
+    decaf:isDecaf(b),bagLabel:b.fam||null,lastMethodId:b.lastMethod||null,
     regions:(Array.isArray(b.regions)?b.regions:(b.region?[b.region]:[]))
       .map(r=>({land:r.land,i:r.i==null?null:r.i})),
     region:(Array.isArray(b.regions)&&b.regions[0])||b.region||null,

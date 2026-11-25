@@ -116,6 +116,7 @@ string of een 0 die iets anders betekent.
 | `decaf` | bool | afgeleid uit naam en noten |
 | `bagLabel` | `espresso` \| `filter` \| `both` \| null | wat de zak zelf zegt |
 | `methodIds` | string[] | |
+| `lastMethodId` | string \| null | de methode die je de vorige keer bij deze boon koos; staat bovenaan in het keuzescherm "how do you brew it?" |
 | `brewIds` | string[] | |
 | `dials` | object | per `methodId` de dial die je aftekende, zie hieronder |
 
