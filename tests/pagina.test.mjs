@@ -14,12 +14,12 @@ test('pagina: alleen gewone webadressen, nooit eigen netwerk',async()=>{
  assert.equal(n,0);
 });
 test('pagina: haalt de tekst eruit zonder scripts',async()=>{
- const html='<html><head><title>Finca Los Angeles</title><meta property="og:description" content="Natural Pacamara"><script>steel()</script></head><!-- kapot commentaar <style> -- End of the comment --> /* Compiled CSS */ @font-face { font-family: Work Sans; } </style><body>[class^="icon-x"] { font-family: Modern; } @media (max-width:9px){ .a{color:red} }\n.fusion-portfolio-post> .fusion-masonry-element-container>a>img,.products-6> .products-5> .product .summary.entry-summary\n<h1>El Salvador</h1><p>Melon, green grapes &amp; cane sugar</p></body></html>';
+ const html='<html><head><title>Finca Los Angeles</title><meta property="og:description" content="Natural Pacamara"><script>steel()</script></head><!-- kapot commentaar <style> -- End of the comment --> /* Compiled CSS */ @font-face { font-family: Work Sans; } </style><body>[class^="icon-x"] { font-family: Modern; } @media (max-width:9px){ .a{color:red} }\n.fusion-portfolio-post> .fusion-masonry-element-container>a>img,.products-6> .products-5> .product .summary.entry-summary\n<h1>El Salvador</h1><p>Melon, green grapes &amp; cane sugar</p> .x .y>a{color:red} <span>Natural process, 1380 masl</span></body></html>';
  const r=await met(async()=>new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}),()=>paginaRoute(vraag('https://singleestatecoffee.nl/el-salvador')));
  assert.equal(r.status,200);
  const d=await r.json();
  assert.equal(d.titel,'Finca Los Angeles');assert.equal(d.beschrijving,'Natural Pacamara');
- assert.match(d.tekst,/El Salvador/);assert.match(d.tekst,/green grapes & cane sugar/);assert.doesNotMatch(d.tekst,/steel/);assert.doesNotMatch(d.tekst,/Compiled CSS|font-family|color:red|fusion-portfolio/);
+ assert.match(d.tekst,/El Salvador/);assert.match(d.tekst,/green grapes & cane sugar/);assert.match(d.tekst,/Natural process, 1380 masl/);assert.doesNotMatch(d.tekst,/steel/);assert.doesNotMatch(d.tekst,/Compiled CSS|font-family|color:red|fusion-portfolio/);
 });
 test('pagina: alleen vanuit de app, en een doorverwijzing naar binnen wordt geweigerd',async()=>{
  let n=0;
