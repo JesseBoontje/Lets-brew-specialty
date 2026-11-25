@@ -100,10 +100,14 @@ export async function paginaRoute(request,env={}){
    .replace(/[^{}<>\n]{0,300}\{[^{}]*\}/g,' ').replace(/[^{}<>\n]{0,300}\{[^{}]*\}/g,' ')
    .replace(/<br\s*\/?>|<\/(p|div|li|h\d|tr)>/gi,'\n').replace(/<[^>]+>/g,' ')
    .replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"')
-   .replace(/[ \t]+/g,' ').split('\n')
+   .replace(/[{}]/g,'\n').replace(/[ \t]+/g,' ').split('\n')
    // regels vol code-tekens (CSS-selectors, scripts) weg; gewone zinnen blijven
-   .filter(l=>{const t=l.trim();if(!t)return false;const c=(t.match(/[{}();:>#.\[\]=*_\\]/g)||[]).length;return c<=Math.max(2,t.length*0.08);})
-   .join('\n').trim().slice(0,12000);
+   .map(l=>{const w=l.trim().split(' ').filter(Boolean);if(!w.length)return '';
+     // een woord met code-tekens (selector, declaratie, script) telt als code
+     const code=x=>/[{}();>#\[\]=*_\\|@$]|^[.:]|\.[a-z-]+\.|^-{1,2}[a-z]|:[a-z0-9'"!-]/i.test(x);
+     const goed=w.filter(x=>!code(x));
+     return goed.length>=Math.max(1,w.length*0.6)?goed.join(' '):'';})
+   .filter(Boolean).join('\n').trim().slice(0,12000);
   return json({titel:titel.trim().slice(0,200),beschrijving:(meta('og:description')||meta('description')).slice(0,600),tekst});
  }catch{return json({error:'De pagina was niet bereikbaar.'},502);}
 }
