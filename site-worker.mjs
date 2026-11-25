@@ -100,7 +100,10 @@ export async function paginaRoute(request,env={}){
    .replace(/[^{}<>\n]{0,300}\{[^{}]*\}/g,' ').replace(/[^{}<>\n]{0,300}\{[^{}]*\}/g,' ')
    .replace(/<br\s*\/?>|<\/(p|div|li|h\d|tr)>/gi,'\n').replace(/<[^>]+>/g,' ')
    .replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"')
-   .replace(/[ \t]+/g,' ').replace(/\n\s*\n+/g,'\n').trim().slice(0,12000);
+   .replace(/[ \t]+/g,' ').split('\n')
+   // regels vol code-tekens (CSS-selectors, scripts) weg; gewone zinnen blijven
+   .filter(l=>{const t=l.trim();if(!t)return false;const c=(t.match(/[{}();:>#.\[\]=*_\\]/g)||[]).length;return c<=Math.max(2,t.length*0.08);})
+   .join('\n').trim().slice(0,12000);
   return json({titel:titel.trim().slice(0,200),beschrijving:(meta('og:description')||meta('description')).slice(0,600),tekst});
  }catch{return json({error:'De pagina was niet bereikbaar.'},502);}
 }
