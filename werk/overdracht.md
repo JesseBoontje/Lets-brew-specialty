@@ -501,3 +501,13 @@ Jesse zelf aan, token mag dat niet); delen als pagina/PDF.
 Schetsen: route https://claude.ai/artifact/VcgJSLkRAiirkc3AiNSatN , Brews-tab
 https://claude.ai/artifact/CgkKmjkyDxmo15kUK8xwy8 , nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7
 Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe branch, deze archiveren.
+
+## 25-11: schenkkan in de gietcoach (branch functie/schenkkan, PR #23)
+- app/04-gietcoach.js: gc-k-groep is nu de schenkkan (schoon -> gespiegeld x0,41 -> overtrek.py 7/3.6/3, RDP 0.12;
+  eerste haal 1.6, rest 0.7-1.0). PIV [30,50] (handvat), TIP [188,23] (haakje). CACHE scc-v120.
+- Keurmeester GOEDGEKEURD 8/8. Lokaal 20 node + 47 chromium groen.
+- Preview: handmatige build via trigger abb758cd (POST .../triggers/<id>/builds met branch). PATCH van
+  branch_includes gaf 'Invalid request body': een nieuwe push maakt dus NIET vanzelf een preview, opnieuw handmatig starten.
+- Wacht op Jesse: live of aanpassen. Daarna klus beeldkeuring (functie/beeldkeuring), zie takenbord.
+- Jesse 25-11: "Kan je ook de v60 tekening in de giet coach zetten" -> V60-modus toont m-v60.png (masker, fill var(--ink)).
+  Maten per zetter in GEO (zetGeo): v60 x=173+(px-370)*0.233, y=138+(py-125)*0.233. Switch ongewijzigd. Preview opnieuw handmatig gebouwd.
