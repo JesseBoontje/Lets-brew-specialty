@@ -24,6 +24,40 @@
 <div class="mk-kop"><h1>Slot en sleutel</h1>
   <div class="mk-onder">Opzet, nog niet ingebouwd. Een slot op letsbrew.djez.app (inloggen met een code per mail) en de AI-sleutel veilig op de server, met een daglimiet.</div></div>
 
+<div class="mk-sect"><h2>Nieuw voorstel: twee soorten gebruikers</h2></div>
+<div class="route">
+<svg viewBox="0 0 400 330" role="img" aria-label="Iedereen: app open, eigen sleutel of geen AI. Goedgekeurd: inloggen, AI via de server">
+  <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
+    <rect x="130" y="8" width="140" height="50" rx="18" fill="var(--card)"/>
+    <path d="M170 58 L95 92 M88 82 L94 93 L104 88"/>
+    <path d="M230 58 L305 92 M296 88 L306 93 L312 82"/>
+    <rect x="10" y="96" width="180" height="130" rx="18" fill="var(--cream)"/>
+    <rect x="210" y="96" width="180" height="130" rx="18" fill="var(--card)"/>
+    <rect x="210" y="250" width="180" height="70" rx="18" fill="var(--cream)"/>
+    <path d="M300 226 V246 M293 238 L300 247 L307 238"/>
+  </g>
+  <text class="t" x="200" y="40" text-anchor="middle">letsbrew.djez.app</text>
+  <text class="t" x="100" y="124" text-anchor="middle">iedereen</text>
+  <text class="z" x="100" y="146" text-anchor="middle">geen inlog nodig</text>
+  <text class="z" x="100" y="166" text-anchor="middle">hele app werkt</text>
+  <text class="z" x="100" y="186" text-anchor="middle">AI alleen met</text>
+  <text class="z" x="100" y="204" text-anchor="middle">eigen sleutel</text>
+  <text class="t" x="300" y="124" text-anchor="middle">🔒 goedgekeurd</text>
+  <text class="z" x="300" y="146" text-anchor="middle">één keer inloggen</text>
+  <text class="z" x="300" y="166" text-anchor="middle">met code per mail</text>
+  <text class="z" x="300" y="186" text-anchor="middle">alleen mailadressen</text>
+  <text class="z" x="300" y="204" text-anchor="middle">die jij toevoegt</text>
+  <text class="t" x="300" y="280" text-anchor="middle">🔑 Lets Brew AI</text>
+  <text class="z" x="300" y="302" text-anchor="middle">jouw sleutel, 50 per dag</text>
+</svg>
+</div>
+<div class="mk-sect"><ul>
+  <li>Het slot zit alleen op de AI-deur (<i>/login</i> en <i>/api/ai</i>), niet op de hele app.</li>
+  <li>Een "gratis account" voegt nu niets toe: je gegevens staan op je eigen telefoon. Een account voor iedereen wordt pas nuttig bij de database (synchroniseren). Dan bouwen we het mee.</li>
+  <li>Goedkeuren = een mailadres op de lijst zetten (jij in het dashboard, of jij zegt het tegen Claude). Gratis tot 50 goedgekeurde mensen.</li>
+</ul></div>
+
+<div class="mk-sect"><h2>Eerste voorstel: slot op de hele app</h2></div>
 <div class="route">
 <svg viewBox="0 0 400 400" role="img" aria-label="Telefoon, slot Cloudflare Access, Worker met sleutel en daglimiet, AI">
   <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
