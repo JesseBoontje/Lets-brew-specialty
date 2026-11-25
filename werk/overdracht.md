@@ -511,3 +511,4 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
 - Wacht op Jesse: live of aanpassen. Daarna klus beeldkeuring (functie/beeldkeuring), zie takenbord.
 - Jesse 25-11: "Kan je ook de v60 tekening in de giet coach zetten" -> V60-modus toont m-v60.png (masker, fill var(--ink)).
   Maten per zetter in GEO (zetGeo): v60 x=173+(px-370)*0.233, y=138+(py-125)*0.233. Switch ongewijzigd. Preview opnieuw handmatig gebouwd.
+- 25-11 ~14:06 UTC: PR #23 gemerged na akkoord Jesse (main binnengehaald, CACHE scc-v122), live gecontroleerd: service-worker scc-v122, gietcoach-js met gc-m-v60, m-v60.png 200.
