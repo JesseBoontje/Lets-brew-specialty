@@ -501,3 +501,23 @@ Jesse zelf aan, token mag dat niet); delen als pagina/PDF.
 Schetsen: route https://claude.ai/artifact/VcgJSLkRAiirkc3AiNSatN , Brews-tab
 https://claude.ai/artifact/CgkKmjkyDxmo15kUK8xwy8 , nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7
 Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe branch, deze archiveren.
+
+## 25-11 13:30: OVERDRACHT naar een nieuwe sessie (context vol, Jesse: "maak nieuwe branch en archiveer deze")
+Live op main (scc-v120): release #15 (nakijkpunten, route, 5 tabs, Brews met my brews/brew ideas),
+#16-#22 bonen lezen (foto verkleind als jpeg, echte foutreden, /api/pagina in site-worker.mjs:
+alleen Sec-Fetch-Site same-origin, STEM_LIMITER, redirects zelf gekeurd, tekst gefilterd; foto op wishlist).
+Jesse heeft de foto/link-fix NOG NIET getest op de iPhone. singleestatecoffee.nl geeft via /api/pagina
+bijna geen tekst (waarschijnlijk script-opgebouwd); de app valt dan terug op raden ("partly a guess").
+
+VOLGENDE: de grote klus, stap 1 "slot en sleutel" (branch functie/slot-en-sleutel):
+- Cloudflare Access als slot op letsbrew.djez.app (inlog met code per mail), zodat een AI-sleutel
+  veilig als Worker-secret kan; app stuurt AI-vragen dan via eigen Worker-route met daglimiet.
+- Jesse plakt de sleutel zelf in het dashboard, nooit in de chat.
+- Daarna: D1-database (brews, beans, gear) + AI-coach centraal, websearch via de Worker
+  (wens Jesse: opbouwende kennis voor filter en espresso). Login-mail letsbrew@djez.app (EEN z);
+  Email Routing zet Jesse zelf aan (token mag dat niet).
+- Eerst opzet/schets (skill nieuwe-feature) en akkoord, niets inbouwen zonder akkoord.
+Werkwijze Jesse: zuinig, max één aannemer, één keuring per klus, kleine stappen pushen, let op
+verbruik en context; bij volle context weer overdracht + nieuwe branch + sessie archiveren.
+Cloudflare-token in deze omgeving: zones lezen gaat, Email Routing niet; Access-rechten onbekend (eerst
+met één GET proberen).
