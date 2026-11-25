@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-24 21:55 UTC (PR #14 gemerged en live)
+Laatst bijgewerkt: 2026-11-25 (overdracht naar nieuwe sessie, branch functie/nakijk-en-route)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -441,3 +441,47 @@ Claude. Nog ideeën?"
   5. Home-knop "Nieuwe kop" -> "New brew" (in brew-workspace.js addAction). Gevraagd
      of de andere Nederlandse home-teksten (Recepten kiezen, Koffiecoach, zin
      erboven, tabnamen) ook Engels worden.
+
+## 25-11: OVERDRACHT naar een nieuwe sessie (Jesse: "Maak hierna een nieuwe branch ivm context, archiveer deze")
+Branch: functie/nakijk-en-route (vanaf main 4394164 + werk-commits). Live = main.
+
+Besluiten van Jesse (25-11), letterlijk:
+- "Kan je de lettertypen laten zien ik weet niet welke welke is" -> vergelijking:
+  https://claude.ai/artifact/SH4cuV5SsUXuR4TSwSs2Tr (Caveat vs Patrick Hand, en
+  'alles Patrick Hand' / 'alles Caveat'). WACHT op zijn keuze (advies Patrick Hand).
+- "Alle titels in het engels" -> alle vaste titels/knoppen/zinnen in het Engels
+  (ook home: Nieuwe kop -> New brew, Recepten kiezen -> Choose a recipe,
+  Koffiecoach -> Coffee coach, de zin "Kies een recept...", tabnamen onderin
+  Zetten/Bonen/Recepten/Logboek/Leren/Instellingen, en de Nederlandse UI-teksten in
+  brew-workspace.js). Receptinhoud, lessen en AI-tekst blijven Nederlands (huisstijl).
+
+Nakijkpunten (opmerkingen op https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7),
+samen bouwen in één release, één keuring:
+  1. één lettertype (keuze Jesse afwachten);
+  2. surprise-me-kaart: gietcoach-tekening weg (logo + tekst blijven);
+  3. methoderij home alleen zijwaarts: #methods-scroll overflow-y:hidden (padding
+     voor de randen laten), touch-action pan-x pan-y testen;
+  4. .method{font:inherit} en andere <button>s zonder font nalopen;
+  5. alle titels Engels (zie boven).
+  Opmerkingen-threads zijn beantwoord, nog niet 'resolved': na bouwen resolven
+  (ArtifactComments resolve, url hierboven).
+
+NIEUWE KLUS (Jesse, letterlijk): "Maak in de nieuwe een route hoe ik en de ai moet
+invullen om bij de pourcoach en dial in pagina te komen vanaf beans naar brews naar
+dial in en pour coach let op filter espresso en beide"
+  -> eerst een opzet (skill nieuwe-feature, mockup-artifact), niets inbouwen:
+     de stappen beans -> brews -> dial-in (espresso) of pour coach (filter), en wat
+     bij een boon met fam 'both' (omni) gebeurt; per stap wat Jesse invult en wat de
+     AI invult/voorstelt (zonder AI ook bruikbaar). Bestaande code: beanFam/b.fam
+     (app/07), surMethodes (app/04-surprise.js), beginBrew/openDialIn (app/05),
+     pourToggle/gcPast/apPast (app/04), brewBean, renderChooseBean (app/07),
+     BrewWorkspace.startRecipe. Laten zien, akkoord vragen.
+Later (akkoord, "bouw later"): delen als pagina/PDF (opzet
+  https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i).
+
+Valkuilen deze sessie:
+- Preview/nakijkversie: build-preview.py plakt nu styles.css, scripts en fonts in
+  (fonts in eigen <style> vooraan); build-review.py zet SPLASH_MS op 300.
+  Nakijk-artifact publiceren vanuit een kopie in de scratchpad.
+- Force-push wordt geweigerd: na een merge een nieuwe branch vanaf main maken.
+- Werk zuinig: max één aannemer, één keuring per klus, bon na elke klus pushen.
