@@ -95,7 +95,9 @@ export async function paginaRoute(request,env={}){
   const meta=(n)=>{const m=html.match(new RegExp('<meta[^>]+(?:property|name)=["\']'+n+'["\'][^>]*content=["\']([^"\']*)','i'));return m?m[1]:'';};
   const titel=(html.match(/<title[^>]*>([^<]*)/i)||[])[1]||'';
   const tekst=html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<noscript[\s\S]*?<\/noscript>|<svg[\s\S]*?<\/svg>/gi,' ').replace(/<head[\s>][\s\S]*?<\/head>/i,' ').replace(/<!--[\s\S]*?-->/g,' ')
-   .replace(/\/\*[\s\S]*?\*\//g,' ').replace(/@font-face\s*\{[^}]*\}/gi,' ')
+   .replace(/\/\*[\s\S]*?\*\//g,' ')
+   // losse CSS-regels (selector { ... }), ook genest in @media: twee rondes
+   .replace(/[^{}<>\n]{0,300}\{[^{}]*\}/g,' ').replace(/[^{}<>\n]{0,300}\{[^{}]*\}/g,' ')
    .replace(/<br\s*\/?>|<\/(p|div|li|h\d|tr)>/gi,'\n').replace(/<[^>]+>/g,' ')
    .replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"')
    .replace(/[ \t]+/g,' ').replace(/\n\s*\n+/g,'\n').trim().slice(0,12000);
