@@ -511,3 +511,11 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
 - Wacht op Jesse: live of aanpassen. Daarna klus beeldkeuring (functie/beeldkeuring), zie takenbord.
 - Jesse 25-11: "Kan je ook de v60 tekening in de giet coach zetten" -> V60-modus toont m-v60.png (masker, fill var(--ink)).
   Maten per zetter in GEO (zetGeo): v60 x=173+(px-370)*0.233, y=138+(py-125)*0.233. Switch ongewijzigd. Preview opnieuw handmatig gebouwd.
+- 25-11 ~14:06 UTC: PR #23 gemerged na akkoord Jesse (main binnengehaald, CACHE scc-v122), live gecontroleerd: service-worker scc-v122, gietcoach-js met gc-m-v60, m-v60.png 200.
+
+## 25-11: beeldkeuring (branch functie/beeldkeuring)
+- Inventaris: 68 iconen goed; Jesse's png's blijven; grafieken (kaart/meter/band) buiten de stijlregels; docs/opzet-* archief.
+- Voorstellen in mockup FVbPK8y5ApgmuQSLtPEkNW: (1) AeroPress-coach ketel -> schenkkan (proef gebouwd in app/04-aeropress.js:
+  ongespiegeld 0.33x, tip 134,35, pivot 262,57; script scratchpad zet-ap.py = zet.py met S=0.33, geen spiegeling),
+  (2) BREWER_ART v60/chemex/aeropress -> m-*.png als masker met waterstand, (3) E61/Switch/leerkaarten losser: per tekening, later.
+- Wacht op keuze Jesse. Na bouwen: CACHE ophogen, keuring, PR, preview handmatig (trigger abb758cd).

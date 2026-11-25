@@ -5,8 +5,8 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
-| Schenkkan in de gietcoach (V60/Switch) i.p.v. de ketel + Jesse's eigen V60-tekening (m-v60.png) in V60-modus | architect | functie/schenkkan | gebouwd 25-11 (scc-v120), schenkkan GOEDGEKEURD (8/8); V60-tekening erbij (scc-v121, 2e5bc7e), keuring 2 GOEDGEKEURD (6/6); PR #23, preview https://functie-schenkkan-lets-brew-specialty.jesseboontje-1aa.workers.dev | Jesse test; mergen pas na akkoord |
-| Beeldkeuring: alle iconen, tekeningen, splash, artifacts tegen skill schetsstijl-natekenen (Jesse's eigen png's niet hertekenen); mockup voor/na eerst | architect | functie/beeldkeuring (nog niet aangemaakt) | doorgegeven 25-11 via andere sessie, na schenkkan | Jesse bevestigt, dan inventaris + mockup |
+| Schenkkan + Jesse's V60-tekening in de gietcoach | architect | main (#23) | LIVE 25-11 (scc-v122), 2 keuringen GOEDGEKEURD | Jesse op iPhone testen |
+| Beeldkeuring tegen skill schetsstijl-natekenen | architect | functie/beeldkeuring | inventaris klaar 25-11 (116 svg's + png's); mockup https://claude.ai/artifact/FVbPK8y5ApgmuQSLtPEkNW ; proef AeroPress-schenkkan op branch (geen CACHE, niet gekeurd) | Jesse kiest: 1 AeroPress-schenkkan, 2 brewformulier m-*.png, 3 grote tekeningen losser (later) |
 | Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | LIVE 24-11 via #14 | Jesse op iPhone testen |
 | Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | akkoord Jesse 25-11 ("bouw later") | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; bouwen in app/06 als Jesse zegt, één keuring |
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |
