@@ -1,0 +1,158 @@
+<title>Lets Brew route</title>
+<style>
+/* Opzet "route van boon naar dial-in / pour coach" (25-11). Alleen een schets. */
+.phone .screen{padding:12px 16px 0;}
+.k{font-family:'Caveat',cursive;font-weight:700;font-size:32px;line-height:1;margin:2px 0 4px;}
+.s{font-size:14.5px;color:var(--ink-soft);margin:0 0 10px;}
+.kaart{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:10px 13px;margin:0 0 10px;}
+.kaart b{font-family:'Caveat',cursive;font-size:23px;line-height:1.05;display:block;}
+.kaart span{font-size:13.5px;color:var(--ink-soft);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 10px;}
+.chip{border:2px solid var(--line);border-radius:14px;padding:2px 10px;font-size:15px;background:var(--paper);color:var(--ink);font:inherit;}
+.chip.sel{background:var(--accent);color:var(--cream);border-color:var(--accent);}
+.veld{display:flex;justify-content:space-between;border-bottom:1.5px dashed var(--line);padding:5px 0;font-size:15.5px;}
+.veld i{font-style:normal;color:var(--ink-soft);}
+.ai{font-size:13.5px;background:var(--cream);border:1.5px dashed var(--accent-soft);border-radius:14px;padding:6px 10px;margin:8px 0;}
+.ai::before{content:"AI  ";font-weight:700;color:var(--accent);}
+.app{font-size:13.5px;background:var(--card-2);border-radius:14px;padding:6px 10px;margin:8px 0;}
+.app::before{content:"app  ";font-weight:700;color:var(--accent);}
+.laag{position:absolute;left:0;right:0;bottom:0;background:var(--paper);padding:14px 16px 18px;border-radius:24px 24px 0 0;border-top:2px solid var(--line);}
+.knop{display:block;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);font:inherit;color:var(--ink);padding:9px 13px;margin:0 0 10px;border-radius:18px;}
+.knop b{display:block;font-family:'Caveat',cursive;font-size:23px;line-height:1.05;}
+.knop span{font-size:13.5px;color:var(--ink-soft);}
+.knop.eerst{border-color:var(--accent);border-width:3px;}
+.dim{opacity:.35;}
+.groot{display:block;width:100%;border:0;border-radius:20px;background:var(--accent);color:var(--cream);font:inherit;font-family:'Caveat',cursive;font-size:26px;padding:8px;margin-top:8px;}
+/* routekaart */
+.route{max-width:420px;margin:0 auto 10px;}
+.route svg{display:block;width:100%;height:auto;}
+.route text{font-family:'Patrick Hand',cursive;fill:var(--ink);}
+.route .t{font-family:'Caveat',cursive;font-weight:700;font-size:24px;}
+.route .z{font-size:14px;fill:var(--ink-soft);}
+.tabel{width:100%;border-collapse:collapse;font-size:16px;}
+.tabel th,.tabel td{border-bottom:1.5px dashed var(--line);padding:6px 6px;text-align:left;vertical-align:top;}
+.tabel th{font-family:'Caveat',cursive;font-size:22px;}
+.tw{overflow-x:auto;}
+</style>
+
+<div class="mk-kop"><h1>Van boon naar dial-in of pour coach</h1>
+  <div class="mk-onder">Opzet, nog niet ingebouwd. Welke weg je loopt, wat jij invult en wat de app en de AI voor je invullen. Voor filter, espresso en omni.</div></div>
+
+<div class="route">
+<svg viewBox="0 0 400 470" role="img" aria-label="Route: boon, brew, dan dial-in of pour coach">
+  <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
+    <rect x="110" y="10" width="180" height="70" rx="20" fill="var(--card)"/>
+    <rect x="110" y="120" width="180" height="70" rx="20" fill="var(--card)"/>
+    <path d="M200 225 l45 35 l-45 35 l-45 -35 z" fill="var(--cream)"/>
+    <rect x="10" y="370" width="170" height="80" rx="20" fill="var(--espresso)"/>
+    <rect x="220" y="370" width="170" height="80" rx="20" fill="var(--v60)"/>
+    <path d="M200 80 V118 M200 190 V223 M160 275 C110 300 95 330 95 368 M240 275 C290 300 305 330 305 368"/>
+    <path d="M194 110 l6 8 l6 -8 M194 215 l6 8 l6 -8 M89 360 l6 8 l6 -8 M299 360 l6 8 l6 -8"/>
+  </g>
+  <text class="t" x="200" y="42" text-anchor="middle">1 bean</text>
+  <text class="z" x="200" y="64" text-anchor="middle">espresso / filter / omni</text>
+  <text class="t" x="200" y="152" text-anchor="middle">2 brew</text>
+  <text class="z" x="200" y="174" text-anchor="middle">choose a bean</text>
+  <text class="z" x="200" y="265" text-anchor="middle">which way?</text>
+  <text class="t" x="95" y="403" text-anchor="middle">3 dial-in</text>
+  <text class="z" x="95" y="428" text-anchor="middle">espresso, shot clock</text>
+  <text class="t" x="305" y="403" text-anchor="middle">3 pour coach</text>
+  <text class="z" x="305" y="428" text-anchor="middle">V60, Switch, AeroPress</text>
+  <text class="z" x="20" y="320">espresso roast</text>
+  <text class="z" x="380" y="320" text-anchor="end">filter roast</text>
+  <text class="z" x="200" y="330" text-anchor="middle">omni: jij kiest,</text>
+  <text class="z" x="200" y="348" text-anchor="middle">app onthoudt</text>
+</svg>
+</div>
+
+<div class="mk-rij">
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">new bean</div>
+      <p class="s">snap the bag, or type it in</p>
+      <div class="veld"><span>name</span><i>Ethiopia Guji</i></div>
+      <div class="veld"><span>roaster</span><i>Friedhats</i></div>
+      <div class="veld"><span>roast date</span><i>18 Nov</i></div>
+      <div class="veld"><span>roast</span><i>light</i></div>
+      <div style="margin-top:10px;font-size:15px">roasted for</div>
+      <div class="chips"><button class="chip" type="button">espresso</button><button class="chip" type="button">filter</button><button class="chip sel" type="button">omni</button></div>
+      <div class="ai">las het etiket: naam, brander, datum, branding en "omni roast" ingevuld. Klopt het? Tik om te wijzigen.</div>
+      <div class="app">zonder AI: jij typt het, de app vult niets in wat hij niet weet.</div>
+    </div></div>
+    <figcaption><b>1 · de boon</b> — jij: foto of typen. AI: leest het etiket. De keuze espresso, filter of omni bepaalt straks de weg.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="dim">
+        <div class="k">new brew</div>
+        <p class="s">which bean?</p>
+        <div class="kaart" style="background:var(--espresso)"><b>Brazil Cerrado</b><span>espresso roast · day 9</span></div>
+        <div class="kaart"><b>Ethiopia Guji</b><span>omni roast · day 7</span></div>
+      </div>
+      <div class="laag">
+        <div class="k" style="font-size:27px">how do you brew it?</div>
+        <button class="knop eerst" type="button"><b>espresso · dial in</b><span>Linea Mini · last time 18 g → 40 g</span></button>
+        <button class="knop" type="button"><b>filter · pour coach</b><span>V60 · or AeroPress</span></button>
+        <div class="ai">light omni roast: shines as filter, as espresso go 1:2.5 at 95 °C.</div>
+      </div>
+    </div></div>
+    <figcaption><b>2 · omni-boon</b> — alleen bij omni (of meerdere methodes) vraagt de app de weg. Je laatste keuze staat bovenaan, de rest gaat zonder vraag door.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">dial-in</div>
+      <p class="s">Ethiopia Guji · Linea Mini</p>
+      <div class="veld"><span>dose</span><i>18 g</i></div>
+      <div class="veld"><span>yield</span><i>45 g</i></div>
+      <div class="veld"><span>grind</span><i>11 (last: 12)</i></div>
+      <div class="veld"><span>target time</span><i>28–32 s</i></div>
+      <div class="app">ingevuld uit je laatste shot met deze boon, anders uit het recept. Dag 7 na branding: één tikje fijner.</div>
+      <div class="ai">na het shot: "zuur en snel" → grind 10, zelfde dosis.</div>
+      <button class="groot" type="button">start shot clock</button>
+    </div></div>
+    <figcaption><b>3a · espresso</b> — jij: shot zetten, tijd en smaak. App: dosis, yield, maalstand. AI: volgende stap na het proeven.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">brew</div>
+      <p class="s">Ethiopia Guji · V60</p>
+      <div class="veld"><span>recipe</span><i>Hoffmann 1 cup</i></div>
+      <div class="veld"><span>coffee</span><i>15 g</i></div>
+      <div class="veld"><span>water</span><i>250 g · 94 °C</i></div>
+      <div class="veld"><span>bloom</span><i>45 g · 45 s</i></div>
+      <div class="app">recept van vorige keer op de V60. Bloom uit de versheid (dag 7).</div>
+      <div class="ai">optioneel: recept op maat voor deze boon.</div>
+      <button class="groot" type="button">open pour coach</button>
+    </div></div>
+    <figcaption><b>3b · filter</b> — jij: start de coach en giet. App: recept, gram, bloom. AI: alleen als je erom vraagt.</figcaption>
+  </figure>
+</div>
+
+<div class="mk-sect">
+  <h2>Wie vult wat in</h2>
+  <div class="tw"><table class="tabel">
+    <tr><th>stap</th><th>Jesse</th><th>app (altijd)</th><th>AI (als hij aan staat)</th></tr>
+    <tr><td>1 bean</td><td>foto of naam, en controleren</td><td>versheid, piek, welke methodes je hebt</td><td>etiket lezen, branding en espresso/filter/omni</td></tr>
+    <tr><td>2 brew</td><td>boon kiezen; bij omni de weg</td><td>weg bij espresso- of filterboon, je laatste keuze onthouden</td><td>één zin advies bij omni</td></tr>
+    <tr><td>3 dial-in</td><td>shot, tijd, smaak</td><td>dosis, yield, maalstand uit laatste shot</td><td>volgende maalstand na het proeven</td></tr>
+    <tr><td>3 pour coach</td><td>gieten, smaak</td><td>recept, gram, bloom</td><td>recept op maat (op verzoek)</td></tr>
+  </table></div>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat ik anders doe dan nu</h2>
+  <ul>
+    <li><b>Omni kiest nu stil de eerste methode.</b> Dat kan net de verkeerde zijn. Voorstel: een keuzevel met twee knoppen, je laatste keuze bovenaan.</li>
+    <li><b>Espresso- en filterbonen</b> gaan zoals nu direct door, zonder extra tik.</li>
+    <li><b>Meerdere filtermethodes bij één boon</b> (V60 en AeroPress): hetzelfde keuzevel, anders pakt de app altijd de eerste.</li>
+    <li><b>Zonder AI</b> werkt de hele weg. De AI vult alleen dingen voor, jij tikt ze goed.</li>
+  </ul>
+  <h2>Wat niet kan</h2>
+  <ul>
+    <li>De AI kan niet zien hoe je shot eruitziet. Hij weet alleen wat jij invult: tijd, gewicht en smaak.</li>
+    <li>Zonder sleutel geen etiket lezen. Dan typ je de boon zelf in.</li>
+  </ul>
+</div>
