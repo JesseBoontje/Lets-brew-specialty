@@ -20,13 +20,28 @@
 .route text{font-family:'Patrick Hand',cursive;fill:var(--ink);}
 .route .t{font-family:'Caveat',cursive;font-weight:700;font-size:22px;}
 .route .z{font-size:13px;fill:var(--ink-soft);}
+.reel{position:absolute;inset:34px 0 52px 0;background:var(--ink);color:var(--paper);overflow:hidden;}
+.reel .foto{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.reel .foto svg{width:70%;height:auto;}
+.reel .onder{position:absolute;left:14px;right:64px;bottom:14px;}
+.reel .onder b{font-family:'Caveat',cursive;font-size:28px;display:block;line-height:1;}
+.reel .onder span{font-size:13px;opacity:.85;}
+.reel .wie{font-size:14px;margin-bottom:4px;}
+.reel .zij{position:absolute;right:10px;bottom:18px;display:flex;flex-direction:column;gap:14px;align-items:center;font-size:12px;}
+.reel .zij i{font-style:normal;font-size:24px;display:block;text-align:center;}
+.reel .boven{position:absolute;top:10px;left:0;right:0;text-align:center;font-family:'Caveat',cursive;font-size:22px;}
+.reel .veeg{position:absolute;top:44%;right:8px;font-size:11px;opacity:.6;writing-mode:vertical-rl;}
+.tabbalk{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-around;border-top:2px solid var(--line);background:var(--paper);padding:8px 4px 12px;font-size:13px;color:var(--ink-soft);}
+.tabbalk .on{color:var(--ink);font-weight:700;text-decoration:underline;}
+.prof{display:flex;gap:14px;font-size:13px;color:var(--ink-soft);margin:0 0 10px;}
+.prof b{display:block;font-family:'Caveat',cursive;font-size:24px;color:var(--ink);}
 </style>
 
-<div class="mk-kop"><h1>Account en delen</h1>
-  <div class="mk-onder">Opzet, nog niet ingebouwd. Iedereen kan een eigen account maken. Je beans en brews staan dan ook veilig online, en per stuk kies je: privé, alleen voor wie de link heeft, of openbaar. AI krijg je alleen als Jesse je account goedkeurt.</div></div>
+<div class="mk-kop"><h1>Account, volgen en feed</h1>
+  <div class="mk-onder">Opzet, wordt later gebouwd. Iedereen kan een eigen account maken, privé of openbaar. Je volgt andere accounts, en hun brews en beans zie je in een feed die je omhoog veegt, zoals Reels. AI alleen voor accounts die Jesse goedkeurt.</div></div>
 
 <div class="route">
-<svg viewBox="0 0 400 300" role="img" aria-label="Drie stappen: account en database, delen, AI voor goedgekeurde accounts">
+<svg viewBox="0 0 400 300" role="img" aria-label="Drie stappen: account en database, volgen en feed, AI voor goedgekeurde accounts">
   <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
     <rect x="70" y="10" width="260" height="70" rx="18" fill="var(--card)"/>
     <rect x="70" y="112" width="260" height="70" rx="18" fill="var(--cream)"/>
@@ -35,9 +50,9 @@
     <path d="M200 182 V210 M193 202 L200 211 L207 202"/>
   </g>
   <text class="t" x="200" y="40" text-anchor="middle">stap 1 · account + database</text>
-  <text class="z" x="200" y="62" text-anchor="middle">inloggen met Face ID, beans en brews online bewaard</text>
-  <text class="t" x="200" y="142" text-anchor="middle">stap 2 · delen</text>
-  <text class="z" x="200" y="164" text-anchor="middle">per bean of brew: privé · link · openbaar</text>
+  <text class="z" x="200" y="62" text-anchor="middle">Face ID, beans en brews online bewaard</text>
+  <text class="t" x="200" y="142" text-anchor="middle">stap 2 · volgen + feed</text>
+  <text class="z" x="200" y="164" text-anchor="middle">account privé of openbaar, veeg door je feed</text>
   <text class="t" x="200" y="244" text-anchor="middle">stap 3 · AI voor goedgekeurd</text>
   <text class="z" x="200" y="266" text-anchor="middle">jij zet AI aan per account, 50 vragen per dag</text>
 </svg>
@@ -52,30 +67,34 @@
       <button class="knop2" type="button">not now, keep it on this phone</button>
       <div class="cf">No password. Your iPhone keeps the key in iCloud Keychain.</div>
     </div></div>
-    <figcaption><b>1 · account</b>: inloggen met Face ID (een passkey). Geen wachtwoord en geen mail nodig. Zonder account werkt de app gewoon zoals nu.</figcaption>
+    <figcaption><b>1 · account</b>: inloggen met Face ID (passkey). Geen wachtwoord, geen mail. Zonder account werkt de app gewoon zoals nu.</figcaption>
   </figure>
 
   <figure class="mk-fig">
     <div class="phone"><div class="statusbar">9:41</div><div class="screen">
-      <div class="k">Ethiopia Guji</div>
-      <div class="kaart"><b>Who can see this?</b>
-        <div class="keus"><button type="button">private</button><button class="sel" type="button">link</button><button type="button">public</button></div>
-        <span>Anyone with the link can look. Not listed on your profile.</span></div>
-      <button class="knop2" type="button">copy link</button>
-      <div class="cf">Price, notes and photos: you choose per item what is shown.</div>
+      <div class="k">@jesse</div>
+      <div class="prof"><span><b>42</b>brews</span><span><b>9</b>beans</span><span><b>18</b>followers</span><span><b>12</b>following</span></div>
+      <div class="kaart"><b>Account</b>
+        <div class="keus"><button class="sel" type="button">private</button><button type="button">public</button></div>
+        <span>Private: people ask to follow you, you say yes or no. Public: anyone can follow and look.</span></div>
+      <div class="kaart"><b>Follow requests</b><span>sanne wants to follow you</span>
+        <div class="keus" style="margin-top:6px"><button class="sel" type="button">accept</button><button type="button">decline</button></div></div>
     </div></div>
-    <figcaption><b>2 · delen</b>: standaard staat alles op privé. "Link" is voor vrienden. "Openbaar" komt op je profielpagina te staan.</figcaption>
+    <figcaption><b>2 · je profiel</b>: één schakelaar voor je hele account. Privé betekent dat mensen een volgverzoek sturen en jij beslist. Openbaar betekent dat iedereen je kan volgen.</figcaption>
   </figure>
 
   <figure class="mk-fig">
     <div class="phone"><div class="statusbar">9:41</div><div class="screen">
-      <div class="k">jesse's coffee</div>
-      <div class="cf">letsbrew.djez.app/@jesse</div>
-      <div class="kaart"><b>Ethiopia Guji</b><span>washed · 1950 m · ★ 8 · 4 brews</span></div>
-      <div class="kaart"><b>Hoffmann V60, sweet</b><span>15 g → 250 g · 94 °C · 2:45</span></div>
-      <button class="knop2" type="button">save to my brew ideas</button>
+      <div class="reel">
+        <div class="boven">following</div>
+        <div class="foto"><svg viewBox="0 0 120 120" fill="none" stroke="var(--paper)" stroke-width="2.5" filter="url(#wobble-rough)"><path d="M25 45 H85 L80 95 Q78 104 68 104 H42 Q32 104 30 95 Z"/><path d="M85 55 Q102 55 100 70 Q98 82 82 82"/><path d="M45 35 Q40 25 47 18 M58 35 Q53 25 60 18 M71 35 Q66 25 73 18"/></svg></div>
+        <div class="veeg">swipe up ↑</div>
+        <div class="onder"><div class="wie">@sanne · 2 h</div><b>Kenya Nyeri, V60</b><span>15 g → 250 g · 93 °C · 3:05 · ★ 8.5<br>"blackcurrant, so juicy"</span></div>
+        <div class="zij"><span><i>♡</i>24</span><span><i>☕</i>try</span><span><i>⤴</i>share</span></div>
+      </div>
+      <div class="tabbalk"><span>Home</span><span>Beans</span><span>Brews</span><span class="on">Feed</span><span>Settings</span></div>
     </div></div>
-    <figcaption><b>3 · zo zien anderen het</b>: een gewone webpagina. Een vreemde heeft geen account nodig om te kijken. Wie wel een account heeft, kan een recept bewaren.</figcaption>
+    <figcaption><b>3 · de feed</b>: één brew of bean per scherm, omhoog vegen voor de volgende, alleen van accounts die je volgt. Met "try" komt het recept in je brew ideas. Let op: in deze schets staat Feed op de plek van Learn. Waar Learn komt, kiezen we bij het bouwen.</figcaption>
   </figure>
 
   <figure class="mk-fig">
@@ -94,23 +113,27 @@
 <div class="mk-sect">
   <h2>Wat ik overneem</h2>
   <ul>
-    <li>Iedereen een eigen account, met database (Cloudflare D1, gratis voor dit gebruik).</li>
-    <li>Per bean en per brew kiezen: privé of gedeeld, met vrienden of met vreemden.</li>
-    <li>AI alleen voor accounts die jij goedkeurt, met jouw sleutel veilig op de server.</li>
+    <li>Delen per account, niet per bean of brew: je hele account staat op privé of openbaar.</li>
+    <li>Accounts volgen elkaar. Een feed als Reels, in de Lets Brew-tekenstijl.</li>
+    <li>Later bouwen. Nu alleen de basis bedenken, zodat stap 1 al goed ligt.</li>
   </ul>
-  <h2>Wat ik anders doe, en waarom</h2>
+  <h2>Wat ik toevoeg, en waarom</h2>
   <ul>
-    <li><b>Face ID in plaats van een code per mail.</b> Cloudflare Access is gratis tot 50 mensen en is gemaakt om een slot te zijn, niet om iedereen te laten aanmelden. Codes mailen naar vreemden vraagt een extra maildienst. Een passkey (Face ID) heeft geen mail nodig, kent geen limiet en staat al op je wensenlijst.</li>
-    <li><b>Drie standen in plaats van twee:</b> privé, link en openbaar. "Link" is precies het delen met vrienden, zonder dat het voor de hele wereld te zien is.</li>
-    <li><b>Geen openbare tijdlijn van vreemden, voorlopig.</b> Openbaar betekent: op je eigen profielpagina. Een tijdlijn waarop vreemden posten vraagt om toezicht (spam, rare foto's). Die kan later, als het nodig blijkt.</li>
-    <li><b>Je telefoon blijft de basis.</b> De app werkt offline zoals nu, en het account houdt een kopie bij. Er raakt niets kwijt als je even geen bereik hebt.</li>
-    <li>De opzet "delen als pagina/PDF" valt hierin op: stand "link" maakt zo'n pagina.</li>
+    <li><b>Volgverzoeken bij privé</b>, zoals Instagram. Anders betekent "privé" eigenlijk "niemand kan je volgen".</li>
+    <li><b>De feed laat alleen zien wie je volgt</b>, geen vreemden die je niet kent. Zo is er geen toezicht nodig op spam.</li>
+    <li><b>Prijs en eigen notities</b> blijven altijd privé, ook bij een openbaar account. Gedeeld worden recept, boon, score en de korte smaaknotitie.</li>
+    <li><b>"Try"</b> zet het recept van een ander in je eigen brew ideas. Daarmee wordt de feed nuttig en niet alleen leuk om te kijken.</li>
   </ul>
-  <h2>Wat er niet kan, of wat je moet weten</h2>
+  <h2>De basis die nu al bedacht is</h2>
   <ul>
-    <li><b>Gegevens van anderen bewaren is een verantwoordelijkheid (AVG).</b> Er komen een korte privacytekst en een knop "account en alles wissen" bij. Dat bouw ik mee.</li>
-    <li><b>Foto's online</b> hebben opslag nodig (Cloudflare R2, gratis tot 10 GB). In stap 1 alleen tekst, foto's in stap 2.</li>
-    <li><b>Telefoon kwijt</b>: de passkey zit in iCloud Keychain, dus op een nieuwe iPhone kun je gewoon weer inloggen. Zonder iCloud Keychain ben je je account kwijt. Een reserve-inlog per mail kan later.</li>
-    <li>Dit is de grootste klus tot nu toe. Ik bouw hem in drie stappen, en elke stap krijgt een eigen testlink en jouw akkoord.</li>
+    <li><b>De database</b> (Cloudflare D1) heeft vanaf de start een plek voor accounts, privé/openbaar, wie wie volgt (met verzoek of geaccepteerd), likes en AI-goedkeuring. Volgen kan er dus later bij zonder om te bouwen. Het schema staat in docs/infra-account-volgen.md.</li>
+    <li><b>Je huidige gegevens passen er al in</b>: elke bean en brew heeft een eigen nummer en een tijd. Er hoeft nu niets aan de app te veranderen. Bij stap 1 komt er alleen een "laatst gewijzigd"-tijd bij, nodig om te synchroniseren.</li>
+    <li><b>Foto's</b> voor de feed komen in Cloudflare R2 (gratis tot 10 GB), en worden verkleind voordat ze worden opgeslagen.</li>
+  </ul>
+  <h2>Wat je moet weten</h2>
+  <ul>
+    <li><b>Gegevens van anderen bewaren valt onder de AVG.</b> Er komen een privacytekst, een knop "account en alles wissen" en een knop om iemand te melden of te blokkeren.</li>
+    <li><b>Telefoon kwijt</b>: de passkey zit in iCloud Keychain, dus op een nieuwe iPhone log je weer in.</li>
+    <li>Elke stap krijgt een eigen testlink en jouw akkoord.</li>
   </ul>
 </div>
