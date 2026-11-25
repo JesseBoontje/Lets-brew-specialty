@@ -1,0 +1,89 @@
+<title>Lets Brew Brews-tab</title>
+<style>
+/* Opzet "één tab Brews met brewed en recipes" (25-11). Alleen een schets. */
+.phone .screen{padding:12px 16px 0;position:relative;height:100%;box-sizing:border-box;}
+.k{font-family:'Caveat',cursive;font-weight:700;font-size:38px;line-height:1;margin:4px 0 8px;}
+.wissel{display:flex;gap:8px;margin:0 0 12px;}
+.wissel button{flex:1;border:2px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);font:inherit;font-size:18px;padding:6px 0;}
+.wissel button.sel{background:var(--accent);color:var(--cream);border-color:var(--accent);}
+.kaart{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:9px 13px;margin:0 0 10px;}
+.kaart b{font-family:'Caveat',cursive;font-size:24px;line-height:1.05;display:block;}
+.kaart span{font-size:14px;color:var(--ink-soft);}
+.kaart .r{float:right;font-family:'Caveat',cursive;font-size:24px;color:var(--ink);}
+.nieuw{display:block;width:100%;border:0;border-radius:20px;background:var(--accent);color:var(--cream);font:inherit;font-family:'Caveat',cursive;font-size:24px;padding:7px;margin:2px 0 12px;}
+.tabbalk{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-around;border-top:2px solid var(--line);background:var(--paper);padding:8px 4px 12px;font-size:13px;color:var(--ink-soft);}
+.tabbalk .on{color:var(--ink);font-weight:700;text-decoration:underline;}
+.route{max-width:420px;margin:0 auto 10px;}
+.route svg{display:block;width:100%;height:auto;}
+.route text{font-family:'Patrick Hand',cursive;fill:var(--ink);}
+.route .t{font-family:'Caveat',cursive;font-weight:700;font-size:23px;}
+.route .z{font-size:14px;fill:var(--ink-soft);}
+</style>
+
+<div class="mk-kop"><h1>Eén tab: Brews</h1>
+  <div class="mk-onder">Opzet, nog niet ingebouwd. Brew ideas (recepten) en my brews (je gezette koppen) onder één tab, met twee knoppen bovenaan. Er gaat niets verloren.</div></div>
+
+<div class="route">
+<svg viewBox="0 0 400 430" role="img" aria-label="Ketting: boon, Brews, recept, dial-in of pour coach, opslaan, terug onder brewed">
+  <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
+    <rect x="120" y="10" width="160" height="56" rx="18" fill="var(--card)"/>
+    <rect x="120" y="96" width="160" height="56" rx="18" fill="var(--card)"/>
+    <rect x="120" y="182" width="160" height="56" rx="18" fill="var(--cream)"/>
+    <rect x="120" y="268" width="160" height="56" rx="18" fill="var(--espresso)"/>
+    <rect x="120" y="354" width="160" height="56" rx="18" fill="var(--v60)"/>
+    <path d="M200 66 V94 M200 152 V180 M200 238 V266 M200 324 V352"/>
+    <path d="M194 86 l6 8 l6 -8 M194 172 l6 8 l6 -8 M194 258 l6 8 l6 -8 M194 344 l6 8 l6 -8"/>
+    <path d="M280 382 C370 382 370 124 282 124"/>
+    <path d="M292 118 l-10 6 l10 6"/>
+  </g>
+  <text class="t" x="200" y="45" text-anchor="middle">bean</text>
+  <text class="t" x="200" y="131" text-anchor="middle">Brews</text>
+  <text class="t" x="200" y="210" text-anchor="middle">recipe</text>
+  <text class="z" x="200" y="229" text-anchor="middle">of "new brew" zonder recept</text>
+  <text class="t" x="200" y="303" text-anchor="middle">dial-in / pour coach</text>
+  <text class="t" x="200" y="389" text-anchor="middle">save</text>
+  <text class="z" x="372" y="250" text-anchor="end" transform="rotate(90 360 250)">komt onder my brews</text>
+</svg>
+</div>
+
+<div class="mk-rij">
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Brews</div>
+      <div class="wissel"><button class="sel" type="button">my brews</button><button type="button">brew ideas</button></div>
+      <button class="nieuw" type="button">＋ new brew</button>
+      <div class="kaart"><span class="r">8</span><b>Ethiopia Guji</b><span>V60 · today · 15 g → 250 g · 2:45</span></div>
+      <div class="kaart"><span class="r">7.5</span><b>Brazil Cerrado</b><span>espresso · yesterday · 18 g → 40 g · 29 s</span></div>
+      <div class="kaart"><span class="r">—</span><b>Brazil Cerrado</b><span>dial-in attempt · yesterday · sour, fast</span></div>
+      <div class="tabbalk"><span>Home</span><span>Beans</span><span class="on">Brews</span><span>Learn</span><span>Settings</span></div>
+    </div></div>
+    <figcaption><b>my brews</b>: alles wat je echt zette, nieuwste bovenaan. Hetzelfde als de lijst die nu "Log" heet, met filters en zoeken zoals nu.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Brews</div>
+      <div class="wissel"><button type="button">my brews</button><button class="sel" type="button">brew ideas</button></div>
+      <button class="nieuw" type="button">＋ own recipe</button>
+      <div class="kaart"><b>Hoffmann V60</b><span>15 g · 250 g · 94 °C · base recipe</span></div>
+      <div class="kaart"><b>Guji sweet espresso</b><span>18 g → 45 g · 95 °C · own recipe</span></div>
+      <div class="kaart"><b>AeroPress inverted</b><span>14 g · 200 g · 88 °C · base recipe</span></div>
+      <div class="tabbalk"><span>Home</span><span>Beans</span><span class="on">Brews</span><span>Learn</span><span>Settings</span></div>
+    </div></div>
+    <figcaption><b>brew ideas</b>: je plannen. Tik op een recept en "brew with this recipe" start de dial-in of de pour coach.</figcaption>
+  </figure>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat er verandert</h2>
+  <ul>
+    <li><b>Tabbalk</b> van zes naar vijf: Home · Beans · Brews · Learn · Settings.</li>
+    <li><b>Brews</b> opent op <i>my brews</i>. De app onthoudt welke knop je het laatst koos.</li>
+    <li><b>Op home</b> wordt "Choose a recipe" een snelkoppeling naar Brews → brew ideas.</li>
+    <li><b>Gegevens</b>: niets verhuist of verdwijnt. Recepten en gezette koppen blijven apart opgeslagen.</li>
+  </ul>
+  <h2>Wat ik bewust niet doe</h2>
+  <ul>
+    <li>Recepten en koppen in één lijst door elkaar. Dan zie je een plan en een resultaat niet meer uit elkaar.</li>
+  </ul>
+</div>

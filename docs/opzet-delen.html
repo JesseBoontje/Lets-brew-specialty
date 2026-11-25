@@ -1,0 +1,107 @@
+<title>Lets Brew delen</title>
+<style>
+/* Opzet "delen als pagina/PDF" (25-11). Randen: zelfde getekende dubbele lijnen als de app. */
+.rand{position:relative;}
+.rand>svg.r{position:absolute;left:-8px;top:-8px;overflow:visible;pointer-events:none;fill:none;stroke-linecap:round;filter:url(#wobble-rough);}
+.rand>svg.r path{stroke:var(--ink);stroke-width:1.6;}
+.rand>svg.r path.b{stroke-width:1.15;opacity:.6;}
+.rand.zacht>svg.r path{stroke:var(--ink-soft);}
+.phone .screen{padding:14px 16px 0;}
+.dl-kop{font-family:'Caveat',cursive;font-weight:700;font-size:34px;line-height:1;margin:4px 0 2px;}
+.dl-sub{font-size:15px;color:var(--ink-soft);margin:0 0 12px;}
+.dl-laag{position:absolute;left:0;right:0;bottom:0;background:var(--paper);padding:14px 16px 18px;border-radius:24px 24px 0 0;}
+.dl-laag h3{font-family:'Caveat',cursive;font-weight:700;font-size:26px;margin:0 0 8px;}
+.dl-knop{display:block;width:100%;text-align:left;border:0;background:var(--card);font:inherit;color:var(--ink);padding:10px 14px;margin:0 0 12px;border-radius:18px;min-height:56px;}
+.dl-knop b{display:block;font-family:'Caveat',cursive;font-size:22px;line-height:1.05;}
+.dl-knop span{font-size:13.5px;color:var(--ink-soft);}
+.dl-dim{opacity:.35;}
+.pg{background:#fbf8f1;padding:16px 14px 0;height:100%;}
+.pg .t{font-family:'Caveat',cursive;font-weight:700;font-size:32px;line-height:1;}
+.pg .s{font-size:14px;color:var(--ink-soft);margin:2px 0 10px;}
+.pg-rij{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
+.pg-rij img{height:70px;mix-blend-mode:multiply;}
+.pg-getal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 12px;}
+.pg-getal div{padding:6px 2px;text-align:center;border-radius:12px;background:var(--card);}
+.pg-getal b{display:block;font-family:'Caveat',cursive;font-size:22px;line-height:1;}
+.pg-getal span{font-size:12px;color:var(--ink-soft);}
+.pg ol{margin:0 0 10px 18px;padding:0;font-size:14px;line-height:1.45;}
+.pg .voet{font-size:12px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:6px;margin-top:6px;}
+.mk-uitleg{max-width:340px;font-size:16px;line-height:1.45;}
+.mk-uitleg li{margin:4px 0;}
+</style>
+
+<div class="mk-kop"><h1>Delen met iemand zonder app</h1>
+  <div class="mk-onder">Opzet, nog niet ingebouwd. Een brew of een boon doorsturen als pagina of als PDF.</div></div>
+
+<div class="mk-rij">
+  <figure class="mk-fig">
+    <div class="phone">
+      <div class="statusbar">9:41</div>
+      <div class="screen">
+        <div class="dl-dim">
+          <div class="dl-kop">Kenya Nyeri</div>
+          <p class="dl-sub">V60, 15 g to 250 g, 2:45, 94 °C</p>
+          <div class="rand zacht" data-seed="3" style="height:120px;border-radius:22px;background:var(--v60)"></div>
+        </div>
+        <div class="dl-laag">
+          <h3>share this brew</h3>
+          <button class="dl-knop rand" data-seed="11" type="button"><b>send as a page</b><span>one file anyone can open, no app needed</span></button>
+          <button class="dl-knop rand" data-seed="12" type="button"><b>save as PDF</b><span>to print or attach to a mail</span></button>
+          <button class="dl-knop rand zacht" data-seed="13" type="button"><b>send to a Lets Brew user</b><span>they can add it to their own app</span></button>
+        </div>
+      </div>
+    </div>
+    <figcaption><b>delen</b> — op een brew of een boon. Hetzelfde menu voor allebei.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone">
+      <div class="statusbar">9:41</div>
+      <div class="pg">
+        <div class="pg-rij"><img src="../m-v60.png" alt=""><div><div class="t">Kenya Nyeri</div><div class="s">brewed by Jesse, 24 Nov 2026</div></div></div>
+        <div class="pg-getal"><div><b>15 g</b><span>coffee</span></div><div><b>250 g</b><span>water</span></div><div><b>94 °C</b><span>water</span></div>
+          <div><b>medium</b><span>grind</span></div><div><b>2:45</b><span>total</span></div><div><b>8.5</b><span>score</span></div></div>
+        <ol><li>0:00 bloom to 45 g, swirl</li><li>0:45 pour to 150 g</li><li>1:15 pour to 250 g</li><li>2:45 dry, done</li></ol>
+        <div class="s">taste: blackcurrant, lime, sweet</div>
+        <div class="voet">made with Lets Brew Specialty, letsbrew.djez.app</div>
+      </div>
+    </div>
+    <figcaption><b>de pagina</b> — zo ziet de ontvanger hem, in elke browser of mail. Als PDF ziet hij er hetzelfde uit.</figcaption>
+  </figure>
+
+  <div class="mk-sect mk-uitleg">
+    <h2>Hoe het werkt</h2>
+    <ul>
+      <li><b>Stuur als pagina:</b> de app maakt één los bestand met je recept en de tekening erin. Via WhatsApp, mail of AirDrop te openen zonder app.</li>
+      <li><b>PDF:</b> hetzelfde blad via het printmenu van de iPhone (Bewaar als PDF of Deel).</li>
+      <li><b>Bonen:</b> naam, brander, herkomst, proces, branddatum, smaaknotities, prijs per kop en je beste recept met die boon.</li>
+      <li><b>Naar een Lets Brew-gebruiker:</b> blijft het bestaande bestand dat hij in zijn eigen app kan zetten.</li>
+      <li><b>Niet mee:</b> je naam alleen als je hem invulde, geen AI-sleutels, geen andere brews.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function(){
+  function rng(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+  function pass(r,x,y,w,h,R,ver){const j=()=>(r()-.5)*2*ver,rr=()=>Math.max(5,Math.min(R+(r()-.5)*R*.5,w/2-2,h/2-2));
+    const a=rr(),b=rr(),c=rr(),d=rr(),sx=x+a+Math.max(0,w-a-b)*(.15+r()*.5),f=v=>v.toFixed(1);
+    let p='M'+f(sx)+' '+f(y+j());
+    p+=' Q'+f(x+w*.75)+' '+f(y+j()*1.4)+' '+f(x+w-b+j())+' '+f(y+j());
+    p+=' Q'+f(x+w+j()*.6)+' '+f(y+j()*.6)+' '+f(x+w+j())+' '+f(y+b+j());
+    p+=' Q'+f(x+w+j()*1.4)+' '+f(y+h/2)+' '+f(x+w+j())+' '+f(y+h-c+j());
+    p+=' Q'+f(x+w+j()*.6)+' '+f(y+h+j()*.6)+' '+f(x+w-c+j())+' '+f(y+h+j());
+    p+=' Q'+f(x+w/2)+' '+f(y+h+j()*1.4)+' '+f(x+d+j())+' '+f(y+h+j());
+    p+=' Q'+f(x+j()*.6)+' '+f(y+h+j()*.6)+' '+f(x+j())+' '+f(y+h-d+j());
+    p+=' Q'+f(x+j()*1.4)+' '+f(y+h/2)+' '+f(x+j())+' '+f(y+a+j());
+    p+=' Q'+f(x+j()*.6)+' '+f(y+j()*.6)+' '+f(x+a+j())+' '+f(y+j());
+    p+=' Q'+f((x+a+sx)/2)+' '+f(y+j())+' '+f(sx+8+r()*6)+' '+f(y+j()*1.6);return p;}
+  function teken(el){const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;const r=rng(+el.dataset.seed||7),p=8;
+    const R=parseFloat(getComputedStyle(el).borderTopLeftRadius)||16,ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
+    svg.setAttribute('class','r');svg.setAttribute('width',w+2*p);svg.setAttribute('height',h+2*p);svg.setAttribute('viewBox','0 0 '+(w+2*p)+' '+(h+2*p));
+    for(let k=0;k<2;k++){const q=document.createElementNS(ns,'path');q.setAttribute('d',k?pass(r,p-1.5,p-1.2,w+3,h+2.4,R+2,2.4):pass(r,p,p,w,h,R,1.1));if(k)q.setAttribute('class','b');svg.appendChild(q);}
+    el.appendChild(svg);}
+  const alles=()=>document.querySelectorAll('.rand').forEach(teken);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(alles);else alles();
+})();
+</script>

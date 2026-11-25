@@ -1,6 +1,6 @@
 # Overdrachtsbon
 
-Laatst bijgewerkt: 2026-11-24 (oude adres vervangen; PR #14 wacht op Jesse)
+Laatst bijgewerkt: 2026-11-25 (overdracht naar nieuwe sessie, branch functie/nakijk-en-route)
 
 ## Waar Jesse om vroeg
 "Zet de skill architect in, bekijk de repository. Zoek uit wat de app is, probeer
@@ -398,3 +398,106 @@ Claude. Nog ideeën?"
     hun eigen tint; kop "start with"; brew-kaart als zin (brewZin).
   - Tests: tests/startscherm.spec.cjs. Lokaal 42 Playwright (chromium) + 20 node groen.
 - Volgende stap: één keuring, dan (na akkoord) mergen PR #14, live controleren.
+
+## 24-11 21:50 UTC: LIVE
+- Jesse koos in de bouwsessie "Ja, zet live". PR #14 squash-merged (main 4394164),
+  Workers Builds account 1aaa91af geslaagd; letsbrew.djez.app geeft scc-v116.
+- Live doorgeklikt (chromium, iPhone 13): splash, home, randen, surprise me,
+  methodeknop naar dial-in, bonen. Console: alleen Cloudflare Web Analytics-
+  beacon door CSP geweigerd (bestond al).
+- Zelf testen door Jesse: iPhone Safari (splash-tik, randen, beginschermicoon).
+- Deze bon staat op branch werk/na-live-2026-11-24 (vanaf main); meenemen in de
+  volgende PR.
+
+## 25-11 02:10 UTC: wekker, volgende klus "delen als pagina/PDF"
+- Opzet docs/opzet-delen.html, artifact https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i
+  Menu op brew en boon: "send as a page" (los HTML-bestand met tekening, via
+  navigator.share als bestand), "save as PDF" (bestaand printBrew/runPrint, nu ook
+  voor bonen), "send to a Lets Brew user" (bestaand .lbsbrew/.lbsbeans).
+  Bestaande code: app/06 shareOneBrew, shareOneBean, brewSheetHTML, runPrint.
+- Wacht op akkoord Jesse; daarna bouwen (zelf, geen aannemer), één keuring.
+
+## 25-11: Jesse "1 bouw later" (delen als pagina/PDF: akkoord, later bouwen) en
+   "Kan je me een pagina geven waar ik weer aanpassingen aan kan noteren"
+- Nakijkversie opnieuw gebouwd en gepubliceerd op een NIEUWE link:
+  https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7 (de oude bestond niet meer).
+- Bouwer gerepareerd: build-preview.py plakt nu styles.css en alle lokale scripts
+  (app/01..12, brew-*.js) in de pagina en haalt de CSP-meta en manifest weg;
+  build-review.py zet SPLASH_MS op 300. Zonder dit was de nakijkversie sinds de
+  opsplitsing kapot.
+- Wacht op: Jesse's geplakte "Opdracht voor Lets Brew" (deel B van de skill).
+- Nakijkpunten van Jesse (opmerkingen op de nakijkpagina, 25-11), nog te bouwen in
+  één release:
+  1. Lettertypes: in de nakijkversie ontbraken ze (bouwerfout, hersteld). Jesse wil
+     "1 lettertype": vraag in de chat, advies Patrick Hand overal.
+  2. Surprise-me-kaart: "Verwijder deze tekening" (gietcoach-tekening weg, logo en
+     tekst blijven).
+  3. Methoderij op home: "mag alleen links rechts swipen, gaat nu ook naar boven
+     beneden". Oorzaak: padding-top/-bottom op #methods-scroll (overflow-x:auto maakt
+     overflow-y ook auto). Oplossing: overflow-y:hidden + touch-action:pan-x
+     (verticaal scrollen van de pagina moet blijven werken: pan-x pan-y? test).
+  4. Methodeknoppen op home: namen in systeemletter (button zonder font:inherit).
+     Oplossing: .method{font:inherit} (en nalopen: andere knoppen zonder font).
+  5. Home-knop "Nieuwe kop" -> "New brew" (in brew-workspace.js addAction). Gevraagd
+     of de andere Nederlandse home-teksten (Recepten kiezen, Koffiecoach, zin
+     erboven, tabnamen) ook Engels worden.
+
+## 25-11: OVERDRACHT naar een nieuwe sessie (Jesse: "Maak hierna een nieuwe branch ivm context, archiveer deze")
+Branch: functie/nakijk-en-route (vanaf main 4394164 + werk-commits). Live = main.
+
+Besluiten van Jesse (25-11), letterlijk:
+- "Kan je de lettertypen laten zien ik weet niet welke welke is" -> vergelijking:
+  https://claude.ai/artifact/SH4cuV5SsUXuR4TSwSs2Tr (Caveat vs Patrick Hand, en
+  'alles Patrick Hand' / 'alles Caveat'). WACHT op zijn keuze (advies Patrick Hand).
+- "Alle titels in het engels" -> alle vaste titels/knoppen/zinnen in het Engels
+  (ook home: Nieuwe kop -> New brew, Recepten kiezen -> Choose a recipe,
+  Koffiecoach -> Coffee coach, de zin "Kies een recept...", tabnamen onderin
+  Zetten/Bonen/Recepten/Logboek/Leren/Instellingen, en de Nederlandse UI-teksten in
+  brew-workspace.js). Receptinhoud, lessen en AI-tekst blijven Nederlands (huisstijl).
+
+Nakijkpunten (opmerkingen op https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7),
+samen bouwen in één release, één keuring:
+  1. één lettertype (keuze Jesse afwachten);
+  2. surprise-me-kaart: gietcoach-tekening weg (logo + tekst blijven);
+  3. methoderij home alleen zijwaarts: #methods-scroll overflow-y:hidden (padding
+     voor de randen laten), touch-action pan-x pan-y testen;
+  4. .method{font:inherit} en andere <button>s zonder font nalopen;
+  5. alle titels Engels (zie boven).
+  Opmerkingen-threads zijn beantwoord, nog niet 'resolved': na bouwen resolven
+  (ArtifactComments resolve, url hierboven).
+
+NIEUWE KLUS (Jesse, letterlijk): "Maak in de nieuwe een route hoe ik en de ai moet
+invullen om bij de pourcoach en dial in pagina te komen vanaf beans naar brews naar
+dial in en pour coach let op filter espresso en beide"
+  -> eerst een opzet (skill nieuwe-feature, mockup-artifact), niets inbouwen:
+     de stappen beans -> brews -> dial-in (espresso) of pour coach (filter), en wat
+     bij een boon met fam 'both' (omni) gebeurt; per stap wat Jesse invult en wat de
+     AI invult/voorstelt (zonder AI ook bruikbaar). Bestaande code: beanFam/b.fam
+     (app/07), surMethodes (app/04-surprise.js), beginBrew/openDialIn (app/05),
+     pourToggle/gcPast/apPast (app/04), brewBean, renderChooseBean (app/07),
+     BrewWorkspace.startRecipe. Laten zien, akkoord vragen.
+Later (akkoord, "bouw later"): delen als pagina/PDF (opzet
+  https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i).
+
+Valkuilen deze sessie:
+- Preview/nakijkversie: build-preview.py plakt nu styles.css, scripts en fonts in
+  (fonts in eigen <style> vooraan); build-review.py zet SPLASH_MS op 300.
+  Nakijk-artifact publiceren vanuit een kopie in de scratchpad.
+- Force-push wordt geweigerd: na een merge een nieuwe branch vanaf main maken.
+- Werk zuinig: max één aannemer, één keuring per klus, bon na elke klus pushen.
+
+## 25-11 middag: stand na nakijkronde, route en Brews-tab
+Branch functie/nakijk-en-route, laatste app-commit 8e1c999, CACHE scc-v118. 45/45 chromium groen.
+Gebouwd (Jesse akkoord): nakijkpunten 1-5 (beide lettertypes houden, geen system-ui meer,
+surprise-tekening weg, methoderij alleen zijwaarts, alles Engels); route boon -> dial-in/pour coach
+(keuzescherm #route-pop bij omni of meer eigen methodes, b.lastMethod, feature 'route'); vijf tabs
+Home·Beans·Brews·Learn·Settings; tab Brews met knoppen "my brews" (=page-brews) en "brew ideas"
+(=page-recipes), keuze in localStorage scc_brews_kant.
+Jesse 25-11 letterlijk: "Bouw eerst de kleine klussen zet die live laat mij structuur controleren
+daarna grote klussen." -> na keuring mergen naar main (PR), Jesse controleert, dan pas grote klussen.
+Grote klussen later: inlog + D1 + AI-coach centraal (AI met database van alle brews/beans/gear en
+koffietheorie via websearch in de Worker); login-mail letsbrew@djez.app (EEN z; Email Routing zet
+Jesse zelf aan, token mag dat niet); delen als pagina/PDF.
+Schetsen: route https://claude.ai/artifact/VcgJSLkRAiirkc3AiNSatN , Brews-tab
+https://claude.ai/artifact/CgkKmjkyDxmo15kUK8xwy8 , nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7
+Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe branch, deze archiveren.

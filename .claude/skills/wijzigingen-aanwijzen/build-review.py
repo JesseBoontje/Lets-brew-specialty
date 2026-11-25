@@ -41,9 +41,9 @@ def main():
                       "<title>Lets Brew \u2014 nakijken</title>", 1)
 
     # 3. de splash overslaan: bij nakijken wil je meteen in de app zitten
-    app, n = re.subn(r"\},\s*3000\);", "},300);", app, count=1)
+    app, n = re.subn(r"const SPLASH_MS=\d+;", "const SPLASH_MS=300;", app, count=1)
     if n != 1:
-        print("let op: splash-vertraging niet gevonden, hij blijft 3 s")
+        print("let op: splash-vertraging niet gevonden, hij blijft 4,25 s")
 
     # 4. de coffee finder een voorgekookt AI-antwoord geven. Een artifact mag niet
     #    naar buiten praten, dus zonder dit doet de zoekbalk op enter niets en valt

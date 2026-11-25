@@ -6,6 +6,9 @@
     --espresso:#e3d3bf;--aeropress:#dfdcc9;--v60:#e6d9cf;--chemex:#dcd9cc;--perculator:#e4d6cc;
     --radius:26px;
   }
+  /* knoppen en velden zonder eigen lettertype: niet de systeemletter van de telefoon */
+  :where(button,input,select,textarea){font-family:inherit;}
+  :where(button){color:inherit;}
   .phone,body{transition:background .45s;}
   /* statische koffieboon-achtergrond (feature: bg) */
   #bg-bean{position:absolute;inset:0;pointer-events:none;z-index:0;display:none;overflow:hidden;}
@@ -47,9 +50,9 @@
   .methods{padding:16px 12px;margin-bottom:16px;}
   .methods .lbl{color:var(--ink-soft);font-size:19px;padding:0 8px 12px;display:flex;justify-content:space-between;align-items:center;}
   .methods .lbl a{font-size:16px;border-bottom:1.5px solid var(--line);cursor:pointer;}
-  .methods-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 6px 4px;}
+  .methods-scroll{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;overscroll-behavior-x:contain;padding:0 6px 4px;}
   .methods-scroll::-webkit-scrollbar{display:none;}
-  .method{flex:none;width:74px;text-align:center;cursor:pointer;border:none;background:none;color:var(--ink);padding:10px 4px;border-radius:18px;}
+  .method{font:inherit;flex:none;width:74px;text-align:center;cursor:pointer;border:none;background:none;color:var(--ink);padding:10px 4px;border-radius:18px;}
   .method:active{background:rgba(0,0,0,.04);}
   .method .ic{height:50px;display:flex;align-items:center;justify-content:center;}
   .method .ic img{max-height:100%;max-width:100%;mix-blend-mode:multiply;}
@@ -1662,17 +1665,7 @@ html.randen .sketch.rand-on::before{display:none;}
 html.randen .rand-on:is(.ws-card,.ws-actions>button,.ws-filters>button,.lp,.method,.btn-reco,.peak-line){border-color:transparent;filter:none;}
 html.randen .sketch.rand-on{filter:none;}
 /* home: surprise me in de stijl van de gietcoach (keuze Jesse 24-11) */
-#surprise-btn.sur-kaart{background:var(--card);color:var(--ink);align-items:stretch;padding:12px 14px 12px 8px;gap:8px;}
-#surprise-btn .sur-tek{flex:0 0 92px;height:112px;display:block;}
-#surprise-btn .sur-gc{width:100%;height:100%;display:block;}
-#surprise-btn .sur-gc .lijn{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
-#surprise-btn .sur-gc .lijn .b{opacity:.58;stroke-width:2;}
-#surprise-btn .sur-gc .lijn .z{opacity:.3;stroke-width:2;}
-#surprise-btn .sur-gc .glas{stroke-width:2;}
-#surprise-btn .sur-gc .koffie{fill:var(--accent-soft);stroke:none;}
-#surprise-btn .sur-gc :is(.crema,.grond,.arcering,.rimpel,.bel,.opp,.bedlijn,.drip,.zacht){display:none;}
-#surprise-btn .sur-gc .straal{fill:none;stroke:var(--accent-soft);stroke-width:4;stroke-linecap:round;stroke-dasharray:13 3;}
-#surprise-btn .sur-gc .damp path{fill:none;stroke:var(--ink-soft);stroke-width:2;stroke-linecap:round;}
+#surprise-btn.sur-kaart{background:var(--card);color:var(--ink);align-items:stretch;padding:12px 14px;gap:8px;}
 #surprise-btn .reco-txt{flex:1;justify-content:flex-end;}
 #surprise-btn .sur-logo{width:96px;height:auto;mix-blend-mode:multiply;margin:0 0 auto -2px;}
 #surprise-btn .reco-h{font-size:31px;}
@@ -1689,3 +1682,16 @@ html.randen .sketch.rand-on{filter:none;}
 @keyframes f2{0%{opacity:0}17.6%{opacity:0}17.7%{opacity:1}35.2%{opacity:1}35.3%{opacity:0}100%{opacity:0}}
 @keyframes f3{0%{opacity:0}35.2%{opacity:0}35.3%{opacity:1}52.8%{opacity:1}52.9%{opacity:0}100%{opacity:0}}
 @keyframes f4{0%{opacity:0}52.8%{opacity:0}52.9%{opacity:1}100%{opacity:1}}
+
+/* route: welke kant op met deze boon (omni of meer methodes) */
+.route-knop{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);
+  font:inherit;color:var(--ink);padding:9px 13px;margin:0 0 10px;border-radius:18px;min-height:60px;cursor:pointer;}
+.route-knop.eerst{border-color:var(--accent);border-width:3px;}
+.route-knop b{display:block;font-family:'Caveat',cursive;font-size:23px;line-height:1.05;}
+.route-knop span span{font-size:14px;color:var(--ink-soft);}
+.route-ic{flex:0 0 40px;display:flex;align-items:center;justify-content:center;}
+.route-ic img{max-height:40px;max-width:40px;mix-blend-mode:multiply;}
+
+/* Brews-tab: my brews / brew ideas, even breed */
+.brews-kant{margin:4px 0 14px;}
+.brews-kant button{flex:1;}

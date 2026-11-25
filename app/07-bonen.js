@@ -152,17 +152,76 @@ function renderChooseBean(){
 }
 function brewBean(beanId){
   const b=beanById(beanId);if(!b)return;
+  const opts=routeOpties(b);
+  // omni-boon of meerdere eigen methodes: eerst vragen welke kant op (vorige keuze bovenaan)
+  if(featOn('route')&&opts.length>1){routeOpen(b,opts);return;}
+  brewBeanMet(beanId,opts[0]||null);
+}
+// welke methodes horen bij deze boon? Eigen keuze bij de boon gaat voor, dan de branding.
+function routeOpties(b){
+  const aan=state.methods.filter(m=>m.on);
   const mList=(Array.isArray(b.methods)&&b.methods.length?b.methods:(b.method?[b.method]:[]));
+  const laatst=b.lastMethod&&aan.some(m=>m.id===b.lastMethod)?b.lastMethod:null;
+  const vooraan=l=>laatst&&l.includes(laatst)?[laatst,...l.filter(x=>x!==laatst)]:l;
+  const eigen=mList.filter(id=>aan.some(m=>m.id===id));
+  if(eigen.length)return vooraan(eigen);
   const voorkeur=beanFam(b);
-  // heb je zelf methodes gekozen? die gaan voor. Anders beslist de branding.
-  let mid=mList.find(id=>state.methods.find(m=>m.id===id&&m.on))||mList[0]||null;
-  if(!mid&&voorkeur){
-    mid=(state.methods.filter(m=>m.on&&methodFamily(m)===voorkeur)[0]||{}).id||null;
+  if(voorkeur){
+    // espresso- of filterboon: geen vraag, wel je vorige methode in die familie
+    const fam=aan.filter(m=>methodFamily(m)===voorkeur).map(m=>m.id);
+    const een=laatst&&fam.includes(laatst)?laatst:fam[0];
+    if(een)return [een];
   }
+  if(b.fam==='both'){
+    const l=aan.filter(m=>['espresso','filter'].includes(methodFamily(m))&&!['senseo','perculator'].includes(m.id)).map(m=>m.id);
+    if(l.length)return vooraan(l);
+  }
+  const een=laatst||(aan[0]||{}).id;
+  return een?[een]:(mList[0]?[mList[0]]:[]);
+}
+function brewBeanMet(beanId,mid){
+  const b=beanById(beanId);if(!b)return;
   if(!mid)mid=(state.methods.filter(m=>m.on)[0]||{}).id||null;
-  if(methodFamily(mid)==='espresso'){pendingTarget=null;formPrep={};pendingRecipe=null;openDialIn(mid);setTimeout(()=>pickDiBean(beanId),0);}
+  if(mid&&methodById(mid)?.on&&b.lastMethod!==mid){b.lastMethod=mid;save();}
+  if(methodFamily(mid)==='espresso'){
+    pendingTarget=null;formPrep={};pendingRecipe=null;openDialIn(mid);
+    setTimeout(()=>{
+      pickDiBean(beanId);
+      // je laatste shot met deze boon op deze machine is het beste startpunt
+      if(featOn('smartdefaults')){
+        const l=state.brews.filter(x=>x.beanId===beanId&&x.method===mid).sort((x,y)=>(y.ts||0)-(x.ts||0))[0];
+        if(l){if(l.dose)setVal('di-dose',l.dose);if(l.yield)setVal('di-yield',l.yield);if(l.grind)setVal('di-grind',l.grind);if(typeof diAdvice==='function')diAdvice();}
+      }
+    },0);
+  }
   else{openForm(mid);setTimeout(()=>pickBean(beanId),0);}
 }
+function routeTip(b){
+  const r=b.roast||'';
+  if(r==='light'||r==='medium-light')return 'light roast: shines as filter. As espresso, go longer — about 1:2.5 and hotter water.';
+  if(r==='dark'||r==='medium-dark')return 'darker roast: easy as espresso. As filter, go a little cooler and coarser.';
+  return '';
+}
+function routeOpen(b,opts){
+  const el=document.getElementById('route-pop');if(!el){brewBeanMet(b.id,opts[0]);return;}
+  const knoppen=opts.map((id,i)=>{
+    const m=methodById(id);if(!m)return '';
+    const esp=methodFamily(id)==='espresso';
+    const l=state.brews.filter(x=>x.beanId===b.id&&x.method===id).sort((x,y)=>(y.ts||0)-(x.ts||0))[0];
+    const sub=l&&l.dose?('last time '+esc(l.dose)+' g → '+esc(l.yield||'?')+' g'):'first time with this bean';
+    return '<button type="button" class="route-knop'+(i===0?' eerst':'')+'" data-b="'+esc(b.id)+'" data-m="'+esc(id)+'" onclick="routeKies(this.dataset.b,this.dataset.m)">'+
+      '<span class="route-ic">'+iconHTML(m,34)+'</span><span><b>'+esc(m.name)+' · '+(esp?'dial in':'pour coach')+'</b><span>'+sub+'</span></span></button>';
+  }).join('');
+  const tip=b.fam==='both'?routeTip(b):'';
+  el.innerHTML='<div class="aib-pop route-pop" role="dialog" aria-modal="true" aria-labelledby="route-k">'+
+    '<div class="k" id="route-k">how do you brew it?</div>'+
+    '<div class="sur-wie">'+esc(b.name)+(beanFamLabel(b)?' <span>· '+esc(beanFamLabel(b))+'</span>':'')+'</div>'+
+    knoppen+(tip?'<div class="m zacht">'+esc(tip)+'</div>':'')+
+    '<div class="aib-knoppen"><button class="naar" onclick="routeWeg()">close</button></div></div>';
+  el.classList.remove('hidden');
+}
+function routeWeg(){const el=document.getElementById('route-pop');if(el){el.classList.add('hidden');el.innerHTML='';}}
+function routeKies(beanId,mid){routeWeg();brewBeanMet(beanId,mid);}
 /* De dial-in journey van deze boon, per espressomethode. Dezelfde tekening als
    in het dial-in-scherm; de doelzone leggen we om de tijd die je aftekende, of
    anders om het doel van je laatste poging.                                  */
@@ -417,7 +476,7 @@ function saveBean(){
     state.beans.push(data);
     // stond hij nog op je lijstje, dan is hij daar nu vanaf
     if(editingWens){state.wishlist=(state.wishlist||[]).filter(w=>w.id!==editingWens);
-      toast('✓ van je lijstje naar je plank');}
+      toast('✓ moved from your list to your shelf');}
     else toast('✓ bean saved');
     const terug=beanFormTerug;beanFormTerug=null;
     if(terug){editingWens=null;save();beanPhoto=null;naNieuweBoon(terug,data.id);return;}
@@ -449,8 +508,8 @@ function saveBeanAlsWens(naam){
   if(editingBean){
     state.beans=state.beans.filter(b=>b.id!==editingBean);
     state.brews.forEach(b=>{if(b.beanId===editingBean)b.beanId=null;});
-    toast('✓ terug op je lijstje');
-  }else toast('✓ op je lijstje');
+    toast('✓ back on your list');
+  }else toast('✓ on your list');
   beanFormTerug=null;editingBean=null;editingWens=null;save();beanPhoto=null;go('beans');
 }
 function delBean(id){

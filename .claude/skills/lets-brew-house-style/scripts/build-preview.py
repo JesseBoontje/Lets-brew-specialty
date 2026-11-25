@@ -75,7 +75,31 @@ def main():
 
     # 2. swap the external font link for embedded faces
     src = re.sub(r"<link[^>]*fonts\.(googleapis|gstatic)\.com[^>]*>\s*", "", src)
-    src = src.replace("<style>", "<style>\n" + build_font_css() + "\n", 1)
+    # de lettertypes komen in een eigen <style> vooraan: index.html heeft zelf
+    # geen <style> meer sinds de opmaak in styles.css staat
+    src = "<style>\n" + build_font_css() + "\n</style>\n" + src
+
+    # 2b. de app is opgesplitst in styles.css en losse scripts (app/01..12,
+    #     brew-*.js): die moeten erin, want een artifact laadt geen eigen
+    #     bestanden van een relatieve URL. Volgorde blijft die van index.html.
+    if os.path.exists("styles.css"):
+        css = open("styles.css", encoding="utf-8").read()
+        src, n = re.subn(r'<link rel="stylesheet" href="styles\.css">',
+                         lambda m: "<style>\n" + css + "\n</style>", src, count=1)
+        if n != 1:
+            print("let op: styles.css-link niet gevonden")
+    src = re.sub(r'<link rel="manifest"[^>]*>\s*', "", src)
+    # de CSP van de echte app verbiedt ingebedde scripts; in de preview staat
+    # alles ingebed en zet de artifact-host zijn eigen CSP
+    src = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\s*', "", src)
+    def inline_script(m):
+        pad = m.group(1)
+        if not os.path.exists(pad):
+            return m.group(0)
+        code = open(pad, encoding="utf-8").read().replace("</script", "<\\/script")
+        return "<script>/* " + pad + " */\n" + code + "\n</script>"
+    src, n = re.subn(r'<script src="((?:app/)?[\w.-]+\.js)"></script>', inline_script, src)
+    print(f"{n} scripts ingebed")
 
     # 3. inline the drawings
     inlined = 0
