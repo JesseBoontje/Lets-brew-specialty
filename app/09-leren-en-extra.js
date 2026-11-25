@@ -348,7 +348,7 @@ function voiceParse(){
   if(dose==null)dose=rest.shift()??null;
   if(yld==null) yld =rest.shift()??null;
   if(sec==null) sec =rest.shift()??null;
-  if(dose==null&&yld==null&&sec==null){toast('zeg het zo: 18 in, 36 uit, 27 seconden');return;}
+  if(dose==null&&yld==null&&sec==null){toast('say it like: 18 in, 36 uit, 27 seconden');return;}
   if(dose)setVal('di-dose',dose);
   if(yld)setVal('di-yield',yld);
   if(sec){const inp=document.getElementById('di-time');if(inp){inp.value=String(Math.round(sec));normalizeTime(inp);}}
@@ -363,16 +363,16 @@ function voiceListen(){
   // tweede keer indrukken zet hem weer uit
   if(luisteraar){try{luisteraar.stop();}catch(e){}luisteraar=null;micStand(false);return;}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('geen spraakherkenning hier — gebruik de microfoon op je toetsenbord');
+  if(!SR){toast('no speech recognition here — use the microphone on your keyboard');
     document.getElementById('voice-text').focus();return;}
   try{
     const r=new SR();r.lang='nl-NL';r.interimResults=false;
     r.onresult=e=>{document.getElementById('voice-text').value=e.results[0][0].transcript;voiceParse();};
-    r.onerror=()=>toast('niet verstaan — probeer het nog eens');
+    r.onerror=()=>toast('didn\'t catch that — try again');
     // hoe het ook eindigt, de knop gaat altijd terug naar zijn rustkleur
     r.onend=()=>{luisteraar=null;micStand(false);};
     r.start();luisteraar=r;micStand(true);toast('ik luister…');
-  }catch(e){luisteraar=null;micStand(false);toast('microfoon niet beschikbaar');}
+  }catch(e){luisteraar=null;micStand(false);toast('microphone not available');}
 }
 /* ---------------- weer-bewuste suggestie ---------------- */
 async function refreshWeather(){
@@ -1042,7 +1042,7 @@ function cupPick(id){
   const i=cup.picks.indexOf(id);
   if(i>=0)cup.picks.splice(i,1);
   else if(cup.picks.length<4)cup.picks.push(id);
-  else toast('vier kommen is het meeste dat je tong aankan');
+  else toast('four cups is the most your tongue can handle');
   renderCupping();
 }
 function cupSize(v){const n=parseInt(v,10);if(n>=100&&n<=400){cup.size=n;const d=document.querySelector('.cup-recipe');if(d)renderCupping();}}
@@ -1095,7 +1095,7 @@ function cupSaveNotes(){
     if(!r.b)return;
     r.b.notes=((r.b.notes||'')+`\ncupping ${d}: ${r.tot}/72 (blind ${r.L}) — ${field}${r.n?'\n  '+r.n:''}`).trim();
   });
-  save();toast('✓ bewaard bij elke boon');
+  save();toast('✓ saved with every bean');
 }
 /* ---------------- latte-art gallery + AI coach ---------------- */
 async function addLatteShot(ev){
@@ -1107,7 +1107,7 @@ async function addLatteShot(ev){
     state.latteShots.unshift(nieuw);
     latteOpen[nieuw.id]=true;   // je eigen nieuwe giet zie je meteen, niet dichtgeklapt
     save();renderGallery();toast('✓ giet toegevoegd');
-  }catch(e){toast('kon de foto niet laden');}
+  }catch(e){toast('could not load the photo');}
   ev.target.value='';
 }
 /* Welke vorm was je van plan? Dat is de helft van bruikbare feedback: zonder

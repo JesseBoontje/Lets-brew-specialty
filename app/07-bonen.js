@@ -417,7 +417,7 @@ function saveBean(){
     state.beans.push(data);
     // stond hij nog op je lijstje, dan is hij daar nu vanaf
     if(editingWens){state.wishlist=(state.wishlist||[]).filter(w=>w.id!==editingWens);
-      toast('✓ van je lijstje naar je plank');}
+      toast('✓ moved from your list to your shelf');}
     else toast('✓ bean saved');
     const terug=beanFormTerug;beanFormTerug=null;
     if(terug){editingWens=null;save();beanPhoto=null;naNieuweBoon(terug,data.id);return;}
@@ -449,8 +449,8 @@ function saveBeanAlsWens(naam){
   if(editingBean){
     state.beans=state.beans.filter(b=>b.id!==editingBean);
     state.brews.forEach(b=>{if(b.beanId===editingBean)b.beanId=null;});
-    toast('✓ terug op je lijstje');
-  }else toast('✓ op je lijstje');
+    toast('✓ back on your list');
+  }else toast('✓ on your list');
   beanFormTerug=null;editingBean=null;editingWens=null;save();beanPhoto=null;go('beans');
 }
 function delBean(id){

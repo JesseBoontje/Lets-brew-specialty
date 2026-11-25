@@ -1034,19 +1034,19 @@ function bpOpLijst(){
   const proc=(bpProc&&inf.proc.includes(bpProc))?bpProc:inf.proc[0];
   if(!Array.isArray(state.wishlist))state.wishlist=[];
   if(state.wishlist.some(w=>bpHoortBij(w,bpLandId,bpStreek))){
-    toast('staat al op je lijstje');return;
+    toast('already on your list');return;
   }
   state.wishlist.push({id:uid(),naam:st.n+' · '+L.naam,brander:'',url:'',
     regions:[{land:bpLandId,i:bpStreek}],proces:proc,variety:st.v||inf.var,
     brand:bpBrand||'light',smaak:st.s.slice(),notitie:'',
     zoek:bpZoekregel(),at:Date.now()});
-  save();toast('✓ op je lijstje gezet');bpTeken(true);
+  save();toast('✓ added to your list');bpTeken(true);
 }
 function bpVanLijst(id){
   const w=(state.wishlist||[]).find(x=>x.id===id);
   if(w&&!confirm('“'+(w.naam||'deze wens')+'” van je lijstje halen?'))return;
   state.wishlist=(state.wishlist||[]).filter(x=>x.id!==id);
-  save();renderBeans();toast('van het lijstje af');
+  save();renderBeans();toast('removed from your list');
 }
 /* "gekocht" is hetzelfde formulier, maar dan omgezet naar je plank. De wens
    blijft staan tot je opslaat, dus annuleren kost je niets. */
@@ -1054,7 +1054,7 @@ function bpGekocht(id){
   bpWijzigWens(id);
   if(editingWens!==id)return;
   beanZetMode(false);
-  toast('van je lijstje — vul de branddatum aan');
+  toast('from your list — add the roast date');
 }
 function bpWensDicht(){
   state.wensDicht=!state.wensDicht;save();renderBeans();
@@ -1064,12 +1064,12 @@ function bpWensHTML(){
   const lijst=state.wishlist||[];
   const kop='<button class="wens-kop" onclick="bpWensDicht()">'+
     '<span class="hand">Bean wishlist</span>'+
-    '<span class="sd">'+(lijst.length?(lijst.length+' nog niet gekocht'):'nog leeg')+'</span>'+
+    '<span class="sd">'+(lijst.length?(lijst.length+' not bought yet'):'still empty')+'</span>'+
     '<span class="wens-arr">'+(state.wensDicht?'›':'⌄')+'</span></button>';
   if(state.wensDicht)return '<div class="sect wens-sect">'+kop+'</div>';
   if(!lijst.length)return '<div class="sect wens-sect">'+kop+'</div>'+
-    '<div class="empty-note">nog niets op je lijstje. Kom je ergens een mooie zak tegen, '+
-    'zet hem hier neer via New Bean — met de link erbij.</div>';
+    '<div class="empty-note">nothing on your list yet. Spot a nice bag somewhere? '+
+    'Put it here via New Bean — with the link.</div>';
   return '<div class="sect wens-sect">'+kop+'</div>'+
     lijst.map(w=>{
       const regs=bpRegios(w);
@@ -1767,7 +1767,7 @@ function fdPil(){
   }
 }
 function fdAIAan(){
-  if(!fdAI&&!aiReady()){toast('zet AI aan onder profile');return;}
+  if(!fdAI&&!aiReady()){toast('turn on AI under profile');return;}
   fdAI=!fdAI; bpTeken(true);
 }
 function fdNaar(land,i){

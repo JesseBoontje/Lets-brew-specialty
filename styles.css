@@ -1666,16 +1666,6 @@ html.randen .rand-on:is(.ws-card,.ws-actions>button,.ws-filters>button,.lp,.meth
 html.randen .sketch.rand-on{filter:none;}
 /* home: surprise me in de stijl van de gietcoach (keuze Jesse 24-11) */
 #surprise-btn.sur-kaart{background:var(--card);color:var(--ink);align-items:stretch;padding:12px 14px;gap:8px;}
-#surprise-btn .sur-tek{flex:0 0 92px;height:112px;display:block;}
-#surprise-btn .sur-gc{width:100%;height:100%;display:block;}
-#surprise-btn .sur-gc .lijn{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);}
-#surprise-btn .sur-gc .lijn .b{opacity:.58;stroke-width:2;}
-#surprise-btn .sur-gc .lijn .z{opacity:.3;stroke-width:2;}
-#surprise-btn .sur-gc .glas{stroke-width:2;}
-#surprise-btn .sur-gc .koffie{fill:var(--accent-soft);stroke:none;}
-#surprise-btn .sur-gc :is(.crema,.grond,.arcering,.rimpel,.bel,.opp,.bedlijn,.drip,.zacht){display:none;}
-#surprise-btn .sur-gc .straal{fill:none;stroke:var(--accent-soft);stroke-width:4;stroke-linecap:round;stroke-dasharray:13 3;}
-#surprise-btn .sur-gc .damp path{fill:none;stroke:var(--ink-soft);stroke-width:2;stroke-linecap:round;}
 #surprise-btn .reco-txt{flex:1;justify-content:flex-end;}
 #surprise-btn .sur-logo{width:96px;height:auto;mix-blend-mode:multiply;margin:0 0 auto -2px;}
 #surprise-btn .reco-h{font-size:31px;}

@@ -357,8 +357,8 @@
         <div class="set-d" id="di-journey-note" style="font-size:14px"></div>
       </div>
 
-      <button class="save-btn" onclick="saveDialInBrew(false)">Bewaar geslaagde kop</button>
-      <button class="profile-btn" onclick="saveDialInBrew(true)" style="margin-top:2px">Bewaar poging, later opnieuw</button>
+      <button class="save-btn" onclick="saveDialInBrew(false)">Save successful brew</button>
+      <button class="profile-btn" onclick="saveDialInBrew(true)" style="margin-top:2px">Save attempt, try again later</button>
       <div class="set-d" style="text-align:center;margin-top:8px;font-size:14px">we save this attempt and give a new AI grind tip — so you can keep improving from here</div>
     </div>
   </div>
@@ -445,7 +445,7 @@
   <div id="page-methods" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand">methods</div><button onclick="goBack('recipes')">Terug</button></div>
+      <div class="form-head"><div class="h hand">methods</div><button onclick="goBack('recipes')">Back</button></div>
       <div class="subtitle">turn on or off, or add your own method.</div>
       <div id="mm-list"></div>
       <div class="field" style="margin-top:18px;"><label>new method</label>
@@ -550,7 +550,7 @@
       <div class="learn-card sketch" id="filter-card" style="background:var(--chemex)" onclick="go('learn-filter')">
         <div class="lc-ic"><svg viewBox="0 0 24 24" class="acic lc-svg"><path d="M4.2 5.6 Q12 4.9 19.9 5.7"/><path d="M4.6 5.8 Q8.4 13.4 11.4 19.6"/><path d="M19.6 5.8 Q15.9 13.4 12.9 19.6"/><path d="M11.4 19.6 Q12.2 20.4 12.9 19.5"/><path d="M7 10.2 Q12 9.4 17.1 10.3" opacity="0.7"/><path d="M10.2 12.6 Q10.6 15.4 11.6 17.9" opacity="0.45"/><path d="M14 12.6 Q13.5 15.4 12.6 17.9" opacity="0.45"/></svg></div>
         <div class="lc-body"><div class="lc-t hand">filter skills</div>
-          <div class="lc-d">percolatie, bloom, doorlooptijd & gieten</div></div>
+          <div class="lc-d">percolation, bloom, brew time & pouring</div></div>
         <div class="lc-arr">&rsaquo;</div>
       </div>
 
@@ -581,11 +581,11 @@
 
         <div class="lesson sketch soft"><h3>your recipe</h3>
           <div class="wt-presets" id="wt-presets"></div>
-          <div class="wt-row"><label>hardheid (ppm)</label>
+          <div class="wt-row"><label>hardness (ppm)</label>
             <input id="wt-gh" type="number" inputmode="numeric" value="70" oninput="waterCalc()"></div>
-          <div class="wt-row"><label>alkaliniteit (ppm)</label>
+          <div class="wt-row"><label>alkalinity (ppm)</label>
             <input id="wt-kh" type="number" inputmode="numeric" value="40" oninput="waterCalc()"></div>
-          <div class="wt-row"><label>hoeveel water</label>
+          <div class="wt-row"><label>how much water</label>
             <input id="wt-l" type="number" inputmode="decimal" step="0.5" value="1" oninput="waterCalc()"></div>
           <div class="wt-out" id="wt-out"></div>
         </div>
@@ -679,8 +679,8 @@
   <div id="page-cupping" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand">Cupping</div><button onclick="goBack('learn')">Terug</button></div>
-      <div class="subtitle">zet ze allemaal hetzelfde, proef blind, scoor eerst — onthul daarna.</div>
+      <div class="form-head"><div class="h hand">Cupping</div><button onclick="goBack('learn')">Back</button></div>
+      <div class="subtitle">brew them all the same, taste blind, score first — reveal after.</div>
       <div id="cupping-body"></div>
     </div>
   </div>
@@ -689,7 +689,7 @@
   <div id="page-gallery" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>▤ ◗ ▮</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand">pouring shapes</div><button onclick="goBack('learn')">Terug</button></div>
+      <div class="form-head"><div class="h hand">pouring shapes</div><button onclick="goBack('learn')">Back</button></div>
       <div class="subtitle">every pour recorded — watch your rosetta get better.</div>
 
       <div class="settings-card sketch soft" id="ga-help">
@@ -901,7 +901,7 @@
         </button>
       </div>
       <div id="wn-list"></div>
-      <button class="wn-ok hand" onclick="sluitNieuws()">aan de slag</button>
+      <button class="wn-ok hand" onclick="sluitNieuws()">let's go</button>
     </div>
   </div>
   <div id="nav" class="nav hidden">
