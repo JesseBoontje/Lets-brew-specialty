@@ -521,3 +521,13 @@ Werkwijze Jesse: zuinig, max één aannemer, één keuring per klus, kleine stap
 verbruik en context; bij volle context weer overdracht + nieuwe branch + sessie archiveren.
 Cloudflare-token in deze omgeving: zones lezen gaat, Email Routing niet; Access-rechten onbekend (eerst
 met één GET proberen).
+
+## 25-11 avond: Jesse "Ga alles bouwen", wakker om 2:00
+Besluit Jesse: bouw de hele klus account + volgen + feed + AI (opzet https://claude.ai/artifact/JDrq9Y2MouPUdYnGRCR8Mw,
+basis docs/infra-account-volgen.md). Plan Access-slot vervalt (docs/opzet-slot-en-sleutel.html blijft als archief).
+Volgorde, elk een eigen stap met push en keuring vóór testlink, alles achter featurevlag, niets naar main zonder akkoord:
+1. account (passkey/Face ID in site-worker.mjs) + D1 + sync (+updatedAt in app), privacytekst, account wissen
+2. profiel privé/openbaar, volgen (verzoek bij privé), feed als Reels in huisstijl, try -> brew ideas, foto's R2, melden/blokkeren
+3. beheerscherm (alleen admin Jesse), ai_allowed per account, /api/ai met sleutel als Worker-secret, 50/dag
+Jesse moet zelf: AI-sleutel als secret plakken in het dashboard (nooit in de chat). Eerst checken of het token D1/R2 mag aanmaken.
+Feed staat in de schets op de plek van Learn: bij bouwen voorstel doen waar Learn komt.
