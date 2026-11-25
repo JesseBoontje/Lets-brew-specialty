@@ -438,3 +438,6 @@ Claude. Nog ideeën?"
      (verticaal scrollen van de pagina moet blijven werken: pan-x pan-y? test).
   4. Methodeknoppen op home: namen in systeemletter (button zonder font:inherit).
      Oplossing: .method{font:inherit} (en nalopen: andere knoppen zonder font).
+  5. Home-knop "Nieuwe kop" -> "New brew" (in brew-workspace.js addAction). Gevraagd
+     of de andere Nederlandse home-teksten (Recepten kiezen, Koffiecoach, zin
+     erboven, tabnamen) ook Engels worden.
