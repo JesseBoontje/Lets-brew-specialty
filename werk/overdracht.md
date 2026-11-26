@@ -577,3 +577,15 @@ bindingen DB, FOTOS. Open voor Jesse: ANTHROPIC_API_KEY als secret (Production, 
 account op letsbrew.djez.app maken → architect zet is_admin/ai_allowed in live-D1 b737aed4.
 Wacht op nakijkopdracht van Jesse ("Opdracht voor Lets Brew").
 - 26-11: live-account jesseboontje is_admin=1, ai_allowed=1 (bevestigd door Jesse). ANTHROPIC_API_KEY staat nog NIET op lets-brew-specialty (gecontroleerd via API en wrangler).
+
+## 26-11 avond: ronde "na live 1" klaar op functie/na-live-1 (18b2d80), NIET live
+- Opdracht werk/opdracht-na-live-1.md + extra punten 6-15 uit opmerkingen in de nakijkversie
+  (https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7). Verslag werk/verslag-na-live-1.md (op die branch).
+- Gekeurd: GOEDGEKEURD, 3 mag-punten hersteld. node 60/60, Playwright chromium 74/74. CACHE scc-v127.
+- Testlink: https://na-live-1-lets-brew-specialty.jesseboontje-1aa.workers.dev (preview-D1; jesse daar admin).
+- Open: opmerking 11 "My brews" bij #page-recipe uitlegregel: gevraagd wat Jesse bedoelt (thread 83e02f6a).
+- Jesse moet: ANTHROPIC_API_KEY + ELEVENLABS_API_KEY als RUNTIME secret (Settings > Variables and Secrets,
+  NIET onder Build: daar stond hij op 26-11, zie screenshot). ElevenLabs-sleutel: Text to Speech + Voices read.
+  Voor de testlink apart onder Previews Base, daarna preview opnieuw maken (wrangler preview --name na-live-1).
+- Live mergen pas als Jesse "live" zegt (PR van functie/na-live-1 naar main).
+- Werk-branch voor werk/: werk/na-live-2026-11-26.
