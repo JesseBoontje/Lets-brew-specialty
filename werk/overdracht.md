@@ -502,6 +502,48 @@ Schetsen: route https://claude.ai/artifact/VcgJSLkRAiirkc3AiNSatN , Brews-tab
 https://claude.ai/artifact/CgkKmjkyDxmo15kUK8xwy8 , nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7
 Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe branch, deze archiveren.
 
+## 25-11 13:30: OVERDRACHT naar een nieuwe sessie (context vol, Jesse: "maak nieuwe branch en archiveer deze")
+Live op main (scc-v120): release #15 (nakijkpunten, route, 5 tabs, Brews met my brews/brew ideas),
+#16-#22 bonen lezen (foto verkleind als jpeg, echte foutreden, /api/pagina in site-worker.mjs:
+alleen Sec-Fetch-Site same-origin, STEM_LIMITER, redirects zelf gekeurd, tekst gefilterd; foto op wishlist).
+Jesse heeft de foto/link-fix NOG NIET getest op de iPhone. singleestatecoffee.nl geeft via /api/pagina
+bijna geen tekst (waarschijnlijk script-opgebouwd); de app valt dan terug op raden ("partly a guess").
+
+VOLGENDE: de grote klus, stap 1 "slot en sleutel" (branch functie/slot-en-sleutel):
+- Cloudflare Access als slot op letsbrew.djez.app (inlog met code per mail), zodat een AI-sleutel
+  veilig als Worker-secret kan; app stuurt AI-vragen dan via eigen Worker-route met daglimiet.
+- Jesse plakt de sleutel zelf in het dashboard, nooit in de chat.
+- Daarna: D1-database (brews, beans, gear) + AI-coach centraal, websearch via de Worker
+  (wens Jesse: opbouwende kennis voor filter en espresso). Login-mail letsbrew@djez.app (EEN z);
+  Email Routing zet Jesse zelf aan (token mag dat niet).
+- Eerst opzet/schets (skill nieuwe-feature) en akkoord, niets inbouwen zonder akkoord.
+Werkwijze Jesse: zuinig, max één aannemer, één keuring per klus, kleine stappen pushen, let op
+verbruik en context; bij volle context weer overdracht + nieuwe branch + sessie archiveren.
+Cloudflare-token in deze omgeving: zones lezen gaat, Email Routing niet; Access-rechten onbekend (eerst
+met één GET proberen).
+
+## 25-11 avond: Jesse "Ga alles bouwen", wakker om 2:00
+Besluit Jesse: bouw de hele klus account + volgen + feed + AI (opzet https://claude.ai/artifact/JDrq9Y2MouPUdYnGRCR8Mw,
+basis docs/infra-account-volgen.md). Plan Access-slot vervalt (docs/opzet-slot-en-sleutel.html blijft als archief).
+Volgorde, elk een eigen stap met push en keuring vóór testlink, alles achter featurevlag, niets naar main zonder akkoord:
+1. account (passkey/Face ID in site-worker.mjs) + D1 + sync (+updatedAt in app), privacytekst, account wissen
+2. profiel privé/openbaar, volgen (verzoek bij privé), feed als Reels in huisstijl, try -> brew ideas, foto's R2, melden/blokkeren
+3. beheerscherm (alleen admin Jesse), ai_allowed per account, /api/ai met sleutel als Worker-secret, 50/dag
+Jesse moet zelf: AI-sleutel als secret plakken in het dashboard (nooit in de chat). Eerst checken of het token D1/R2 mag aanmaken.
+Feed staat in de schets op de plek van Learn: bij bouwen voorstel doen waar Learn komt.
+
+## 26-11 nacht: stap 1-3 klaar op functie/slot-en-sleutel (5d5aab3)
+- Verslagen: werk/verslag-stap1-account.md, -stap2-volgen.md, -stap3-ai.md. Opdrachten werk/opdracht-stap*.md.
+- D1 lets-brew b737aed4..., lets-brew-preview 4f37078c... (migraties 0001, 0002 via API door architect).
+  R2 lets-brew-fotos(-preview), EU. Vlaggen: account, social (def uit).
+- Testlink (wrangler preview --name account, vanuit een worktree): https://account-lets-brew-specialty.jesseboontje-1aa.workers.dev
+  workers.dev is vanuit de cloudomgeving niet bereikbaar (proxy 403): controleer via D1-queries.
+- Na registratie Jesse: UPDATE users SET is_admin=1,ai_allowed=1 WHERE handle=... (preview-D1, later live).
+- Jesse moet ANTHROPIC_API_KEY als secret zetten; voor previews mogelijk apart (wrangler preview secret). Nagaan.
+- Open: feed sorteert op updated_at; geen melding bij volgverzoek; stream-afbreek telt als vraag; niet getest op iPhone/WebKit; handleiding niet bijgewerkt; 6 tabs krap (voorstel Learn naar Home).
+
+## 26-11: Settings herindelen
+Akkoord Jesse op opzet docs/opzet-instellingen.html (https://claude.ai/artifact/Q37grtdUDF262nczdgMVNQ). Bouwen als Jesse het zegt, met nieuwe-feature deel B. Geen instelling weg; vlaggen account/social naar de grote kaart. Wens Jesse: grote kaart en rijen met getekende potloodlijnen (app/11-randen.js, drawn edges), huisstijl.
 ## 25-11: schenkkan in de gietcoach (branch functie/schenkkan, PR #23)
 - app/04-gietcoach.js: gc-k-groep is nu de schenkkan (schoon -> gespiegeld x0,41 -> overtrek.py 7/3.6/3, RDP 0.12;
   eerste haal 1.6, rest 0.7-1.0). PIV [30,50] (handvat), TIP [188,23] (haakje). CACHE scc-v120.

@@ -1198,8 +1198,9 @@ async function latteCoach(id){
 /* ---------------- shortcuts: start vanaf je beginscherm ---------------- */
 function renderShortcuts(){
   const card=document.getElementById('shortcut-card');if(!card)return;
-  card.style.display=featOn('shortcuts')?'block':'none';
-  if(!featOn('shortcuts'))return;
+  // de rij staat er altijd (de schakelaar zit erin); de links alleen met de vlag aan
+  card.style.display='block';
+  if(!featOn('shortcuts')){document.getElementById('shortcut-list').innerHTML='';return;}
   const base=location.origin+location.pathname;
   document.getElementById('shortcut-list').innerHTML=
     state.methods.filter(m=>m.on).map(m=>`<button class="profile-btn ic-btn" onclick="copyShortcut('${m.id}')">${iconHTML(m,22)} copy link: start ${esc(m.name)}</button>`).join('')+

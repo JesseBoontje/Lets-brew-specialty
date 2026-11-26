@@ -222,6 +222,179 @@ ooit ingevuld — het volledige bereik van die molen, in wat voor eenheid hij
 ook gebruikt (klikken, een schaal 1–100, noem het). Zonder opgegeven bereik
 zijn beide `null`.
 
+## Account en sync (vlag `account`, stap 1)
+
+Een account is optioneel en staat standaard uit (*profile → features → account &
+sync*). Zonder account verandert er niets: alles blijft op de telefoon.
+
+### `updatedAt` en tombstones
+
+- Elke bean, brew, gear en eigen recept krijgt bij elk opslaan waarin hij
+  veranderde een `updatedAt` (ms sinds 1970, klok van de telefoon). De app ziet
+  zelf welke records veranderden (vingerafdruk per record in `save()`), dus elk
+  scherm doet mee zonder eigen code. Dat stempelen loopt altijd, ook zonder
+  account, zodat een later account niets mist.
+- De dial-in-pogingen (`dialLog`) zijn lijsten zonder eigen veld; hun tijd staat
+  in `sync.dialAt["<beanId>--<methodId>"]`.
+- Bestaande data zonder `updatedAt` krijgt bij de eerste sync zijn eigen tijd
+  (`ts` of `at`), anders het moment van syncen.
+- Wat je wist terwijl je ingelogd bent, komt als tombstone in `sync.tomb`:
+  `{kind, id, at}`. Na een geslaagde sync verdwijnt de tombstone weer.
+
+### `sync` (intern, in de back-up)
+
+```json
+{ "user":{"handle":"jesse","visibility":"private"}, "lastHandle":"jesse",
+  "since":1764150000000000, "sentUpTo":1764150000000, "last":1764150000000,
+  "tomb":[{"kind":"brew","id":"abc1234","at":1764150000000}],
+  "dialAt":{"abc1234--espresso":1764150000000}, "later":false }
+```
+
+`user` is `null` als je niet (meer) ingelogd bent. `since` is de servertijd van
+de vorige sync (in microseconden), `sentUpTo` de telefoontijd tot waar alles al
+online staat. `later` onthoudt "not now, keep it on this phone". De sessie zelf
+zit in een HttpOnly-cookie (`lb_s`) en is voor de app onzichtbaar.
+
+### Wat online staat
+
+Cloudflare D1 (EU), tabel `records`: per gebruiker `(kind, id)` met
+`kind` = `bean` | `brew` | `gear` | `recipe` | `dial` en `data` = het record zoals
+de telefoon het heeft, zonder `data:`-foto's (bij binnenkomst zet de app de eigen foto terug; met de
+vlag `social` gaat een verkleinde kopie apart naar R2, zie hieronder). Max 64 KB per record.
+Een `dial`-record is `{key:"<beanId>|<methodId>", attempts:[…]}`. Merge per record
+op `updatedAt`: de nieuwste wint, op de server en op de telefoon. Prijs en eigen
+notities gaan wel mee naar je eigen online kopie, maar worden nooit aan anderen
+getoond. *delete account and everything online* wist alles van je account in één
+keer; de telefoon houdt zijn eigen kopie.
+
+Routes (alleen voor de app zelf, `Origin` moet kloppen): `/api/auth/register/*`,
+`/api/auth/login/*`, `/api/auth/logout`, `/api/auth/me`, `POST /api/sync`
+`{since, changes:[{kind,id,data,updatedAt,deleted}]}` → `{now, more, changes,
+rejected}`, en `DELETE /api/account`.
+
+## Volgen en feed (vlag `social`, stap 2)
+
+Staat standaard uit (*Settings → features → follow & feed*) en werkt alleen met
+een account. Zonder de vlag gaat er niets extra's online.
+
+### Zichtrechten
+
+Een ander ziet jouw brews en beans alleen als jouw account `public` is, of als
+hij een geaccepteerde volger is. Nooit als een van jullie de ander blokkeerde.
+Private: een volgverzoek staat op `pending` tot jij accepteert; public: meteen
+`accepted` (en wie wachtte, wordt bij omzetten naar public geaccepteerd).
+Blokkeren verbergt over en weer (profiel, zoeken, feed, foto's), verbreekt
+volgen beide kanten op en wist de likes op elkaars records. Gear, eigen
+recepten en dial-in-pogingen (`dialIn`/`kind:"dial-in"`) worden nooit gedeeld.
+
+### Wat een ander krijgt (allowlist, `DEEL_VELDEN` in social-worker.mjs)
+
+| kind | velden |
+|---|---|
+| bean | `name` `roaster` `origin` `process` `variety` `roast` `roasternotes` (max 140 tekens) |
+| brew | `title` `drink` `beans` (naam van de boon) `method` (id) `brewer` `dose` `yield` `ratio` `time` `temp` `score` `tags` (max 12) `ts`, en uit `beanSnapshot` alleen `roaster` `origin` `process` |
+
+Alles daarbuiten gaat nooit naar een ander: `price`, `bagsize`, `notes`, `url`,
+`roastdate`, `grind`, `grinder`, `custom`, `prep`, `target`, wishlist, budget.
+Een item in feed of profiel is `{kind, id, owner:{handle,name}, at, data,
+photo, likes, liked}`; `photo` is `/api/foto/<sleutel>` of `null`.
+
+### Foto's (R2, binding `FOTOS`)
+
+Na een geslaagde sync verkleint de app de eigen `data:`-foto van een bean of brew
+(max 1280 px, jpeg 0.8, max 1 MB) en zet hem online; `sync.fotos["bean/<id>"] =
+{h}` onthoudt wat er al staat. Online heet hij `foto/<user-id>.<willekeurig>` en
+staat de sleutel in `records.photo_key`. Ophalen kan alleen met dezelfde
+zichtrechten als het record. Wissen via sync, `DELETE /api/foto` of account
+wissen haalt hem ook uit R2. De telefoon houdt zijn eigen foto. Zet je de vlag
+`social` uit, dan gaat je account online terug naar `private` (lukt dat niet, dan bij de
+volgende sync: `sync.socialUit`), maar foto's die al online staan blijven daar tot je het
+record of je account wist. Opgehaald worden ze met `Cache-Control: private, no-store`.
+Een private profiel zonder geaccepteerd volgen toont alleen handle en naam (`counts:null`).
+
+### Routes (sessie nodig, `Origin` moet kloppen bij POST/DELETE)
+
+`GET /api/social/me` (profiel, tellers, verzoeken, volgers, gevolgd, geblokkeerd) ·
+`POST /api/social/profile {name?, visibility?}` · `GET /api/social/search?q=`
+(begin van de handle, max 20) · `GET /api/social/u/<handle>` en
+`/api/social/u/<handle>/items?cursor=` · `POST|DELETE /api/social/follow {handle}` ·
+`POST /api/social/request {handle, accept}` · `DELETE /api/social/follower {handle}` ·
+`GET /api/social/feed?cursor=` (10 per pagina, nieuwste `updated_at` eerst) ·
+`POST|DELETE /api/social/like {handle, kind, id}` · `POST|DELETE /api/social/block {handle}` ·
+`POST /api/social/report {handle, reason}` · `POST /api/foto?kind=&id=` (body = jpeg/webp) ·
+`DELETE /api/foto?kind=&id=` · `GET /api/foto/<sleutel>`.
+Rate limit via `STEM_LIMITER` met sleutel `social:<soort>:<user-id>` op zoeken,
+volgen, likes, blokkeren, melden en foto's opladen/wissen.
+
+### In de app
+
+"try" op een brew maakt een eigen recept (`state.recipes`, bij *brew ideas*) met
+`van:"<handle>/brew/<id>"`; op een bean een wens in `wishlist` met hetzelfde
+`van`-veld. Een gedeelde link is `/?u=<handle>`.
+
+## Beheer en Lets Brew AI (vlag `account`, stap 3)
+
+Geen eigen vlag: valt onder `account`. De server beslist; de app toont alleen wat
+`/api/auth/me` zegt.
+
+### Wat erbij kwam in D1
+
+- `users.locked` (migratie `0002_locked.sql`, `INTEGER NOT NULL DEFAULT 0`): een account
+  op slot kan niet inloggen (403 `{code:"locked"}`), en een bestaande sessie telt nergens
+  meer (sync, volgen, feed, foto's, AI: 401). Op slot zetten wist ook de sessies.
+  Voor anderen is het account weg: niet in feed, zoeken, profiel, volgers of tellers, foto's
+  404; alleen ontvolgen, volger weghalen en (de)blokkeren werken nog.
+- `users.is_admin` en `users.ai_allowed` bestonden al (0001). `is_admin` zet de beheerder
+  zelf in D1; er is geen route voor.
+- `ai_usage(user_id, day, count)` bestond al: `day` is de datum in Europe/Amsterdam
+  (`YYYY-MM-DD`), dus de teller begint om middernacht Nederlandse tijd opnieuw.
+
+### `/api/auth/me`
+
+`{user:{handle, visibility, admin, ai}, ai:{used, limit}}`; `ai` alleen als het account
+Lets Brew AI mag. De app bewaart `admin` en `ai` in `state.sync.user`, zodat de keuze na
+het openen meteen klopt; bij elke keer Settings openen wordt het opnieuw gevraagd.
+
+### Routes voor de beheerder (`is_admin=1`, anders 403; `Origin` en JSON bij POST)
+
+`GET /api/admin/users` → `{users:[{handle, name, created, ai_allowed, locked, admin,
+ai_today}], total_today, limit, day}` · `POST /api/admin/user {handle, ai_allowed?,
+locked?}` (jezelf op slot zetten kan niet) · `GET /api/admin/reports` → `{reports:[{id,
+reason, at, by, about, about_locked}]}` (nieuwste eerst, max 200) · `POST
+/api/admin/reports {id, action:"dismiss"|"block"}`: dismiss wist de melding; block zet het
+gemelde account op slot en wist alle meldingen over dat account. Interne user-id's gaan
+nooit naar buiten, alleen handles.
+
+### `POST /api/ai`
+
+Alleen ingelogd, `ai_allowed=1` en niet op slot (anders 401/403 `{code:"not_allowed"}`).
+De sleutel staat alleen in de Worker-secret `ANTHROPIC_API_KEY`; ontbreekt hij: 503
+`{error:"AI is not set up yet.", code:"not_set_up"}`. Het lijf heeft de vorm van de
+Anthropic Messages-API; de server laat alleen `model`, `max_tokens`, `messages`,
+`stream` en `system` door (ook binnen een bericht alleen `text` en base64-`image`), kiest
+het model uit een vaste lijst (`AI_MODEL`, komma's toegestaan, de eerste is de standaard;
+zonder `AI_MODEL` hetzelfde model als de app voor Anthropic gebruikt), en zet
+`max_tokens` op hoogstens 4000. Lijf max 6 MB (foto's van zakken), alle tekst samen (berichten en system) max 200.000
+tekens en max 4 foto's per vraag (anders 413). `stream:true` komt
+terug als `text/event-stream`. Per gebruiker per dag 50 vragen: de teller gaat in één
+statement omhoog vóór het doorsturen (boven de 50: 429 `{error:"Daily limit reached (50).
+Resets at midnight.", code:"limit"}`); mislukt het bij Anthropic, dan telt de vraag niet.
+Elk antwoord heeft de kop `X-AI-Left` met wat er vandaag nog over is. Rate limit:
+`STEM_LIMITER` met sleutel `ai:<user-id>`. Fouttekst van Anthropic gaat niet door naar de
+app, de sleutel en de berichten worden nergens gelogd.
+
+### In de app
+
+Aanbieder `letsbrew` ("Lets Brew AI") in `AI_AANBIEDERS`: url `/api/ai`, geen sleutel,
+`credentials:"same-origin"`, verder dezelfde vorm als Anthropic. Kiesbaar in *Settings →
+AI* (keuze "Lets Brew AI" / "own key") alleen met vlag `account`, ingelogd en `ai`.
+`scc_ai_prov` kan nu ook `letsbrew` zijn; `scc_ai_prov_eigen` onthoudt welke
+eigen-sleutel-aanbieder je daarnaast had. Mag het account het niet (meer), dan valt de
+keuze vanzelf terug op die eigen aanbieder. Is de daglimiet op (of staat AI op de server
+uit), en staat er een eigen sleutel in dit tabblad, dan vraagt de app die (reserve).
+Lets Brew AI telt niet mee in `state.ai` (AI-budget): het kost jou niets.
+De kaart *accounts* in Settings is er alleen voor `admin`.
+
 ## Waar de maalstand vandaan komt
 
 `grind` en `dials[].grind` zijn vrije tekst, met opzet. De ene molen heeft
@@ -244,6 +417,10 @@ in het geheugen van het tabblad (`BrewStem` in `brew-stem.js`). Wel bewaard, in
 ElevenLabs-lijst (`scc_el_voice`, de stem-id, en `scc_el_voice_naam`) en of de
 stappen hardop gaan (`scc_gc_stem`, gedeeld door gietcoach, AeroPress-coach en
 shot clock).
+
+Ook alleen voor dit toestel: wanneer je voor het laatst een back-up maakte
+(`scc_last_backup`, ms sinds 1970), voor de regel "last: today" bij
+Settings › your data › back-up & restore.
 
 Hetzelfde geldt voor de AI-teller onder `state.ai`. Die houdt per maand bij wat
 de app zelf aan Claude uitgaf — `{budget, maand, dagen:{dag:dollars},

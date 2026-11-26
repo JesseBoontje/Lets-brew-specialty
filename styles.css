@@ -1692,3 +1692,122 @@ html.randen .sketch.rand-on{filter:none;}
 /* Brews-tab: my brews / brew ideas, even breed */
 .brews-kant{margin:4px 0 14px;}
 .brews-kant button{flex:1;}
+
+/* account & sync (vlag account) */
+#acct-card .acct-wie{font-size:17px;margin:6px 0 2px;}
+#acct-card .acct-wie b{font-size:24px;}
+#acct-card .profile-btn{color:var(--ink);font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:21px;}
+#acct-card .profile-btn.acct-hoofd{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);margin-top:10px;}
+#acct-card .profile-btn.acct-later{background:var(--paper);font-family:'Patrick Hand',cursive;font-weight:400;font-size:17px;}
+#acct-card .profile-btn.acct-wis{background:var(--paper);border-style:dashed;font-family:'Patrick Hand',cursive;font-weight:400;font-size:17px;}
+#acct-card .profile-btn:disabled{opacity:.6;}
+#acct-card .acct-privacy{font-size:14px;margin:8px 0 12px;border-top:1.5px dashed var(--line);padding-top:10px;}
+#acct-card .acct-privacy b{color:var(--ink);font-weight:400;}
+
+/* ---- profiel, volgen en feed (stap 2, vlag social) ---- */
+#volg-card .acct-wie{font-size:17px;margin:6px 0 2px;}
+#volg-card .acct-wie b{font-size:28px;}
+#volg-card .acct-privacy{font-size:14px;margin:10px 0 4px;border-top:1.5px dashed var(--line);padding-top:10px;}
+#volg-card .acct-privacy b{color:var(--ink);font-weight:400;}
+.volg-tel{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--ink-soft);margin:4px 0 12px;}
+.volg-tel b{display:block;font-size:26px;line-height:1;color:var(--ink);}
+.volg-keus{display:flex;gap:8px;margin:2px 0 6px;}
+.volg-keus button{flex:1;border:2px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);font:inherit;font-size:17px;padding:7px 0;cursor:pointer;filter:url(#wobble);}
+.volg-keus button.sel{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+.volg-kop2{font-family:'Caveat',cursive;font-weight:700;font-size:22px;margin:16px 0 4px;border-bottom:1.5px dashed var(--line);padding-bottom:2px;}
+.volg-rij{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px dashed var(--line);padding:6px 0;font-size:15px;}
+.volg-naam{background:none;border:0;padding:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.volg-naam b{font-size:21px;}
+.volg-naam span{color:var(--ink-soft);font-size:14px;}
+.volg-acties{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.volg-st{font-size:13px;color:var(--ink-soft);}
+.volg-k{border:2px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);font:inherit;font-size:14px;padding:3px 10px;cursor:pointer;filter:url(#wobble);}
+.volg-k.vol{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+#page-person .profile-btn{color:var(--ink);font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:21px;}
+#page-person .profile-btn.acct-hoofd{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);}
+#page-person .profile-btn.acct-wis{background:var(--paper);border-style:dashed;font-family:'Patrick Hand',cursive;font-weight:400;font-size:17px;}
+#page-person .subtitle{margin:-6px 0 8px;}
+.volg-onder{margin-top:22px;}
+.volg-item{padding:12px 16px;margin:0 0 12px;}
+.volg-it-t{font-size:25px;line-height:1.05;}
+.volg-img{width:100%;max-height:200px;object-fit:cover;border-radius:16px;border:2px solid var(--line);margin:0 0 6px;display:block;}
+.volg-it-k{display:flex;gap:6px;margin-top:8px;}
+.volg-it-k .feed-knop{flex-direction:row;gap:4px;border:2px solid var(--line);border-radius:14px;padding:3px 10px;color:var(--ink);background:var(--paper);filter:url(#wobble);}
+.volg-it-k .feed-knop .acic{stroke:var(--ink);width:18px;height:18px;}
+.volg-it-k .feed-knop.aan .acic{fill:var(--accent-soft);stroke:var(--accent-soft);}
+/* de feed: één kaart per scherm, verticaal vegen */
+.feed-reel{flex:1;min-height:0;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+.feed-plek{height:100%;box-sizing:border-box;padding:14px 12px 92px;scroll-snap-align:start;scroll-snap-stop:always;}
+.feed-meer{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+.feed-kaart{position:relative;height:100%;background:var(--ink);color:var(--paper);border-radius:26px;overflow:hidden;}
+.feed-kaart::before{content:"";position:absolute;inset:0;border:2px solid var(--ink);border-radius:inherit;filter:url(#wobble);pointer-events:none;z-index:2;}
+.feed-boven{position:absolute;top:12px;left:0;right:0;text-align:center;font-size:24px;z-index:1;}
+.feed-foto{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.feed-img{width:100%;height:100%;object-fit:cover;filter:url(#wobble-rough);opacity:.82;}
+.feed-teken{width:62%;max-width:260px;height:auto;fill:none;stroke:var(--paper);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;filter:url(#wobble-rough);margin-bottom:22%;}
+.feed-teken .b{opacity:.62;stroke-width:1.6;}
+.feed-veeg{position:absolute;top:42%;right:6px;font-size:12px;opacity:.65;writing-mode:vertical-rl;display:flex;align-items:center;gap:4px;}
+.feed-veeg .acic{stroke:var(--paper);width:16px;height:16px;}
+.feed-onder{position:absolute;left:16px;right:72px;bottom:18px;z-index:1;text-shadow:0 1px 6px rgba(58,48,42,.55);}
+.feed-onder b{font-size:32px;display:block;line-height:1;margin:2px 0 4px;}
+.feed-onder span{font-size:15px;opacity:.9;line-height:1.35;}
+.feed-wie{background:none;border:0;padding:0;color:var(--paper);font:inherit;font-size:15px;cursor:pointer;}
+.feed-zoek{margin-top:12px;border:2px solid var(--paper);border-radius:16px;background:var(--accent-soft);color:var(--cream);font-family:'Caveat',cursive;font-weight:700;font-size:22px;padding:6px 16px;cursor:pointer;filter:url(#wobble);}
+.feed-zij{position:absolute;right:10px;bottom:20px;display:flex;flex-direction:column;gap:14px;align-items:center;z-index:1;}
+.feed-knop{background:none;border:0;padding:0;color:var(--paper);font:inherit;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;}
+.feed-zij .feed-knop .acic{width:30px;height:30px;stroke:var(--paper);stroke-width:1.8;}
+.feed-zij .feed-knop.aan .acic{fill:var(--paper);}
+
+/* ---- beheer en Lets Brew AI (stap 3) ---- */
+.lb-keus{margin:4px 0 8px;}
+.lb-kaart{border:2px solid var(--line);border-radius:18px;background:var(--paper);padding:10px 14px 8px;margin:8px 0;filter:url(#wobble);}
+.lb-kaart .k{font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.05;}
+.lb-kaart .n{font-size:17px;margin-top:2px;}
+.lb-kaart .n b{font-family:'Caveat',cursive;font-weight:700;font-size:28px;}
+.lb-kaart .aib-meter{margin:8px 0 4px;}
+#beheer-card .bh-rij{align-items:center;}
+#beheer-card .bh-wie{min-width:0;display:flex;flex-direction:column;}
+#beheer-card .bh-wie b{font-size:21px;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#beheer-card .bh-wie span{color:var(--ink-soft);font-size:13px;}
+#beheer-card .bh-ai{transform:scale(.86);transform-origin:right center;}
+#beheer-card .bh-totaal{margin:10px 0 2px;}
+#beheer-card .bh-totaal b{color:var(--ink);font-weight:400;}
+#beheer-card .bh-melding{border-bottom:1px dashed var(--line);padding:7px 0;font-size:15px;display:flex;flex-direction:column;gap:4px;}
+#beheer-card .bh-melding b{font-size:17px;}
+#beheer-card .bh-reden{color:var(--ink);font-size:15px;overflow-wrap:anywhere;}
+#beheer-card .bh-melding .volg-acties{justify-content:flex-end;}
+#beheer-card .volg-k.bh-blok{border-style:dashed;}
+
+/* Settings per onderwerp (app/11-instellingen.js, opzet 26-11) */
+#page-profile .sect{margin:20px 2px 8px;}
+#page-profile .sect .hand{font-size:24px;}
+.set-groot{background:var(--ink);color:var(--paper);border-radius:24px;padding:14px 18px 15px;margin:0 0 4px;cursor:pointer;}
+.set-groot.sketch{--sketch-stroke:var(--ink);}
+/* potloodlijnen op de donkere kaart: licht, anders vallen ze weg tegen de inkt */
+.set-groot>.rand-svg{stroke:var(--paper);opacity:.65;}
+.set-groot b{font-family:'Caveat',cursive;font-weight:700;font-size:32px;display:block;line-height:1;}
+.set-groot>span{display:block;font-size:15px;line-height:1.35;opacity:.88;margin-top:3px;}
+.set-groot .rij2{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+.set-groot .pil{border:1.5px solid var(--paper);border-radius:12px;padding:2px 10px;font-size:14px;}
+.set-groot .groot-knop{background:var(--paper);color:var(--ink);font:inherit;font-size:15px;border:none;border-radius:14px;padding:5px 13px;cursor:pointer;}
+.set-rij{padding:11px 16px;margin-bottom:9px;}
+.set-rij .set-t{font-size:22px;}
+.set-rij .adv-head{gap:8px;min-height:30px;}
+.set-rij .rij-w{margin-left:auto;font-size:14px;color:var(--ink-soft);white-space:nowrap;}
+.set-rij .rij-w:empty{display:none;}
+.set-rij.open>.adv-body{padding-top:4px;}
+.set-rij .set-row{gap:10px;}
+.set-deel{border-top:1.5px dashed var(--line);margin-top:12px;padding-top:2px;}
+.set-deel:first-child{border-top:none;margin-top:0;}
+.set-sub{font-size:21px;margin:10px 0 2px;}
+.feat-plek:empty{display:none;}
+/* Home met volgen en feed aan: Learn als kaart, en een rustige regel bij een volgverzoek */
+.home-leer{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:var(--ink);font:inherit;
+  padding:12px 16px;margin:0 0 14px;cursor:pointer;}
+.home-leer .navic{width:34px;height:34px;flex:none;}
+.home-leer .hl-t{flex:1;display:flex;flex-direction:column;}
+.home-leer .hl-t .hand{font-size:25px;line-height:1;}
+.home-leer .hl-d{font-size:14.5px;color:var(--ink-soft);}
+.home-leer .g-arr{color:var(--ink-soft);font-size:20px;}
+#volg-melding svg{stroke:var(--ink-soft);}
+#volg-melding b{font-weight:400;font-family:'Caveat',cursive;font-size:19px;}

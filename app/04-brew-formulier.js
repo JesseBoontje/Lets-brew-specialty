@@ -108,7 +108,7 @@ async function updateDialIn(beanId,method){
     const tY=parseFloat(tgt.yield)||36, tT=parseTimeSec(tgt.time)||28;
     // bij filter is het doel de tijd van het recept, niet een opbrengst per seconde
     const rcp=esp?null:recipeById((state.lastRecipe||{})[method]);
-    const fDoel=rcp?(rcp.stappen[rcp.stappen.length-1].t+40):190;
+    const fDoel=(rcp&&Array.isArray(rcp.stappen)&&rcp.stappen.length)?(rcp.stappen[rcp.stappen.length-1].t+40):190;
     const fTijd=Math.floor(fDoel/60)+':'+String(fDoel%60).padStart(2,'0');
     const lines=attempts.map((a,i)=>{
       const aY=parseFloat(a.yield)||null, aT=parseTimeSec(a.time)||null;
@@ -541,7 +541,7 @@ function openRecipe(id,mid){
   if(best&&best.eigen){
     const water=Math.round(best.dose*best.ratio);
     recBewerk={id:best.id,mid:best.mid,beanId:best.beanId||null,
-      stappen:best.stappen.map(x=>({t:x.t,g:x.p?Math.round(water*x.p):'',k:x.k,klep:x.klep||'',d:x.d}))};
+      stappen:(Array.isArray(best.stappen)?best.stappen:[]).map(x=>({t:x.t,g:x.p?Math.round(water*x.p):'',k:x.k,klep:x.klep||'',d:x.d}))};
     setVal('rec-naam',best.naam);setVal('rec-dose',best.dose);setVal('rec-water',water);
     setVal('rec-temp',best.temp);setVal('rec-maling',best.maling);setVal('rec-over',best.over||'');
     setVal('rec-stand',best.stand||'');setVal('rec-tijd',best.tijd||'');recBewerk.molen=best.molen||null;
@@ -970,7 +970,7 @@ function cardSummaries(){
 
   if(pc.total!=null)zet('pour','total '+pourFmt(pc.total)+(pc.draw!=null?(' \u00b7 drawdown '+pourFmt(pc.draw)):''));
   else if(pc.run)zet('pour',pourFmt(pc.el)+' \u00b7 '+((pc.steps[pourCur()]||{}).k||''));
-  else zet('pour',r?('not started \u2014 '+r.stappen.length+' steps'):'no recipe');
+  else zet('pour',r?('not started \u2014 '+((r.stappen||[]).length)+' steps'):'no recipe');
 
   const score=document.getElementById('f-score').value;
   const cup=formCup?(cupById(formCup)||{}).n:'';

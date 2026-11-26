@@ -18,8 +18,7 @@ function naarOpenAI(messages){
     return {role:m.role,content:delen};
   });
 }
-const AI_AANBIEDERS=[
-  {id:'anthropic',naam:'Anthropic',merk:'Claude',hint:'sk-ant-...',
+const AI_ANTHROPIC={id:'anthropic',naam:'Anthropic',merk:'Claude',hint:'sk-ant-...',
    model:'claude-sonnet-4-6',prijs:{in:3,uit:15},waar:'console.anthropic.com',
    url:()=>'https://api.anthropic.com/v1/messages',
    kop:k=>({'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true',
@@ -36,8 +35,9 @@ const AI_AANBIEDERS=[
    stroom:(ev,v)=>{
      if(ev.type==='message_start'&&ev.message&&ev.message.usage)Object.assign(v,ev.message.usage);
      if(ev.type==='message_delta'&&ev.usage&&ev.usage.output_tokens!=null)v.output_tokens=ev.usage.output_tokens;
-     return (ev.type==='content_block_delta'&&ev.delta&&ev.delta.text)?ev.delta.text:'';}},
-
+     return (ev.type==='content_block_delta'&&ev.delta&&ev.delta.text)?ev.delta.text:'';}};
+const AI_AANBIEDERS=[
+  AI_ANTHROPIC,
   {id:'openai',naam:'OpenAI',merk:'GPT',hint:'sk-...',
    model:'gpt-4o-mini',prijs:{in:0.15,uit:0.6},waar:'platform.openai.com',
    url:()=>'https://api.openai.com/v1/chat/completions',
@@ -53,8 +53,20 @@ const AI_AANBIEDERS=[
      if(ev.usage)Object.assign(v,{input_tokens:ev.usage.prompt_tokens,output_tokens:ev.usage.completion_tokens});
      const c=ev.choices&&ev.choices[0];
      return (c&&c.delta&&c.delta.content)||'';}},
+  /* Lets Brew AI: dezelfde vorm als Anthropic, maar via de eigen server (/api/ai). Geen
+     sleutel op de telefoon; de sessiecookie zegt wie je bent. De server kiest het model
+     en telt per dag; het kost jou niets, dus het telt niet mee in het AI-budget. */
+  {...AI_ANTHROPIC,id:'letsbrew',naam:'Lets Brew AI',hint:'',prijs:{in:0,uit:0},waar:'',
+   server:true,cred:'same-origin',url:()=>'/api/ai',kop:()=>({'Content-Type':'application/json'})},
 ];
-function aiProv(){return localStorage.getItem('scc_ai_prov')||'anthropic';}
+// de eigen-sleutel-aanbieder die je het laatst koos (reserve naast Lets Brew AI)
+function aiEigenProv(){const p=localStorage.getItem('scc_ai_prov_eigen');return AI_AANBIEDERS.some(x=>x.id===p&&!x.server)?p:'anthropic';}
+// Lets Brew AI alleen als het account het mag; anders valt de keuze terug op je eigen sleutel
+function aiProv(){
+  const p=localStorage.getItem('scc_ai_prov')||'anthropic';
+  if(p==='letsbrew')return (typeof aiLbKan==='function'&&aiLbKan())?p:aiEigenProv();
+  return p;
+}
 function aiAanbieder(id){return AI_AANBIEDERS.find(x=>x.id===(id||aiProv()))||AI_AANBIEDERS[0];}
 // de sleutel van Anthropic stond er al onder de oude naam -- die laten we staan
 function aiSleutelNaam(id){id=id||aiProv();return id==='anthropic'?'scc_ai_key':'scc_ai_key_'+id;}
@@ -102,35 +114,55 @@ function aiTarief(id){
 }
 
 /* ---------------- AI: één aanroep, welke aanbieder er ook staat ---------- */
+/* Lets Brew AI op, uit of nog niet klaar, en staat er een eigen sleutel in dit tabblad?
+   Dan vraagt de app het die sleutel: de eigen sleutel is de reserve. */
+function aiReserve(a,e){
+  if(!a.server||!e||![429,403,503].includes(e.status)||!['limit','not_allowed','not_set_up'].includes(e.code))return null;
+  const r=aiEigenProv();return getKey(r)?aiAanbieder(r):null;
+}
+function aiFetch(a,messages,mx,stream,oud){
+  return fetch(a.url(),{method:"POST",headers:a.kop(getKey(a.id)),signal:AbortSignal.timeout(60000),
+    credentials:a.cred||'same-origin',body:JSON.stringify(a.lijf(messages,mx,aiModel(a.id),stream,oud))});
+}
+// fout van de aanbieder, met status en (bij de eigen server) de code erbij
+async function aiFoutVan(res){const e=new Error(await apiFout(res));e.status=res.status;e.code=res._code;return e;}
 async function askAI(messages, maxTokens, bron){
-  if(!aiEnabled()||!getKey())throw new Error('AI uit of geen sleutel');
-  const a=aiAanbieder(),mx=maxTokens||1000;
+  if(!aiReady())throw new Error('AI uit of geen sleutel');
+  const mx=maxTokens||1000;
   if(typeof BrewWorkspace!=='undefined')messages=BrewWorkspace.withContext(messages,undefined,bron);
-  let res=await fetch(a.url(),{method:"POST",headers:a.kop(getKey()),signal:AbortSignal.timeout(60000),
-    body:JSON.stringify(a.lijf(messages,mx,aiModel(),false,false))});
+  const a=aiAanbieder();
+  try{return await askAIBij(a,messages,mx,bron);}
+  catch(e){const r=aiReserve(a,e);if(!r)throw e;toast('Lets Brew AI: '+aiFoutKort(e)+' — using your own key');return askAIBij(r,messages,mx,bron);}
+}
+async function askAIBij(a,messages,mx,bron){
+  let res=await aiFetch(a,messages,mx,false,false);
+  if(a.server)aiLbLinks(res.headers.get('X-AI-Left'));
   if(!res.ok){
-    const m=await apiFout(res);
+    const e=await aiFoutVan(res);
     // sommige modellen willen max_tokens, andere max_completion_tokens -- één keer omdraaien
-    if(res.status===400&&/max_(completion_)?tokens/.test(m)){
-      res=await fetch(a.url(),{method:"POST",headers:a.kop(getKey()),signal:AbortSignal.timeout(60000),
-        body:JSON.stringify(a.lijf(messages,mx,aiModel(),false,true))});
-      if(!res.ok)throw new Error(await apiFout(res));
-    }else throw new Error(m);
+    if(!a.server&&res.status===400&&/max_(completion_)?tokens/.test(e.message)){
+      res=await aiFetch(a,messages,mx,false,true);
+      if(!res.ok)throw await aiFoutVan(res);
+    }else throw e;
   }
   const data=await res.json();
-  try{aiTel(a.verbruik(data),bron);setTimeout(aiMeldNa,900);}catch(e){}
+  try{aiTel(a.verbruik(data),bron,a.id);setTimeout(aiMeldNa,900);}catch(e){}
   const out=a.lees(data);
   if(!out)throw new Error('leeg antwoord');
   return out;
 }
 // streamende variant: roept onDelta(volledigeTekst) aan terwijl het antwoord binnenkomt
 async function askAIStream(messages, maxTokens, onDelta, bron){
-  if(!aiEnabled()||!getKey())throw new Error('AI uit of geen sleutel');
-  const a=aiAanbieder();
+  if(!aiReady())throw new Error('AI uit of geen sleutel');
   if(typeof BrewWorkspace!=='undefined')messages=BrewWorkspace.withContext(messages,undefined,bron);
-  const res=await fetch(a.url(),{method:"POST",headers:a.kop(getKey()),signal:AbortSignal.timeout(60000),
-    body:JSON.stringify(a.lijf(messages,maxTokens||600,aiModel(),true,false))});
-  if(!res.ok||!res.body)throw new Error(res.body?await apiFout(res):('api '+res.status));
+  const a=aiAanbieder();
+  try{return await askAIStreamBij(a,messages,maxTokens||600,onDelta,bron);}
+  catch(e){const r=aiReserve(a,e);if(!r)throw e;toast('Lets Brew AI: '+aiFoutKort(e)+' — using your own key');return askAIStreamBij(r,messages,maxTokens||600,onDelta,bron);}
+}
+async function askAIStreamBij(a,messages,mx,onDelta,bron){
+  const res=await aiFetch(a,messages,mx,true,false);
+  if(a.server)aiLbLinks(res.headers.get('X-AI-Left'));
+  if(!res.ok||!res.body){if(!res.body){const e=new Error('api '+res.status);e.status=res.status;throw e;}throw await aiFoutVan(res);}
   const reader=res.body.getReader();const dec=new TextDecoder();let buf='',full='';
   const verbruik={input_tokens:0,output_tokens:0};
   while(true){
@@ -146,7 +178,7 @@ async function askAIStream(messages, maxTokens, onDelta, bron){
       }catch(e){}
     }
   }
-  try{aiTel(verbruik,bron);setTimeout(aiMeldNa,900);}catch(e){}
+  try{aiTel(verbruik,bron,a.id);setTimeout(aiMeldNa,900);}catch(e){}
   if(!full)throw new Error('leeg antwoord');
   return full;
 }
@@ -156,6 +188,7 @@ async function askAIStream(messages, maxTokens, onDelta, bron){
 async function apiFout(res){
   let m='';
   try{const e=await res.json();
+    if(e&&typeof e.code==='string')res._code=e.code;
     m=(e&&e.error&&(e.error.message||e.error))||'';
     if(typeof m!=='string')m='';
   }catch(_){}
@@ -210,7 +243,7 @@ async function scanLabel(ev){
     document.getElementById('label-preview').innerHTML='<img src="'+beanPhoto+'" style="max-height:140px;border-radius:14px;border:2px solid var(--line)">';
   }catch(e){}
   // 2) als AI uit staat of geen sleutel: stop hier, foto is bewaard
-  if(!aiEnabled()||!getKey()){
+  if(!aiReady()){
     status.textContent='photo saved. turn on AI in profile to read the label automatically.';
     ev.target.value='';return;
   }

@@ -1,0 +1,144 @@
+<title>Lets Brew slot en sleutel</title>
+<style>
+/* Opzet "slot en sleutel" (25-11): Cloudflare Access + AI-sleutel als Worker-secret. Alleen een schets. */
+.phone .screen{padding:12px 16px 0;position:relative;height:100%;box-sizing:border-box;}
+.k{font-family:'Caveat',cursive;font-weight:700;font-size:34px;line-height:1;margin:4px 0 8px;}
+.kaart{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:9px 13px;margin:0 0 10px;}
+.kaart b{font-family:'Caveat',cursive;font-size:24px;line-height:1.05;display:block;}
+.kaart span{font-size:14px;color:var(--ink-soft);}
+.veld{border:2px solid var(--line);border-radius:14px;background:var(--paper);padding:8px 12px;margin:6px 0 10px;font-size:16px;color:var(--ink);}
+.knop{display:block;width:100%;border:0;border-radius:20px;background:var(--accent);color:var(--cream);font:inherit;font-family:'Caveat',cursive;font-size:24px;padding:7px;margin:2px 0 12px;}
+.cf{font-size:13px;color:var(--ink-soft);margin:0 0 10px;}
+.keus{display:flex;gap:8px;margin:0 0 10px;}
+.keus button{flex:1;border:2px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);font:inherit;font-size:16px;padding:6px 0;}
+.keus button.sel{background:var(--accent);color:var(--cream);border-color:var(--accent);}
+.balk{height:12px;border:2px solid var(--line);border-radius:8px;overflow:hidden;margin:6px 0 4px;}
+.balk i{display:block;height:100%;width:24%;background:var(--accent);}
+.route{max-width:440px;margin:0 auto 10px;}
+.route svg{display:block;width:100%;height:auto;}
+.route text{font-family:'Patrick Hand',cursive;fill:var(--ink);}
+.route .t{font-family:'Caveat',cursive;font-weight:700;font-size:22px;}
+.route .z{font-size:13px;fill:var(--ink-soft);}
+</style>
+
+<div class="mk-kop"><h1>Slot en sleutel</h1>
+  <div class="mk-onder">Opzet, nog niet ingebouwd. Een slot op letsbrew.djez.app (inloggen met een code per mail) en de AI-sleutel veilig op de server, met een daglimiet.</div></div>
+
+<div class="mk-sect"><h2>Nieuw voorstel: twee soorten gebruikers</h2></div>
+<div class="route">
+<svg viewBox="0 0 400 330" role="img" aria-label="Iedereen: app open, eigen sleutel of geen AI. Goedgekeurd: inloggen, AI via de server">
+  <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
+    <rect x="130" y="8" width="140" height="50" rx="18" fill="var(--card)"/>
+    <path d="M170 58 L95 92 M88 82 L94 93 L104 88"/>
+    <path d="M230 58 L305 92 M296 88 L306 93 L312 82"/>
+    <rect x="10" y="96" width="180" height="130" rx="18" fill="var(--cream)"/>
+    <rect x="210" y="96" width="180" height="130" rx="18" fill="var(--card)"/>
+    <rect x="210" y="250" width="180" height="70" rx="18" fill="var(--cream)"/>
+    <path d="M300 226 V246 M293 238 L300 247 L307 238"/>
+  </g>
+  <text class="t" x="200" y="40" text-anchor="middle">letsbrew.djez.app</text>
+  <text class="t" x="100" y="124" text-anchor="middle">iedereen</text>
+  <text class="z" x="100" y="146" text-anchor="middle">geen inlog nodig</text>
+  <text class="z" x="100" y="166" text-anchor="middle">hele app werkt</text>
+  <text class="z" x="100" y="186" text-anchor="middle">AI alleen met</text>
+  <text class="z" x="100" y="204" text-anchor="middle">eigen sleutel</text>
+  <text class="t" x="300" y="124" text-anchor="middle">🔒 goedgekeurd</text>
+  <text class="z" x="300" y="146" text-anchor="middle">één keer inloggen</text>
+  <text class="z" x="300" y="166" text-anchor="middle">met code per mail</text>
+  <text class="z" x="300" y="186" text-anchor="middle">alleen mailadressen</text>
+  <text class="z" x="300" y="204" text-anchor="middle">die jij toevoegt</text>
+  <text class="t" x="300" y="280" text-anchor="middle">🔑 Lets Brew AI</text>
+  <text class="z" x="300" y="302" text-anchor="middle">jouw sleutel, 50 per dag</text>
+</svg>
+</div>
+<div class="mk-sect"><ul>
+  <li>Het slot zit alleen op de AI-deur (<i>/login</i> en <i>/api/ai</i>), niet op de hele app.</li>
+  <li>Een "gratis account" voegt nu niets toe: je gegevens staan op je eigen telefoon. Een account voor iedereen wordt pas nuttig bij de database (synchroniseren). Dan bouwen we het mee.</li>
+  <li>Goedkeuren = een mailadres op de lijst zetten (jij in het dashboard, of jij zegt het tegen Claude). Gratis tot 50 goedgekeurde mensen.</li>
+</ul></div>
+
+<div class="mk-sect"><h2>Eerste voorstel: slot op de hele app</h2></div>
+<div class="route">
+<svg viewBox="0 0 400 400" role="img" aria-label="Telefoon, slot Cloudflare Access, Worker met sleutel en daglimiet, AI">
+  <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#wobble-rough)">
+    <rect x="110" y="10" width="180" height="58" rx="18" fill="var(--card)"/>
+    <rect x="110" y="104" width="180" height="58" rx="18" fill="var(--cream)"/>
+    <rect x="110" y="198" width="180" height="78" rx="18" fill="var(--card)"/>
+    <rect x="110" y="312" width="180" height="58" rx="18" fill="var(--cream)"/>
+    <path d="M200 68 V100 M193 92 L200 101 L207 92"/>
+    <path d="M200 162 V194 M193 186 L200 195 L207 186"/>
+    <path d="M200 276 V308 M193 300 L200 309 L207 300"/>
+  </g>
+  <text class="t" x="200" y="38" text-anchor="middle">jouw iPhone</text>
+  <text class="z" x="200" y="58" text-anchor="middle">de app, zonder sleutel erin</text>
+  <text class="t" x="200" y="132" text-anchor="middle">🔒 slot (Access)</text>
+  <text class="z" x="200" y="152" text-anchor="middle">alleen jouw mailadres komt erin</text>
+  <text class="t" x="200" y="226" text-anchor="middle">🔑 Worker /api/ai</text>
+  <text class="z" x="200" y="246" text-anchor="middle">checkt het slot nog een keer,</text>
+  <text class="z" x="200" y="264" text-anchor="middle">telt mee, zet de sleutel erbij</text>
+  <text class="t" x="200" y="340" text-anchor="middle">Claude</text>
+  <text class="z" x="200" y="360" text-anchor="middle">antwoord gaat dezelfde weg terug</text>
+  <text class="z" x="300" y="236">50 per dag,</text>
+  <text class="z" x="300" y="252">daarna stop</text>
+</svg>
+</div>
+
+<div class="mk-rij">
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Lets Brew</div>
+      <div class="cf">Sign in to letsbrew.djez.app</div>
+      <div class="veld">jesse@…</div>
+      <button class="knop" type="button">send me a code</button>
+      <div class="cf">Screen by Cloudflare. Only addresses on your list get a code.</div>
+    </div></div>
+    <figcaption><b>1 · het slot</b>: eerste keer openen. Je typt je mailadres, Cloudflare stuurt een code. Dit scherm is van Cloudflare, niet in huisstijl.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">Lets Brew</div>
+      <div class="cf">Enter the code we sent you</div>
+      <div class="veld">4 8 2 9 1 7</div>
+      <button class="knop" type="button">sign in</button>
+      <div class="cf">You stay signed in for 30 days.</div>
+    </div></div>
+    <figcaption><b>2 · de code</b>: één keer per 30 dagen (instelbaar). Daarna opent de app gewoon, ook offline voor wat al op je telefoon staat.</figcaption>
+  </figure>
+
+  <figure class="mk-fig">
+    <div class="phone"><div class="statusbar">9:41</div><div class="screen">
+      <div class="k">AI</div>
+      <div class="keus"><button class="sel" type="button">Lets Brew AI</button><button type="button">own key</button></div>
+      <div class="kaart"><b>Today</b><span>12 of 50 questions</span><div class="balk"><i></i></div><span>Resets at midnight.</span></div>
+      <div class="kaart"><b>No key on this phone</b><span>The key lives on the server. Nothing to paste here.</span></div>
+    </div></div>
+    <figcaption><b>3 · de sleutel</b>: in Settings kies je "Lets Brew AI". Je ziet hoeveel vragen je vandaag nog hebt. Eigen sleutel blijft als reserve.</figcaption>
+  </figure>
+</div>
+
+<div class="mk-sect">
+  <h2>Wat ik overneem</h2>
+  <ul>
+    <li>Cloudflare Access als slot, inloggen met een code per mail. Gratis tot 50 mensen.</li>
+    <li>De AI-sleutel als Worker-secret; jij plakt hem zelf in het dashboard, nooit in de chat.</li>
+    <li>Een eigen route <i>/api/ai</i> met daglimiet.</li>
+  </ul>
+  <h2>Wat ik anders doe, en waarom</h2>
+  <ul>
+    <li><b>De Worker vertrouwt het slot niet blind.</b> Hij controleert zelf het Access-bewijs (een ondertekend kaartje). Zo kan een preview-link of een omweg nooit jouw sleutel gebruiken.</li>
+    <li><b>Limiet per persoon én een vast plafond</b>: 50 vragen per dag, alleen het gekozen model, antwoord niet langer dan nodig. Daarnaast zet jij in de Anthropic-console een maandlimiet als noodrem.</li>
+    <li><b>Geen Email Routing nodig voor deze stap.</b> De code komt van Cloudflare zelf, niet van letsbrew@djez.app. Dat adres is pas nodig bij de database-stap.</li>
+  </ul>
+  <h2>Wat er niet kan, eerlijk</h2>
+  <ul>
+    <li>Ik kan Access niet aanzetten: getest met één GET, antwoord "Access is not enabled". Dat moet jij één keer in het dashboard doen (Zero Trust, gratis plan; Cloudflare vraagt soms een betaalkaart, ook bij gratis).</li>
+    <li>Of mijn sleutel daarna Access mag instellen weet ik pas als het aanstaat. Zo niet, dan klik je het met mijn stappenlijst zelf in (± 5 minuten).</li>
+    <li>Op de iPhone zijn Safari en de app op je beginscherm twee aparte werelden: log in vanuit de app op je beginscherm.</li>
+  </ul>
+  <h2>Wie doet wat</h2>
+  <ul>
+    <li><b>Jesse</b>: Zero Trust aanzetten · sleutel plakken in Workers › lets-brew-specialty › Settings › Variables (secret) · maandlimiet in console.anthropic.com.</li>
+    <li><b>Claude</b>: slot instellen (of stappenlijst) · /api/ai in de Worker met controle en teller · keuze "Lets Brew AI" in de app · testen, keuring, testlink.</li>
+  </ul>
+</div>
