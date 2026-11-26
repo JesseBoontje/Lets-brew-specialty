@@ -1,7 +1,7 @@
 /* ---------------- navigatie ---------------- */
-const pages=['welcome','home','choosebean','form','dialin','recipe','detail','brews','methods','beans','beanform','learn','learn-barista','learn-filter','learn-academy','learn-latte','profile','cupping','gallery','beanpick','finder'];
+const pages=['welcome','home','choosebean','form','dialin','recipe','detail','brews','methods','beans','beanform','learn','learn-barista','learn-filter','learn-academy','learn-latte','profile','cupping','gallery','beanpick','finder','feed','person'];
 const navMap={home:'home',choosebean:'brews',form:'home',dialin:'home',recipe:'brews',detail:'home',
-  cupping:'beans',gallery:'learn',brews:'brews',methods:'home',beans:'beans',beanform:'beans',learn:'learn','learn-barista':'learn','learn-filter':'learn','learn-academy':'learn','learn-latte':'learn',beanpick:'beans',finder:'beans',profile:'profile'};
+  cupping:'beans',gallery:'learn',brews:'brews',methods:'home',beans:'beans',beanform:'beans',learn:'learn','learn-barista':'learn','learn-filter':'learn','learn-academy':'learn','learn-latte':'learn',beanpick:'beans',finder:'beans',profile:'profile',feed:'feed',person:'profile'};
 let navHistory=[];
 let currentPage='welcome';
 function go(p,isBack){
@@ -47,6 +47,9 @@ function go(p,isBack){
   if(p==='beanpick')bpTeken();
   if(p==='finder')fdTeken();
   if(p==='profile')renderProfile();
+  if(p==='feed'&&typeof renderFeed==='function')renderFeed();
+  if(p==='person'&&typeof renderPerson==='function')renderPerson();
+  if(typeof volgNav==='function')volgNav();
   applyAIVisibility();
   try{fdPil();}catch(e){}
   document.querySelector('.phone').scrollTop=0;

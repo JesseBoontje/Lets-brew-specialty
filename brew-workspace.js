@@ -1,7 +1,7 @@
 'use strict';
 // One workspace for plans (recipes), ingredients (beans), and measured history.
 const BrewWorkspace=(()=>{
- const roots=['home','beans','recipes','brews','learn','profile'];
+ const roots=['home','beans','recipes','brews','learn','feed','profile'];
  const originalGo=go,originalBeanRender=renderBeans,originalProfile=renderProfile,originalHome=renderHome,originalAgain=brewAgain;
  const h=esc,allRecipes=()=>state.recipes.concat(ALLE_RECEPTEN());
  let root='home',frames=[],cursor=-1,restoring=false,chatBusy=false,pending=null;
@@ -19,13 +19,14 @@ const BrewWorkspace=(()=>{
  addPage('discovery','Find coffee','<p class="ws-note">Two ways to explore the same world of coffee. Then save a bean to your shelf or wish list.</p><div class="ws-actions"><button data-ws="find-map">On the map</button><button data-ws="find-questions">Five questions</button></div>');
  // Use existing illustrations and one concise label per destination.
  const nav=document.getElementById('nav'),icons={};for(const b of nav.querySelectorAll('button'))icons[b.dataset.p]=b.querySelector('.ic')?.innerHTML||'';
- const navRoots=['home','beans','brews','learn','profile'],navNaam={home:'Home',beans:'Beans',brews:'Brews',learn:'Learn',profile:'Settings'};nav.innerHTML=navRoots.map(id=>'<button type="button" data-p="'+id+'"><span class="ic">'+(icons[id]||icons.brews)+'</span><span class="ws-nav-label">'+navNaam[id]+'</span></button>').join('');
+ // Feed (stap 2) staat alleen in de balk als de vlag social aan staat; Learn blijft staan.
+ const navRoots=['home','beans','brews','learn','feed','profile'],navNaam={home:'Home',beans:'Beans',brews:'Brews',learn:'Learn',feed:'Feed',profile:'Settings'};nav.innerHTML=navRoots.map(id=>'<button type="button" data-p="'+id+'"'+(id==='feed'?' id="nav-feed" style="display:none"':'')+'><span class="ic">'+(icons[id]||icons.brews)+'</span><span class="ws-nav-label">'+navNaam[id]+'</span></button>').join('');
  nav.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;let p=b.dataset.p;if(p==='brews'){try{if(localStorage.getItem('scc_brews_kant')==='ideas')p='recipes';}catch(_){}}go(p);});
  const visibleScreen=()=>document.querySelector('#page-'+currentPage+' .screen');
  function frame(){return{page:currentPage,root,scroll:visibleScreen()?.scrollTop||0,detail:currentDetail,recipeDraft:currentPage==='recipe'&&recBewerk?structuredClone(recBewerk):null,recipeReturn:recTerug,inputs:['form','dialin','recipe'].includes(currentPage)?Array.from(document.querySelectorAll('#page-'+currentPage+' input,#page-'+currentPage+' textarea,#page-'+currentPage+' select')).filter(x=>x.id).map(x=>({id:x.id,value:x.value,checked:x.checked})):null};}
  function remember(){if(cursor>=0)frames[cursor]=frame();}
  function activate(){const r=root==='recipes'?'brews':root;for(const b of nav.querySelectorAll('[data-p]'))b.classList.toggle('on',b.dataset.p===r);for(const k of document.querySelectorAll('[data-ws="brews-kant"]'))k.classList.toggle('selected',(k.dataset.value==='ideas')===(currentPage==='recipes'));}
- function routeRoot(page){if(roots.includes(page))return page;if(['form','dialin','choosebean'].includes(page))return 'home';if(['recipe','methods'].includes(page))return 'recipes';if(page==='beanform'||page==='beanpick'||page==='finder'||page==='discovery')return 'beans';if(page.startsWith('learn')||page==='cupping')return 'learn';if(page==='detail')return root==='beans'?'beans':'brews';return root;}
+ function routeRoot(page){if(roots.includes(page))return page;if(['form','dialin','choosebean'].includes(page))return 'home';if(['recipe','methods'].includes(page))return 'recipes';if(page==='beanform'||page==='beanpick'||page==='finder'||page==='discovery')return 'beans';if(page.startsWith('learn')||page==='cupping')return 'learn';if(page==='detail')return root==='beans'?'beans':'brews';if(page==='person')return root==='feed'?'feed':'profile';return root;}
  go=function(page,isBack=false){
   if(!pages.includes(page))return;
   if(page!=='assistant'&&globalThis.BrewVoice)BrewVoice.stop();

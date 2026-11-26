@@ -55,7 +55,7 @@ test('espresso and filter beans go straight on; two own methods ask; switch off 
 
 test('one Brews tab: five tabs, my brews and brew ideas, last choice remembered',async({page})=>{
  await open(page,zet);
- await expect(page.locator('#nav [data-p]')).toHaveCount(5);
+ await expect(page.locator('#nav [data-p]:visible')).toHaveCount(5); // feed alleen met vlag social
  await expect(page.locator('#nav')).toContainText('Home');
  await page.locator('#nav [data-p="brews"]').tap();
  await expect(page.locator('#page-brews')).toBeVisible();

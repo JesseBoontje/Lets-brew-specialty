@@ -13,7 +13,7 @@ const loadPromise=load();
 if(navigator.storage&&navigator.storage.persist){
   navigator.storage.persist().catch(()=>{});
 }
-loadPromise.then(()=>{if(apiPagina())return;try{applyFeatures();}catch(e){}try{applyAIVisibility();}catch(e){}try{checkReminderOnOpen();}catch(e){}try{acctStart();}catch(e){}}).catch(()=>toast('Stored data need checking. Export a backup via profile.'));
+loadPromise.then(()=>{if(apiPagina())return;try{applyFeatures();}catch(e){}try{applyAIVisibility();}catch(e){}try{checkReminderOnOpen();}catch(e){}try{acctStart();}catch(e){}try{volgStart();}catch(e){}}).catch(()=>toast('Stored data need checking. Export a backup via profile.'));
 
 // app geopend vanuit een melding? -> pas na het laden/splash een nieuwe brew voorstellen
 let pendingQuickBrew=/[?&]quickbrew=1/.test(location.search);
