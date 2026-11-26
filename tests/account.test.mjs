@@ -155,6 +155,18 @@ test('inloggen met ES256: geldige handtekening werkt, geknoeide niet, teller moe
  assert.equal(onbekend.status,401);
 });
 
+test('een account op slot (beheer) kan niet inloggen: 403, geen sessie',async()=>{
+ const env=omgeving();
+ const r=await registreer(env,'op_slot');
+ env.DB.db.prepare("UPDATE users SET locked=1 WHERE handle='op_slot'").run();
+ const n=tel(env,'sessions');
+ const l=await login(env,r.sleutel,{teller:0});
+ assert.equal(l.status,403);assert.equal(l.body.code,'locked');assert.equal(l.cookie,null);
+ assert.equal(tel(env,'sessions'),n,'geen nieuwe sessie');
+ // de sessie van het registreren telt ook niet meer
+ assert.equal((await accountRoute(vraag('/api/auth/me',{method:'GET',cookie:koekje(r.cookie)}),env)).status,401);
+});
+
 test('inloggen met RS256',async()=>{
  const env=omgeving();
  const r=await registreer(env,'login_rs',await maakSleutel(-257));

@@ -1,7 +1,9 @@
 // Nep-D1 op node:sqlite (Node 22) voor tests: prepare/bind/first/all/run en batch in één transactie.
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
-const MIGRATIE=readFileSync(new URL('../migrations/0001_init.sql',import.meta.url),'utf8');
+// alle migraties op volgorde, zoals wrangler ze uitvoert
+const MAP=new URL('../migrations/',import.meta.url);
+const MIGRATIE=readdirSync(MAP).filter(n=>/^\d{4}_.*\.sql$/.test(n)).sort().map(n=>readFileSync(new URL(n,MAP),'utf8')).join('\n');
 export function nepD1(){
  const db=new DatabaseSync(':memory:');db.exec(MIGRATIE);
  const conv=v=>v instanceof ArrayBuffer?new Uint8Array(v):v===undefined?null:typeof v==='boolean'?+v:v;

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/security.test.mjs tests/workspace.test.mjs tests/stem.test.mjs tests/account.test.mjs tests/social.test.mjs && playwright test",
+    "test": "node --test tests/security.test.mjs tests/workspace.test.mjs tests/stem.test.mjs tests/account.test.mjs tests/social.test.mjs tests/ai.test.mjs && playwright test",
     "build": "node scripts/build-site.mjs"
   },
   "devDependencies": {

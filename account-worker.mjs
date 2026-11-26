@@ -106,9 +106,22 @@ export const wisCookie='lb_s=; HttpOnly; Secure; SameSite=Strict; Path=/api/; Ma
 export async function gebruiker(request,env){
  const token=cookie(request,'lb_s');
  if(!/^[A-Za-z0-9_-]{43}$/.test(token))return null;
- const row=await env.DB.prepare('SELECT u.id,u.handle,u.visibility,s.expires_at FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=?').bind(hex(await sha256(token))).first();
- if(!row||row.expires_at<Date.now())return null;
+ const row=await env.DB.prepare('SELECT u.id,u.handle,u.visibility,u.ai_allowed,u.is_admin,u.locked,s.expires_at FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=?').bind(hex(await sha256(token))).first();
+ // een account op slot (beheer) telt nergens meer als ingelogd: geen sync, geen volgen, geen AI
+ if(!row||row.expires_at<Date.now()||row.locked)return null;
  return row;
+}
+/* AI van de app (stap 3): een teller per gebruiker per dag, op de Amsterdamse datum. */
+export const AI_LIMIET=50;
+export const aiDag=(t=Date.now())=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(t);
+export async function aiGebruikt(env,userId){
+ const r=await env.DB.prepare('SELECT count FROM ai_usage WHERE user_id=? AND day=?').bind(userId,aiDag()).first();
+ return r?r.count:0;
+}
+async function ik(env,u){
+ const out={user:{handle:u.handle,visibility:u.visibility,admin:!!u.is_admin,ai:!!u.ai_allowed}};
+ if(u.ai_allowed)out.ai={used:Math.min(AI_LIMIET,await aiGebruikt(env,u.id)),limit:AI_LIMIET};
+ return out;
 }
 async function nieuweSessie(env,userId){
  const token=b64u.enc(rnd(32));
@@ -182,8 +195,9 @@ async function loginVerify(request,env,body){
  const cred=body.credential,r=cred?.response;
  if(!cred||cred.type!=='public-key'||typeof cred.id!=='string'||!/^[A-Za-z0-9_-]{16,1400}$/.test(cred.id)||typeof r?.clientDataJSON!=='string'||typeof r?.authenticatorData!=='string'||typeof r?.signature!=='string')return json({error:'Invalid request.'},400);
  const {raw}=await leesClientData(env,request,r.clientDataJSON,'webauthn.get');
- const pk=await env.DB.prepare('SELECT p.user_id,p.public_key,p.sign_count,u.handle,u.visibility FROM passkeys p JOIN users u ON u.id=p.user_id WHERE p.id=?').bind(cred.id).first();
+ const pk=await env.DB.prepare('SELECT p.user_id,p.public_key,p.sign_count,u.handle,u.visibility,u.locked FROM passkeys p JOIN users u ON u.id=p.user_id WHERE p.id=?').bind(cred.id).first();
  if(!pk)return json({error:'This passkey is not known here. Create an account first.'},401);
+ if(pk.locked)return json({error:'This account is locked.',code:'locked'},403);
  const adBytes=b64u.dec(r.authenticatorData),ad=leesAuthData(adBytes,false);
  await controleerAuthData(request,ad);
  const ok=await controleerHandtekening(bytesVan(pk.public_key),b64u.dec(r.signature),concat(adBytes,await sha256(raw)));
@@ -307,7 +321,7 @@ export async function accountRoute(request,env={}){
   if(!l.success)return json({error:'Too many tries. Wait a minute.'},429);
  }
  try{
-  if(path==='/api/auth/me'){const u=await gebruiker(request,env);return u?json({user:{handle:u.handle,visibility:u.visibility}}):json({user:null},401);}
+  if(path==='/api/auth/me'){const u=await gebruiker(request,env);return u?json(await ik(env,u)):json({user:null},401);}
   if(path==='/api/auth/logout')return await logout(request,env);
   if(path==='/api/auth/login/options')return await loginOptions(request,env);
   const body=m==='POST'?await leesBody(request,path==='/api/sync'?MAX_SYNC_BODY:32768):{};
