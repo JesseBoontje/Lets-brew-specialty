@@ -20,7 +20,7 @@ publiceert hem op **dezelfde URL**, zodat eerder verstuurde links blijven werken
 | | |
 |---|---|
 | bron | `docs/handleiding.html` in deze repo |
-| artifact-URL | `https://claude.ai/code/artifact/de05d674-670e-4ea2-8b72-0b946c5208a4` |
+| artifact-URL | `https://claude.ai/artifact/DDGgEX5u7XbHMToy1F2RqB (nieuw 26-11; de oude link bestond niet meer)` |
 | favicon | `☕` (nooit veranderen — de gebruiker vindt zijn tab aan het icoon) |
 | taal | Nederlands, ook de code-commentaren |
 

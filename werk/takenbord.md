@@ -17,7 +17,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Later: ElevenLabs voor live spraakcoach en AI-coach voorlezen | nog niemand | nog geen | later (besluit Jesse) | eigen klus |
 | Inlog Face ID + D1 + Claude-koppeling (MCP), AI-coach centraal | nog niemand | nog geen | later (besluit Jesse) | grote klus |
 | Startscherm + getekende randen overal (oude logo) | architect | main (#14) | LIVE 24-11 | Jesse op iPhone testen |
-| Handleiding bijwerken voor klus 2-5 en de kleine klussen | architect | geen | na akkoord | skill lets-brew-handleiding |
+| Handleiding bijwerken | architect | functie/slot-en-sleutel | klaar 26-11: Settings, delen, account/feed, Lets Brew AI; NIEUWE link (oude bestond niet meer) | https://claude.ai/artifact/DDGgEX5u7XbHMToy1F2RqB |
 | Cloudflare Web Analytics-script wordt door de CSP geweigerd (bestond al) | Jesse | geen | wacht | in dashboard Web Analytics uitzetten, of script-src uitbreiden (static.cloudflareinsights.com) |
 | Randen: hertekenen bij alleen tekstwijziging (ResizeObserver) | nog niemand | geen | later | klein |
 | Nakijkronde (aanwijzen): 5 punten | architect | functie/nakijk-en-route | gebouwd 25-11 (scc-v117), keuring 1x afgekeurd op NL-resten, hersteld; 42/42 chromium groen; reacties resolved | Jesse test nakijkversie https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7 ; mergen pas na akkoord |
