@@ -6,8 +6,9 @@
    featOn('account'). Online (D1) staat een kopie; merge per record op updatedAt,
    laatste wint. Foto's (data:) gaan niet mee, die blijven op de telefoon. */
 const ACCT_LIJST={bean:'beans',brew:'brews',gear:'gear',recipe:'recipes'};
-const ACCT_MAX_REC=60*1024,ACCT_BATCH=200,ACCT_BATCH_BYTES=2*1024*1024,ACCT_TOMB_MAX=5000;
-let acctFp=null,acctBezig=false,acctTimer=null,acctMelding='';
+const ACCT_MAX_REC=64*1024,ACCT_BATCH=200,ACCT_BATCH_BYTES=2*1024*1024,ACCT_TOMB_MAX=5000;
+let acctFp=null,acctBezig=false,acctTimer=null,acctMelding='',acctOpnieuw=false;
+const acctBytes=t=>new TextEncoder().encode(t).length;
 const acctDialId=key=>String(key).replace(/\|/g,'--');
 function acctSync0(){if(!state.sync||typeof state.sync!=='object')state.sync={};const s=state.sync;if(!Array.isArray(s.tomb))s.tomb=[];if(!s.dialAt||typeof s.dialAt!=='object')s.dialAt={};return s;}
 function acctIngelogd(){return !!(state.sync&&state.sync.user&&state.sync.user.handle);}
@@ -35,7 +36,8 @@ function acctStamp(){
   for(const k of acctFp.keys())if(!nieuw.has(k)){
     const [kind,id]=k.split('/');veranderd=true;
     if(kind==='dial')delete s.dialAt[id];
-    if(acctIngelogd()&&!s.tomb.some(t=>t.kind===kind&&t.id===id))s.tomb.push({kind,id,at:now});
+    // ook na uitloggen, zolang dit toestel bij een account hoorde: anders komt het gewiste terug
+    if((acctIngelogd()||s.lastHandle)&&!s.tomb.some(t=>t.kind===kind&&t.id===id))s.tomb.push({kind,id,at:now});
   }
   if(s.tomb.length>ACCT_TOMB_MAX)s.tomb.splice(0,s.tomb.length-ACCT_TOMB_MAX);
   acctFp=nieuw;
@@ -43,6 +45,7 @@ function acctStamp(){
 }
 function acctPlan(){
   if(!featOn('account')||!acctIngelogd())return;
+  if(acctBezig){acctOpnieuw=true;return;}
   clearTimeout(acctTimer);acctTimer=setTimeout(()=>acctSync(),5000);
 }
 /* data:-foto's eruit voor online; bij binnenkomst de eigen foto terugzetten */
@@ -69,6 +72,9 @@ function acctToepassen(changes){
   const s=acctSync0();let n=0;
   for(const c of changes||[]){
     if(!c||typeof c.id!=='string'||!Number.isFinite(c.updatedAt))continue;
+    // hier gewist en nog niet doorgegeven: een oudere versie van online mag niet terugkomen
+    const ti=s.tomb.findIndex(t=>t.kind===c.kind&&t.id===c.id);
+    if(ti>=0){if(s.tomb[ti].at>=c.updatedAt)continue;s.tomb.splice(ti,1);}
     try{
       if(c.kind==='dial'){
         if(!state.dialLog||typeof state.dialLog!=='object')state.dialLog={};
@@ -112,11 +118,11 @@ async function acctSync(handmatig){
       const r=x.rec,t=x.kind==='dial'?Math.max(0,...r.map(a=>+a.ts||0)):(+r.ts||Date.parse(r.at||'')||0);
       acctZetAt(x,t>0&&t<=merk?t:merk);
     }
-    const vanaf=s.sentUpTo||0,uit=[];
+    const vanaf=s.sentUpTo||0,uit=[];let teGroot=0,tot=merk;
     for(const x of acctRecords())if(acctAt(x)>vanaf){
       const data=x.kind==='dial'?{key:x.key,attempts:acctZonderFotos(x.rec)}:acctZonderFotos(x.rec);
-      const tekst=JSON.stringify(data);if(tekst.length>ACCT_MAX_REC)continue;
-      uit.push({c:{kind:x.kind,id:x.id,updatedAt:acctAt(x),data},n:tekst.length});
+      const n=acctBytes(JSON.stringify(data));if(n>ACCT_MAX_REC){teGroot++;continue;}
+      uit.push({c:{kind:x.kind,id:x.id,updatedAt:acctAt(x),data},n});
     }
     for(const t of s.tomb)if(t.at>vanaf)uit.push({c:{kind:t.kind,id:t.id,updatedAt:t.at,deleted:true},n:60});
     // in stukjes van max 200 records of 2 MB; daarna doorvragen zolang de server "more" zegt
@@ -126,23 +132,30 @@ async function acctSync(handmatig){
     let since=s.since||0,binnen=0;
     for(let i=0;i<stukken.length||i<60;i++){
       const res=await acctApi('/api/sync',{body:{since,changes:stukken[i]||[]}});
-      binnen+=acctToepassen(res.changes);
+      binnen+=acctToepassen(res.changes);acctFp=acctVingers();
+      // door de server geweigerd: sentUpTo blijft ervoor staan, zodat het opnieuw mee kan
+      for(const r of res.rejected||[]){const u=(stukken[i]||[]).find(c=>c.kind===r.kind&&c.id===r.id);if(u)tot=Math.min(tot,u.updatedAt-1);teGroot++;}
       since=res.now;
       if(i>=stukken.length-1&&!res.more)break;
     }
-    s.since=since;s.sentUpTo=merk;s.last=Date.now();
-    s.tomb=s.tomb.filter(t=>t.at>merk);
-    acctFp=acctVingers();
-    acctMelding=binnen?binnen+' change'+(binnen===1?'':'s')+' from online':'';
+    s.since=since;s.sentUpTo=Math.max(vanaf,tot);s.last=Date.now();
+    s.tomb=s.tomb.filter(t=>t.at>tot);
+    acctMelding=(binnen?binnen+' change'+(binnen===1?'':'s')+' from online':'')+(teGroot?(binnen?' · ':'')+teGroot+' too big to sync':'');
     await save();
     if(handmatig)toast('✓ synced');
     return true;
   }catch(e){
     if(e.status===401){acctMelding='signed out — sign in again to sync';acctUitgelogd();}
-    else acctMelding=navigator.onLine===false?'offline, will sync later':'sync did not work, will try again later';
+    else acctMelding=navigator.onLine===false?'offline, will sync later':e.status===413?e.message:'sync did not work, will try again later';
     if(handmatig)toast(acctMelding);
     return false;
-  }finally{acctBezig=false;acctRender();}
+  }finally{
+    acctBezig=false;
+    // binnengekomen records niet als eigen wijziging zien; was er tussendoor opgeslagen, dan nog een ronde
+    acctFp=acctVingers();
+    if(acctOpnieuw){acctOpnieuw=false;acctPlan();}
+    acctRender();
+  }
 }
 /* ---- passkeys ---- */
 const acctB64={

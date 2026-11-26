@@ -181,7 +181,8 @@ test('sync: heen en terug, laatste updatedAt wint, wissen gaat mee, fotos eruit'
   {kind:'brew',id:'w1',updatedAt:1000,data:{id:'w1',dose:18}},
   {kind:'dial',id:'b1--espresso',updatedAt:1000,data:{key:'b1|espresso',attempts:[{g:'4'}]}}]});
  assert.equal(eerst.status,200,JSON.stringify(eerst.body));
- assert.deepEqual(eerst.body.changes,[]);
+ // eigen schrijfwerk komt terug met dezelfde updatedAt; now is het hoogste volgnummer
+ assert.equal(eerst.body.changes.length,3);assert.equal(eerst.body.now,3);
  const opgeslagen=JSON.parse(env.DB.db.prepare("SELECT data FROM records WHERE id='b1'").get().data);
  assert.equal(opgeslagen.photo,null,'data:-foto niet online');assert.equal(opgeslagen.notes,'zoet');
  // tweede toestel haalt alles op
@@ -218,6 +219,45 @@ test('sync: grenzen (soort, id, 64 KB, 500 per verzoek)',async()=>{
  // ophalen gaat in pagina's van 500
  const p1=await sync(env,c,{since:0});assert.equal(p1.body.changes.length,500);assert.equal(p1.body.more,true);
  const p2=await sync(env,c,{since:p1.body.now});assert.equal(p2.body.changes.length,1);assert.equal(p2.body.more,false);
+});
+
+test('sync-cursor: volgnummer per gebruiker, niets gemist bij gelijktijdige verzoeken of een achterlopende klok',async()=>{
+ const env=omgeving();
+ const r=await registreer(env,'cursor');
+ const a=koekje(r.cookie),b=koekje((await login(env,r.sleutel)).cookie);
+ const ander=koekje((await registreer(env,'cursor2')).cookie);
+ const start=await sync(env,a,{since:0});assert.equal(start.body.now,0);
+ // B schrijft met een klok die jaren achterloopt; A ziet het toch
+ await sync(env,b,{since:0,changes:[{kind:'bean',id:'oud',updatedAt:5,data:{name:'oude klok'}}]});
+ const na=await sync(env,a,{since:start.body.now});
+ assert.deepEqual(na.body.changes.map(x=>x.id),['oud']);
+ // gelijktijdig: A en B en een andere gebruiker tegelijk; daarna mist A niets van B
+ const veel=p=>Array.from({length:20},(_,i)=>({kind:'brew',id:p+i,updatedAt:100+i,data:{i}}));
+ const [ra,rb]=await Promise.all([sync(env,a,{since:na.body.now,changes:veel('a')}),sync(env,b,{since:na.body.now,changes:veel('b')}),sync(env,ander,{since:0,changes:veel('x')})]);
+ assert.equal(ra.status,200);assert.equal(rb.status,200);
+ const nummers=env.DB.db.prepare("SELECT synced_at FROM records r JOIN users u ON u.id=r.user_id WHERE u.handle='cursor' ORDER BY synced_at").all().map(x=>x.synced_at);
+ assert.equal(new Set(nummers).size,nummers.length,'uniek');assert.equal(nummers.at(-1),41);
+ const gezien=new Set([...ra.body.changes,...rb.body.changes].map(x=>x.id));
+ const rest=await sync(env,a,{since:Math.min(ra.body.now,rb.body.now)});
+ for(const x of rest.body.changes)gezien.add(x.id);
+ for(const id of [...veel('a'),...veel('b')].map(x=>x.id))assert.ok(gezien.has(id),id);
+ assert.ok(![...gezien].some(id=>id.startsWith('x')),'niets van een andere gebruiker');
+ // now is het hoogste gelezen nummer; zonder nieuws blijft hij staan
+ const leeg=await sync(env,a,{since:41});assert.equal(leeg.body.now,41);assert.deepEqual(leeg.body.changes,[]);
+});
+
+test('maximum aantal records per gebruiker',async()=>{
+ const env=omgeving();
+ const c=koekje((await registreer(env,'vol')).cookie);
+ const uid=env.DB.db.prepare("SELECT id FROM users WHERE handle='vol'").get().id;
+ const ins=env.DB.db.prepare("INSERT INTO records(user_id,kind,id,data,updated_at,synced_at) VALUES(?,'brew',?,'{}',1,?)");
+ for(let i=0;i<4999;i++)ins.run(uid,'v'+i,i+1);
+ const twee=await sync(env,c,{changes:[{kind:'bean',id:'n1',updatedAt:2,data:{}},{kind:'bean',id:'n2',updatedAt:2,data:{}}]});
+ assert.equal(twee.status,413);assert.equal(twee.body.code,'full');
+ assert.equal(tel(env,'records'),4999,'niets geschreven');
+ // bestaande bijwerken en wissen mag altijd, één nieuwe past nog
+ assert.equal((await sync(env,c,{changes:[{kind:'brew',id:'v1',updatedAt:3,data:{x:1}},{kind:'brew',id:'v2',updatedAt:3,deleted:true},{kind:'bean',id:'n1',updatedAt:2,data:{}}]})).status,200);
+ assert.equal((await sync(env,c,{changes:[{kind:'bean',id:'n3',updatedAt:2,data:{}}]})).status,413);
 });
 
 test('account wissen haalt alles van die gebruiker weg, de rest blijft',async()=>{

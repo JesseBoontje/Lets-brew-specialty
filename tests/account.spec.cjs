@@ -115,3 +115,44 @@ test('not now keeps everything on the phone; nothing is sent without an account'
  await page.evaluate(()=>go('profile'));
  await expect(page.locator('#acct-card')).toContainText('not signed in');
 });
+
+test('sync on the phone: a tombstone keeps a deleted record away, signed-out deletes still count, rejected records are retried, a save during sync gets its own round',async({page})=>{
+ await page.route('https://fonts.googleapis.com/**',r=>r.fulfill({contentType:'text/css',body:''}));
+ const verzoeken=[];
+ await page.route('**/api/sync',async r=>{
+  const body=JSON.parse(r.request().postData()||'{}');verzoeken.push(body);
+  await new Promise(res=>setTimeout(res,800));
+  const groot=(body.changes||[]).find(c=>c.id==='te-groot');
+  await r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({now:verzoeken.length,more:false,changes:[],rejected:groot?[{kind:'bean',id:'te-groot',reason:'too big'}]:[]})});
+ });
+ await page.goto('/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>currentPage==='home'&&typeof BrewWorkspace!=='undefined');
+ // 2: gewist hier, oudere versie van online komt niet terug; nieuwere wel, en de tombstone gaat weg
+ const r2=await page.evaluate(async()=>{
+  toggleFeature('account');const s=acctSync0();s.lastHandle='jesse';s.user=null;
+  state.beans.push({id:'tb1',name:'weg'});state.dialLog=state.dialLog||{};state.dialLog['tb1|espresso']=[{ts:1,g:'4'}];await save();
+  state.beans=state.beans.filter(b=>b.id!=='tb1');delete state.dialLog['tb1|espresso'];await save();
+  const tomb=s.tomb.map(t=>t.kind+'/'+t.id).sort().join(',');  // 5: ook uitgelogd
+  const at=s.tomb[0].at;
+  acctToepassen([{kind:'bean',id:'tb1',updatedAt:at-1,data:{id:'tb1',name:'terug?'}},{kind:'dial',id:'tb1--espresso',updatedAt:at-1,data:{key:'tb1|espresso',attempts:[{ts:1}]}}]);
+  const oud=!!beanById('tb1')||!!state.dialLog['tb1|espresso'];
+  acctToepassen([{kind:'bean',id:'tb1',updatedAt:at+1,data:{id:'tb1',name:'elders bewerkt'}}]);
+  return {tomb,oud,nieuw:(beanById('tb1')||{}).name,over:s.tomb.map(t=>t.kind).join(',')};
+ });
+ expect(r2).toEqual({tomb:'bean/tb1,dial/tb1--espresso',oud:false,nieuw:'elders bewerkt',over:'dial'});
+ // 3: geweigerd door de server: sentUpTo blijft ervoor, het gaat de volgende keer weer mee
+ const r3=await page.evaluate(async()=>{
+  const s=acctSync0();s.user={handle:'jesse'};s.sentUpTo=0;
+  state.beans.push({id:'te-groot',name:'x'});await save();
+  const at=beanById('te-groot').updatedAt;
+  await acctSync(true);
+  return {at,sent:s.sentUpTo};
+ });
+ expect(r3.sent).toBeLessThan(r3.at);
+ // 4: opslaan terwijl de sync loopt geeft na afloop nog een ronde met die wijziging
+ const voor=verzoeken.length;
+ await page.evaluate(async()=>{const p=acctSync();await new Promise(r=>setTimeout(r,200));state.beans.push({id:'tussendoor',name:'tussendoor'});await save();await p;});
+ await expect.poll(()=>verzoeken.length,{timeout:12000}).toBeGreaterThan(voor+1);
+ expect(verzoeken.at(-1).changes.some(c=>c.id==='tussendoor')).toBe(true);
+ expect(verzoeken.at(-1).changes.some(c=>c.id==='te-groot')).toBe(true);
+});

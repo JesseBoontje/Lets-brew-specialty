@@ -35,9 +35,9 @@ Branch `functie/account-stap1`. Niets gedeployd, geen migratie uitgevoerd.
   twee algoritmes is het weinig code (CBOR-lezer, authData, DER→raw voor ECDSA), draait
   zonder bundel-gedoe in Workers en is volledig getest met echte sleutels. Een bibliotheek
   (bv. @simplewebauthn/server) trekt veel afhankelijkheden mee voor wat we niet gebruiken.
-- **Extra kolom `records.synced_at`** (servertijd in µs, uniek per rij in een verzoek) plus
-  index `records(user_id, synced_at)`. "Sinds de vorige sync" mag niet afhangen van de klok
-  van de telefoon; `updated_at` (telefoontijd) blijft alleen voor wie-wint.
+- **Extra kolom `records.synced_at`** plus index `records(user_id, synced_at)`: een
+  volgnummer per gebruiker (sinds de keuring, zie hieronder). "Sinds de vorige sync" hangt
+  zo niet af van een klok; `updated_at` (telefoontijd) blijft alleen voor wie-wint.
 - **updatedAt via vingerafdruk in `save()`** in plaats van in elk van de tientallen
   opslagplekken. Elk scherm doet zo vanzelf mee, ook toekomstige. Dit stempelen loopt
   altijd (onzichtbaar, ook met de vlag uit), anders zou een later account wijzigingen van
@@ -52,14 +52,14 @@ Branch `functie/account-stap1`. Niets gedeployd, geen migratie uitgevoerd.
 
 ## Hoe getest (uitkomst)
 - `npm run build`: groen.
-- Node: `node --test` security, workspace, stem, account → **33 groen, 0 rood**
-  (nieuw `tests/account.test.mjs`, 13 tests: nep-D1 op node:sqlite in `tests/nep-d1.mjs`,
+- Node: `node --test` security, workspace, stem, account → **35 groen, 0 rood**
+  (nieuw `tests/account.test.mjs`, 15 tests: nep-D1 op node:sqlite in `tests/nep-d1.mjs`,
   echte registratie + login met in de test gemaakte ES256- en RS256-sleutels, replay,
   verlopen challenge, verkeerde origin/rpID, zonder UV, EdDSA geweigerd, teller, sync heen
   en terug, last-wins, tombstone, foto eruit, 64 KB, 500, paginering, account wissen,
   rate limit, routering via site-worker).
 - Playwright chromium (pw-local.config.cjs, executablePath chromium-1243, `--trace off`):
-  **49 groen, 0 rood** (incl. nieuw `tests/account.spec.cjs`, 2 tests: vlag, account maken
+  **50 groen, 0 rood** (incl. nieuw `tests/account.spec.cjs`, 3 tests: vlag, account maken
   met virtuele authenticator via CDP tegen de echte worker-routes op een nep-D1, sync,
   wissen, binnenkomst nieuwere versie met behoud van foto, offline, uit- en inloggen,
   account wissen; en "not now" stuurt niets).
@@ -80,3 +80,30 @@ Branch `functie/account-stap1`. Niets gedeployd, geen migratie uitgevoerd.
   de app stuurt in stukken van 200 records / 2 MB.
 - Na "delete account" blijft de passkey in de sleutelhanger; de app zegt dat je hem bij
   Instellingen → Wachtwoorden weghaalt.
+
+## Herstel na keuring (26-11, afgekeurd op 2 moet + 4 mag)
+1. **Sync-cursor** (`account-worker.mjs`, sync): `synced_at` is nu een volgnummer per
+   gebruiker, `(SELECT COALESCE(MAX(synced_at),0)+1 FROM records WHERE user_id=?)` in elk
+   statement van dezelfde `DB.batch` (één transactie, dus oplopend in commitvolgorde). Pull
+   gebeurt ná het schrijven; `now` = hoogste gelezen nummer (zonder nieuws: `since`). Eigen
+   schrijfwerk komt dus terug; de telefoon slaat het over (zelfde updatedAt). Test:
+   "sync-cursor: volgnummer per gebruiker…" (achterlopende klok, drie gelijktijdige
+   verzoeken, uniek en oplopend, niets van een ander).
+2. **Tombstone bij binnenkomst** (`acctToepassen`): staat er een tombstone met `at >=
+   updatedAt`, dan wordt het record overgeslagen (ook dial, via de id uit `data.key`);
+   is online nieuwer, dan komt het terug en verdwijnt de tombstone. Test in account.spec.cjs.
+3. Client meet de recordgrootte in bytes (TextEncoder, grens 64 KB zoals de server);
+   `sentUpTo` schuift niet voorbij records die de server in `rejected` teruggaf. Melding
+   "N too big to sync" in de status.
+4. Vingerafdrukken worden na elk binnengekomen stuk en in `finally` ververst; wordt er
+   tijdens een sync opgeslagen, dan volgt na afloop een nieuwe ronde (`acctOpnieuw`).
+5. Tombstones ook na uitloggen, zolang `sync.lastHandle` gezet is (na account wissen niet).
+6. Maximaal 5000 records per gebruiker: `COUNT` vóór het schrijven; alleen echt nieuwe
+   records tellen (bijwerken en wissen mag altijd). Anders 413 `{code:'full'}` en er wordt
+   niets geschreven; de app toont de melding. Test: "maximum aantal records per gebruiker".
+
+**Geen schemawijziging nodig**: geen 0002-migratie. `synced_at` bestond al; alleen de
+betekenis veranderde (volgnummer in plaats van µs-tijd). Let op: stonden er al testrijen in
+D1 met µs-waarden, dan telt het volgnummer daarboven verder (blijft oplopend), maar een
+telefoon met een oude µs-cursor zou nieuwe rijen missen. Live gebruikt nog niemand het; leeg
+het testaccount (delete account in de app) of de testrijen in `records` als ze er zijn.

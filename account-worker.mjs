@@ -6,7 +6,7 @@
 
 const SESSIE_DAGEN=90, CHALLENGE_MS=5*60*1000;
 const KINDS=['bean','brew','gear','recipe','dial'];
-const MAX_RECORD=64*1024, MAX_CHANGES=500, MAX_SYNC_BODY=10*1024*1024, MAX_PULL=500;
+const MAX_RECORD=64*1024, MAX_CHANGES=500, MAX_SYNC_BODY=10*1024*1024, MAX_PULL=500, MAX_RECORDS=5000;
 const enc=new TextEncoder(), dec=new TextDecoder();
 const HEADERS={'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000'};
 const json=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{...HEADERS,...extra}});
@@ -214,7 +214,7 @@ async function sync(request,env,user,body){
  const changes=body.changes===undefined?[]:body.changes;
  if(!Array.isArray(changes))return json({error:'Invalid request.'},400);
  if(changes.length>MAX_CHANGES)return json({error:'Too many changes at once (max '+MAX_CHANGES+').'},413);
- const start=Date.now()*1000,schrijf=[],geweigerd=[],sleutels=new Set();
+ const schrijf=[],geweigerd=[],sleutels=new Set();
  for(const c of changes){
   if(!c||typeof c!=='object'||!KINDS.includes(c.kind)||typeof c.id!=='string'||!ID.test(c.id)||!Number.isSafeInteger(c.updatedAt)||c.updatedAt<0)return json({error:'Invalid change.'},400);
   const k=c.kind+'/'+c.id;if(sleutels.has(k))return json({error:'Duplicate change.'},400);sleutels.add(k);
@@ -227,24 +227,41 @@ async function sync(request,env,user,body){
   }
   schrijf.push({c,deleted,data});
  }
- // eerst ophalen wat er sinds `since` binnenkwam, dan schrijven (eigen schrijfwerk komt zo niet terug)
- const rows=(await env.DB.prepare('SELECT kind,id,data,updated_at,deleted,synced_at FROM records WHERE user_id=? AND synced_at>? ORDER BY synced_at LIMIT ?').bind(user.id,since,MAX_PULL+1).all()).results||[];
- const more=rows.length>MAX_PULL;if(more)rows.length=MAX_PULL;
+ // maximum per gebruiker: alleen nieuwe records (geen wisberichten) tellen mee
  if(schrijf.length){
-  const stmts=schrijf.map(({c,deleted,data},i)=>env.DB.prepare(
-   `INSERT INTO records(user_id,kind,id,data,shareable,updated_at,deleted,synced_at) VALUES(?,?,?,?,0,?,?,?)
-    ON CONFLICT(user_id,kind,id) DO UPDATE SET data=excluded.data,updated_at=excluded.updated_at,deleted=excluded.deleted,synced_at=excluded.synced_at
-    WHERE excluded.updated_at>=records.updated_at`).bind(user.id,c.kind,c.id,deleted?null:data,c.updatedAt,deleted?1:0,start+1+i));
-  const res=await env.DB.batch(stmts);
-  // verloren van een nieuwere versie op de server: die gaat mee terug
-  const verloren=schrijf.filter((_,i)=>!(res[i]?.meta?.changes));
-  for(const {c} of verloren){
-   const r=await env.DB.prepare('SELECT kind,id,data,updated_at,deleted,synced_at FROM records WHERE user_id=? AND kind=? AND id=?').bind(user.id,c.kind,c.id).first();
-   if(r&&!rows.some(x=>x.kind===r.kind&&x.id===r.id))rows.push(r);
+  const {n}=await env.DB.prepare('SELECT COUNT(*) AS n FROM records WHERE user_id=?').bind(user.id).first();
+  const kandidaten=schrijf.filter(x=>!x.deleted);
+  if(n+kandidaten.length>MAX_RECORDS){
+   let nieuw=0;
+   for(const {c} of kandidaten)if(!await env.DB.prepare('SELECT 1 FROM records WHERE user_id=? AND kind=? AND id=?').bind(user.id,c.kind,c.id).first())nieuw++;
+   if(n+nieuw>MAX_RECORDS)return json({error:'Online storage is full (max '+MAX_RECORDS+' records). Nothing was changed; everything stays on this phone.',code:'full'},413);
   }
  }
+ /* synced_at is een volgnummer per gebruiker: MAX+1 binnen dezelfde batch (één
+    transactie), dus oplopend in de volgorde waarin het vastligt. Daarna pas
+    ophalen, zodat niets tussen twee gelijktijdige verzoeken door glipt; `now` is
+    het hoogste gelezen nummer. Eigen schrijfwerk komt ook terug; de telefoon
+    slaat dat over (zelfde updatedAt). */
+ let verloren=[];
+ if(schrijf.length){
+  const stmts=schrijf.map(({c,deleted,data})=>env.DB.prepare(
+   `INSERT INTO records(user_id,kind,id,data,shareable,updated_at,deleted,synced_at)
+    VALUES(?,?,?,?,0,?,?,(SELECT COALESCE(MAX(synced_at),0)+1 FROM records WHERE user_id=?))
+    ON CONFLICT(user_id,kind,id) DO UPDATE SET data=excluded.data,updated_at=excluded.updated_at,deleted=excluded.deleted,synced_at=excluded.synced_at
+    WHERE excluded.updated_at>=records.updated_at`).bind(user.id,c.kind,c.id,deleted?null:data,c.updatedAt,deleted?1:0,user.id));
+  const res=await env.DB.batch(stmts);
+  verloren=schrijf.filter((_,i)=>!(res[i]?.meta?.changes));
+ }
+ const rows=(await env.DB.prepare('SELECT kind,id,data,updated_at,deleted,synced_at FROM records WHERE user_id=? AND synced_at>? ORDER BY synced_at LIMIT ?').bind(user.id,since,MAX_PULL+1).all()).results||[];
+ const more=rows.length>MAX_PULL;if(more)rows.length=MAX_PULL;
+ const now=rows.length?rows[rows.length-1].synced_at:since;
+ // verloren van een nieuwere versie op de server: die gaat altijd mee terug
+ for(const {c} of verloren){
+  if(rows.some(x=>x.kind===c.kind&&x.id===c.id))continue;
+  const r=await env.DB.prepare('SELECT kind,id,data,updated_at,deleted,synced_at FROM records WHERE user_id=? AND kind=? AND id=?').bind(user.id,c.kind,c.id).first();
+  if(r)rows.push(r);
+ }
  const uit=rows.map(r=>{const o={kind:r.kind,id:r.id,updatedAt:r.updated_at,deleted:!!r.deleted};if(!r.deleted){try{o.data=JSON.parse(r.data);}catch{o.data=null;}}return o;});
- const now=more?rows[rows.length-1].synced_at:start;
  return json({now,more,changes:uit,rejected:geweigerd});
 }
 async function wisAccount(env,user){
