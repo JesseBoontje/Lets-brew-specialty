@@ -123,8 +123,8 @@ test('surprise me keeps the character of the base recipe: AeroPress inverted sca
   localStorage.setItem('scc_state',JSON.stringify({methods:[{id:'aeropress',name:'AeroPress',family:'filter',on:true},{id:'perculator',name:'Mokka pot',family:'filter',on:false},{id:'senseo',name:'Senseo',family:'filter',on:false}],
    beans:[{id:'col',name:'Colombia',inStock:true,methods:['aeropress']}],brews:[],gear:[]}));});
  const r=await page.evaluate(()=>{state.methods.forEach(m=>m.on=['aeropress'].includes(m.id));Math.random=()=>0.999999;surpriseOpen();return surprise.voorstel&&surprise.voorstel.recept;});
- // Tay omgekeerd 18 g / 155 g, draai "kortere verhouding" ×0,96 → 1:8,27 → 149 g
- expect(r.naam).toContain('Tay omgekeerd');
+ // inverted AeroPress 18 g / 155 g, draai "kortere verhouding" ×0,96 → 1:8,27 → 149 g
+ expect(r.naam).toContain('inverted AeroPress');
  expect(r.dose).toBe(18);expect(r.ratio).toBeCloseTo(8.27,2);
  const uit=Math.round(18*8.27);expect(uit).toBe(149);
  const teksten=r.stappen.map(s=>s.d).join(' | ');

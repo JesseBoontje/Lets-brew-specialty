@@ -8,11 +8,15 @@ const VOLG_H=/^[a-z0-9_]{3,20}$/, VOLG_ID=/^[A-Za-z0-9_-]{1,100}$/, VOLG_FOTO=/^
 const volg={me:null,meLaden:false,fout:'',feed:[],next:null,klaar:false,bezig:false,geladen:false,persoon:null,zoek:[],zoekQ:'',items:new Map(),fotoBezig:false};
 let volgZoekTimer=null;
 function volgAan(){return featOn('social')&&featOn('account')&&acctIngelogd();}
-// met volgen en feed aan: Feed in de balk en Learn als kaart op Home, zo blijven het 5 tabs
+// met volgen en feed aan: Home, Beans, Brews, Feed, Learn in de balk; Settings wordt het
+// getekende tandwiel rechtsboven op Home (zo blijft Settings altijd bereikbaar). Zonder
+// volgen blijft de balk zoals hij was, met Settings. De Learn-kaart op Home is weg.
 function volgNav(){
   const aan=volgAan(),b=document.getElementById('nav-feed');if(b)b.style.display=aan?'':'none';
-  const l=document.querySelector('#nav [data-p="learn"]');if(l)l.style.display=aan?'none':'';
-  const k=document.getElementById('home-learn');if(k)k.style.display=aan?'':'none';
+  const l=document.querySelector('#nav [data-p="learn"]');if(l)l.style.display='';
+  const s=document.querySelector('#nav [data-p="profile"]');if(s)s.style.display=aan?'none':'';
+  const g=document.getElementById('home-settings');if(g)g.style.display=aan?'':'none';
+  const k=document.getElementById('home-learn');if(k)k.style.display='none';
 }
 // "sanne wants to follow you" op Home; tik = naar je profiel in Settings
 function volgHomeRegel(){
@@ -175,7 +179,7 @@ function volgTry(k){
       {t:45,p:1,k:'giet',klep,d:'giet in rustige cirkels tot je eindgewicht'}];
   }
   state.recipes.push(r);save();
-  toast('✓ in your recipes: '+naam);
+  toast('✓ in your brew ideas: '+naam);
 }
 async function volgDeel(h){
   h=volgH(h);if(!h)return;

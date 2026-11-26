@@ -552,7 +552,7 @@ function openRecipe(id,mid){
     const water=basis?Math.round(basis.dose*basis.ratio):250;
     recBewerk={id:null,mid:methode,
       stappen:basis?basis.stappen.map(x=>({t:x.t,g:x.p?Math.round(water*x.p):'',k:x.k,klep:x.klep||'',d:x.d})):[]};
-    setVal('rec-naam',basis?('my '+basis.naam.toLowerCase()):'my recipe');
+    setVal('rec-naam',basis?('my '+basis.naam.toLowerCase()):'my brew idea');
     setVal('rec-dose',basis?basis.dose:15);setVal('rec-water',water);
     setVal('rec-temp',basis?basis.temp:94);setVal('rec-maling',basis?basis.maling:'medium');
     setVal('rec-over','');
@@ -563,8 +563,9 @@ function openRecipe(id,mid){
     recBewerk.molen=(basis&&basis.molen)||(filterMolens()[0]||{}).name||null;
     recBewerk.houding=(basis&&basis.houding)||'normaal';
   }
-  document.getElementById('rec-title').textContent=(best&&best.eigen)?'edit recipe':'own recipe';
+  document.getElementById('rec-title').textContent=(best&&best.eigen)?'edit brew idea':'own brew idea';
   document.getElementById('rec-del').style.display=(best&&best.eigen)?'block':'none';
+  recOnthoud();
   recMethods();recMolens();recHouding();recSteps();applyAIVisibility();
   const ai=document.getElementById('rec-ai');
   if(ai)ai.style.display='';
@@ -643,13 +644,73 @@ function recFamilie(){
   const note=document.getElementById('rec-stand-note');
   if(note&&esp)note.textContent='the number you actually dial on your espresso grinder';
 }
-function recWater(){
-  // dose gewijzigd: water mee laten lopen met de ratio die er stond
-  const d=parseFloat(document.getElementById('rec-dose').value);
-  const w=parseFloat(document.getElementById('rec-water').value);
-  if(d>0&&w>0&&recBewerk)recBewerk.ratio=w/d;
+/* Wat bovenaan staat, werkt door in het schema eronder: niets twee keer invullen.
+   - dose gewijzigd: het water loopt mee met de verhouding die er stond, en het
+     schema schaalt mee (net als "own ratio or yield" in de gietcoach);
+   - water gewijzigd: de verhouding volgt, het schema schaalt mee, zodat de
+     laatste giet altijd het totale water is;
+   - de laatste giet in het schema aangepast: dat is het totale water bovenaan;
+   - temp of doeltijd gewijzigd: staat die in een staptekst, dan verandert hij mee. */
+const recNum=id=>parseFloat((document.getElementById(id)||{}).value);
+// de laatste stap met grammen (in tijdvolgorde): dat is het totale water
+function recLaatsteGiet(){
+  if(!recBewerk)return -1;
+  let best=-1,t=-1;
+  recBewerk.stappen.forEach((st,i)=>{if(st.g!==''&&st.g!=null&&+st.g>0&&(st.t||0)>=t){best=i;t=st.t||0;}});
+  return best;
 }
-function recRatio(){recWater();}
+function recSchaal(water){
+  if(!recBewerk||!(water>0))return;
+  const i=recLaatsteGiet();if(i<0)return;
+  const oud=+recBewerk.stappen[i].g;if(!(oud>0)||oud===water)return;
+  const f=water/oud;
+  // niet afronden bij het schalen: tikken (2, 25, 250) mag geen grammen kwijtraken; het veld toont afgerond
+  recBewerk.stappen.forEach(st=>{if(st.g!==''&&st.g!=null&&+st.g>0)st.g=+st.g*f;});
+  recBewerk.stappen[i].g=water;
+  recSteps();
+}
+function recWater(){
+  // dose gewijzigd: water mee met de verhouding die er stond
+  if(!recBewerk)return;
+  const d=recNum('rec-dose');
+  if(!(recBewerk.ratio>0)){const w0=recNum('rec-water'),d0=recBewerk.doseWas;if(w0>0&&d0>0)recBewerk.ratio=w0/d0;}
+  if(d>0&&recBewerk.ratio>0){const w=Math.round(d*recBewerk.ratio);setVal('rec-water',w);recSchaal(w);}
+  if(d>0)recBewerk.doseWas=d;
+}
+function recRatio(){
+  // water gewijzigd: verhouding volgt, schema schaalt mee
+  if(!recBewerk)return;
+  const d=recNum('rec-dose'),w=recNum('rec-water');
+  if(d>0&&w>0)recBewerk.ratio=w/d;
+  if(w>0)recSchaal(w);
+}
+// een waarde die in de staptekst staat (93°C, 0:28) mee laten veranderen
+function recTekstMee(veld,oud,nieuw){
+  if(!recBewerk||!oud||!nieuw||oud===nieuw)return;
+  const esc2=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=veld==='temp'?new RegExp('(^|[^\\d.,])'+esc2(oud)+'(\\s?\u00b0\\s?C)','g'):new RegExp('(^|[^\\d:])'+esc2(oud)+'(?![\\d])','g');
+  let anders=false;
+  recBewerk.stappen.forEach(st=>{if(typeof st.d==='string'){const n=st.d.replace(re,(m,a,b)=>a+nieuw+(b||''));if(n!==st.d){st.d=n;anders=true;}}});
+  if(anders)recSteps();
+}
+function recTemp(){
+  if(!recBewerk)return;
+  const v=String((document.getElementById('rec-temp')||{}).value||'').trim();
+  if(/^\d{2,3}(?:[.,]\d)?$/.test(v)){recTekstMee('temp',recBewerk.tempWas,v);recBewerk.tempWas=v;}
+}
+function recTijd(){
+  if(!recBewerk)return;
+  const v=String((document.getElementById('rec-tijd')||{}).value||'').trim();
+  if(/^\d{1,2}:\d{2}$/.test(v)){recTekstMee('tijd',recBewerk.tijdWas,v);recBewerk.tijdWas=v;}
+}
+// beginwaarden onthouden, zodat een wijziging weet wat er eerst stond
+function recOnthoud(){
+  if(!recBewerk)return;
+  const d=recNum('rec-dose'),w=recNum('rec-water');
+  recBewerk.doseWas=d>0?d:null;recBewerk.ratio=d>0&&w>0?w/d:null;
+  recBewerk.tempWas=String((document.getElementById('rec-temp')||{}).value||'').trim();
+  recBewerk.tijdWas=String((document.getElementById('rec-tijd')||{}).value||'').trim();
+}
 function recSteps(){
   const el=document.getElementById('rec-steps');if(!el)return;
   const klep=isSwitch(recBewerk.mid);   // alleen een Switch heeft een klep
@@ -668,7 +729,7 @@ function recSteps(){
       </div>
       <input value="${esc(st.d||'')}" placeholder="what do you do?" oninput="recSet(${i},'d',this.value)">
     </div>
-    <div class="r-g"><input value="${st.g===''||st.g==null?'':st.g}" type="number" inputmode="numeric"
+    <div class="r-g"><input value="${st.g===''||st.g==null?'':Math.round(st.g)}" type="number" inputmode="numeric"
       placeholder="&mdash;" oninput="recSet(${i},'g',this.value)"></div>
     <button class="r-x" onclick="recDel(${i})" title="remove" aria-label="remove step">&times;</button>
   </div>`).join('');
@@ -676,7 +737,12 @@ function recSteps(){
 function recSet(i,veld,v){
   const st=recBewerk.stappen[i];if(!st)return;
   if(veld==='t')st.t=parseTimeSec(v)||0;
-  else if(veld==='g')st.g=(v===''?'':(parseFloat(v)||0));
+  else if(veld==='g'){
+    const laatste=recLaatsteGiet()===i;
+    st.g=(v===''?'':(parseFloat(v)||0));
+    // de laatste giet is het totale water: bovenaan meeschrijven, niet twee keer vragen
+    if(laatste&&st.g>0){setVal('rec-water',st.g);const d=recNum('rec-dose');if(d>0)recBewerk.ratio=st.g/d;}
+  }
   else st[veld]=v;
   if(veld==='t')recSteps();   // opnieuw tekenen zodat de tijd netjes staat
 }
@@ -722,7 +788,7 @@ function saveRecipe(){
   if(i>=0)state.recipes[i]=r;else state.recipes.push(r);
   if(!state.lastRecipe)state.lastRecipe={};
   state.lastRecipe[r.mid]=r.id;
-  save();toast('\u2713 recipe saved');
+  save();toast('\u2713 brew idea saved');
   const terug=recTerug;recBewerk=null;recTerug=null;
   if(terug==='form')terugNaarBrew(r.id);
   else if(terug==='dialin'){pendingTarget={dose:String(r.dose),yield:String(Math.round(r.dose*r.ratio)),time:r.tijd||'',grind:r.stand||''};go('dialin');renderDiGoal();}
@@ -730,12 +796,12 @@ function saveRecipe(){
 }
 function delRecipe(){
   if(!recBewerk||!recBewerk.id)return;
-  if(!confirm('delete this recipe?'))return;
+  if(!confirm('delete this brew idea?'))return;
   state.recipes=(state.recipes||[]).filter(x=>x.id!==recBewerk.id);
   const mid=recBewerk.mid;
   if(state.lastRecipe&&state.lastRecipe[mid]===recBewerk.id)delete state.lastRecipe[mid];
   const terug=recTerug;
-  save();toast('recipe deleted');recBewerk=null;recTerug=null;pc.mid=null;
+  save();toast('brew idea deleted');recBewerk=null;recTerug=null;pc.mid=null;
   if(terug==='form')terugNaarBrew(null);else go('recipes');
 }
 /* De AI schrijft het schema, jij houdt de pen. Alles komt in dezelfde lijst
@@ -970,7 +1036,7 @@ function cardSummaries(){
 
   if(pc.total!=null)zet('pour','total '+pourFmt(pc.total)+(pc.draw!=null?(' \u00b7 drawdown '+pourFmt(pc.draw)):''));
   else if(pc.run)zet('pour',pourFmt(pc.el)+' \u00b7 '+((pc.steps[pourCur()]||{}).k||''));
-  else zet('pour',r?('not started \u2014 '+((r.stappen||[]).length)+' steps'):'no recipe');
+  else zet('pour',r?('not started \u2014 '+((r.stappen||[]).length)+' steps'):'no brew idea');
 
   const score=document.getElementById('f-score').value;
   const cup=formCup?(cupById(formCup)||{}).n:'';
@@ -1117,6 +1183,7 @@ function pourSchema(){
     (draait[i]?('<b>klep '+draait[i]+'</b> \u00b7 '):'')+esc(st.k)+
     ' \u2014 '+esc(st.d)+'</span><span class="g">'+(st.g?st.g+' g':'')+'</span></div>').join('');
 }
+const PICK_LABEL={aeropress:'standard','aeropress-om':'inverted'};
 // welk recept staat er geladen -- en de rij om een ander te kiezen
 function pourRecipes(){
   const r=recipeById(pc.rid);
@@ -1124,22 +1191,31 @@ function pourRecipes(){
   // bij de AeroPress staan normaal (Hoffmann) en omgekeerd (Tay) er altijd tussen
   const keus=(typeof apPast==='function'&&apPast(pc.mid))?eigen.concat(FILTER_RECIPES.filter(x=>x.voor.includes('aeropress'))):eigen;
   const pick=document.getElementById('pc-pick');
-  if(pick)pick.innerHTML=(keus.length>1)?keus.map(x=>
-    '<button type="button" class="lp '+(x.id===pc.rid?'sel':'')+
-    '" onclick="pourPickRecipe(\''+x.id+'\')">'+esc(x.naam)+'</button>').join(''):'';
+  // de vaste AeroPress-recepten heten op de knop in het Engels; eigen recepten houden hun eigen naam
+  // stilstaand: alleen opnieuw opbouwen als de rij echt anders is. Anders krijgt elke
+  // nieuwe knop nieuwe getekende randen en lijkt de rij bij elke wijziging te wiebelen.
+  if(pick){
+    const lijst=keus.length>1?keus:[],sleutel=lijst.map(x=>x.id+'|'+((!x.eigen&&PICK_LABEL[x.id])||x.naam)).join('\n');
+    if(pick.dataset.k!==sleutel){
+      pick.dataset.k=sleutel;
+      pick.innerHTML=lijst.map(x=>
+        '<button type="button" class="lp" data-rid="'+esc(x.id)+'" onclick="pourPickRecipe(\''+x.id+'\')">'+esc((!x.eigen&&PICK_LABEL[x.id])||x.naam)+'</button>').join('');
+    }
+    pick.querySelectorAll('.lp').forEach(b=>b.classList.toggle('sel',b.dataset.rid===pc.rid));
+  }
   const naam=document.getElementById('pc-naam');
-  if(naam)naam.textContent=r?r.naam:'no recipe yet';
+  if(naam)naam.textContent=r?r.naam:'no brew idea yet';
   const o=document.getElementById('pc-over');
   if(o){
     const stand=r&&r.stand?('  \u00b7  '+esc(r.stand)+(r.molen?(' on your '+esc(r.molen)):'')):'';
-    o.innerHTML=r?(esc(r.over)+'  \u00b7  '+esc(r.maling)+', '+esc(String(r.temp))+'\u00b0C'+stand)
+    o.innerHTML=r?((r.over?esc(r.over)+'  \u00b7  ':'')+esc(r.maling)+', '+esc(String(r.temp))+'\u00b0C'+stand)
                  :'write down how you brew this and the pour runs it with you';
   }
   const l=document.getElementById('pc-links');
   if(l){
     l.innerHTML=(r?('<a onclick="openRecipe(\''+r.id+'\')">edit this one</a>'+
                     '<a onclick="openRecipe(null,pc.mid)">write another</a>')
-                  :('<a onclick="openRecipe(null,pc.mid)">write your recipe</a>'));
+                  :('<a onclick="openRecipe(null,pc.mid)">write your own brew idea</a>'));
   }
 }
 function pourPickRecipe(id){
@@ -1188,7 +1264,7 @@ function pourSteps(){
   const el=document.getElementById('pc-steps');if(!el)return;
   const of0=document.getElementById('pc-of');
   if(!pc.steps.length){
-    el.innerHTML='<div class="rec-empty">no schedule yet — open <b>recipe</b> above and write '+
+    el.innerHTML='<div class="rec-empty">no schedule yet — open <b>brew idea</b> above and write '+
       'how you brew this. Every step you put there lands here, and the clock runs it with you.</div>';
     if(of0)of0.textContent='';
     return;

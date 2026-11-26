@@ -1,14 +1,19 @@
 'use strict';
 /* Stem voor "stappen hardop" (gietcoach, AeroPress-coach, shot clock).
+   - Lets Brew voice (ingelogd met Lets Brew AI aan): geen sleutel in de app, de
+     Worker gebruikt zijn eigen ElevenLabs-sleutel (daglimiet per gebruiker). De
+     stem kies je uit de lijst van de server, of de server kiest zijn standaard.
    - Met een eigen ElevenLabs-sleutel én een gekozen stem uit de eigen
      voices-lijst: geluid van ElevenLabs (model eleven_v4) via de Worker.
    - Anders, of als iets misgaat: de stem van de telefoon (speechSynthesis).
    De sleutel staat alleen in dit tabblad (een variabele), nooit in
    localStorage, back-up, export of database. De gekozen stem-id (geen geheim)
-   staat in localStorage onder scc_el_voice.                                  */
+   staat in localStorage onder scc_el_voice (eigen) of scc_el_voice_lb (Lets
+   Brew voice); de keuze tussen die twee onder scc_stem_bron.                  */
 globalThis.BrewStem=(()=>{
  let sleutel='';                 // alleen in het geheugen van dit tabblad
  let afgewezen=false;            // ElevenLabs gaf 401: niet blijven proberen
+ let lbUit='';                   // Lets Brew voice kan nu niet (limit, not_set_up, ...): telefoonstem
  let audio=null,ontgrendeld=false,beurt=0,huidigeUrl='';
  const cache=new Map();          // tekst|stem -> Promise<blob-url>
  const MAX_CACHE=60;
@@ -16,9 +21,13 @@ globalThis.BrewStem=(()=>{
  let wachtrij=Promise.resolve();
  let stemNL=null;
 
- const stemId=()=>{try{const v=localStorage.getItem('scc_el_voice')||'';return /^[A-Za-z0-9]{10,40}$/.test(v)?v:'';}catch(e){return '';}};
- const stemNaam=()=>{try{return (localStorage.getItem('scc_el_voice_naam')||'').slice(0,60);}catch(e){return '';}};
- const actief=()=>!!sleutel&&!!stemId()&&!afgewezen;
+ const lbKan=()=>{try{return typeof aiLbKan==='function'&&!!aiLbKan();}catch(e){return false;}};
+ // 'letsbrew' als dat kan en je niet zelf 'own key' koos; anders 'eigen'
+ const bron=()=>{let v='';try{v=localStorage.getItem('scc_stem_bron')||'';}catch(e){}return lbKan()&&v!=='eigen'?'letsbrew':'eigen';};
+ const sfx=()=>bron()==='letsbrew'?'_lb':'';
+ const stemId=()=>{try{const v=localStorage.getItem('scc_el_voice'+sfx())||'';return /^[A-Za-z0-9]{10,40}$/.test(v)?v:'';}catch(e){return '';}};
+ const stemNaam=()=>{try{return (localStorage.getItem('scc_el_voice'+sfx()+'_naam')||'').slice(0,60);}catch(e){return '';}};
+ const actief=()=>bron()==='letsbrew'?!lbUit:(!!sleutel&&!!stemId()&&!afgewezen);
 
  /* ---- telefoonstem ---- */
  function kiesStem(){
@@ -55,10 +64,18 @@ globalThis.BrewStem=(()=>{
   // ook de telefoonstem in dezelfde tik wakker maken, voor als ElevenLabs straks niet antwoordt
   try{if(globalThis.speechSynthesis){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}}catch(e){}
  }
+ const kop=()=>bron()==='letsbrew'?{'Content-Type':'application/json'}:{'Content-Type':'application/json',Authorization:'Bearer '+sleutel};
  async function haal(tekst){
-  const r=await fetch('/api/stem/zeg',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+sleutel},
-   body:JSON.stringify({text:tekst,voice_id:stemId()}),signal:AbortSignal.timeout(8000)});
-  if(r.status===401){afgewezen=true;try{if(typeof toast==='function')toast('ElevenLabs refused your key — using the phone voice');}catch(e){}}
+  const lb=bron()==='letsbrew',id=stemId();
+  const r=await fetch('/api/stem/zeg',{method:'POST',headers:kop(),credentials:'same-origin',
+   body:JSON.stringify(id||!lb?{text:tekst,voice_id:id}:{text:tekst}),signal:AbortSignal.timeout(8000)});
+  if(lb&&!r.ok&&r.status!==502){
+   // niet blijven proberen tot de app herlaadt of je iets anders kiest
+   const b=await r.clone().json().catch(()=>null);
+   if(!lbUit){lbUit=(b&&typeof b.code==='string'&&b.code.slice(0,20))||String(r.status);
+    try{if(typeof toast==='function')toast(lbUit==='limit'?'today’s Lets Brew voice lines are used up — using the phone voice':'Lets Brew voice unavailable — using the phone voice');}catch(e){}}
+  }
+  if(!lb&&r.status===401){afgewezen=true;try{if(typeof toast==='function')toast('ElevenLabs refused your key — using the phone voice');}catch(e){}}
   if(!r.ok)throw Error('stem '+r.status);
   if(!/^audio\//i.test(r.headers.get('Content-Type')||''))throw Error('geen geluid');
   const blob=await r.blob();
@@ -66,7 +83,7 @@ globalThis.BrewStem=(()=>{
   return URL.createObjectURL(blob);
  }
  function geluidVoor(tekst){
-  const k=stemId()+'|'+tekst;
+  const k=bron()+'|'+stemId()+'|'+tekst;
   if(cache.has(k))return cache.get(k);
   // één verzoek tegelijk: zo blijft de rem in de Worker heel
   const p=wachtrij.catch(()=>{}).then(()=>haal(tekst));
@@ -116,25 +133,32 @@ globalThis.BrewStem=(()=>{
   sleutel=v;afgewezen=false;ontgrendeld=false;
   return true;
  }
+ let standaard='';
  async function stemmen(){
-  if(!sleutel)throw Error('Paste your ElevenLabs key first.');
-  const r=await fetch('/api/stem/voices',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+sleutel},body:'{}',signal:AbortSignal.timeout(15000)});
+  if(bron()!=='letsbrew'&&!sleutel)throw Error('Paste your ElevenLabs key first.');
+  const r=await fetch('/api/stem/voices',{method:'POST',headers:kop(),credentials:'same-origin',body:'{}',signal:AbortSignal.timeout(15000)});
   const b=await r.json().catch(()=>null);
   if(r.status===404&&!b?.error)throw Error('The voice route is not on this host yet.');
   if(!r.ok)throw Error((b&&typeof b.error==='string'&&b.error.slice(0,160))||'Could not load your voices.');
-  afgewezen=false;
+  if(bron()==='letsbrew'){lbUit='';standaard=typeof b?.standaard==='string'&&/^[A-Za-z0-9]{10,40}$/.test(b.standaard)?b.standaard:'';}else afgewezen=false;
   return (Array.isArray(b?.voices)?b.voices:[]).filter(v=>v&&/^[A-Za-z0-9]{10,40}$/.test(v.voice_id||''));
  }
  function kiesStemId(id,naam){
+  const k='scc_el_voice'+sfx();
   try{
-   if(!id){localStorage.removeItem('scc_el_voice');localStorage.removeItem('scc_el_voice_naam');}
-   else if(/^[A-Za-z0-9]{10,40}$/.test(id)){localStorage.setItem('scc_el_voice',id);localStorage.setItem('scc_el_voice_naam',String(naam||'').slice(0,60));}
+   if(!id){localStorage.removeItem(k);localStorage.removeItem(k+'_naam');}
+   else if(/^[A-Za-z0-9]{10,40}$/.test(id)){localStorage.setItem(k,id);localStorage.setItem(k+'_naam',String(naam||'').slice(0,60));}
    else return false;
   }catch(e){return false;}
   return true;
  }
- const stand=()=>({sleutel:!!sleutel,stem:stemId(),naam:stemNaam(),afgewezen,actief:actief()});
+ function kiesBron(v){
+  if(v!=='letsbrew'&&v!=='eigen')return false;
+  try{localStorage.setItem('scc_stem_bron',v);}catch(e){}
+  lbUit='';ontgrendeld=false;return true;
+ }
+ const stand=()=>({bron:bron(),lb:lbKan(),lbUit,standaard,sleutel:!!sleutel,stem:stemId(),naam:stemNaam(),afgewezen,actief:actief()});
 
  globalThis.addEventListener?.('pagehide',stil);
- return {zeg,voorbereid,stil,kan,ontgrendel,zetSleutel,stemmen,kiesStemId,stand};
+ return {zeg,voorbereid,stil,kan,ontgrendel,zetSleutel,stemmen,kiesStemId,kiesBron,stand};
 })();

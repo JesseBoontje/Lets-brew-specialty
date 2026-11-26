@@ -52,7 +52,7 @@
 
   <!-- HOME -->
   <div id="page-home" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
-    <div class="statusbar"><span>▤ ◗ ▮</span></div>
+    <div class="statusbar"><span>▤ ◗ ▮</span><button type="button" class="home-set" id="home-settings" aria-label="Settings" style="display:none" onclick="go('profile')"><svg viewBox="0 0 24 24" class="acic" aria-hidden="true"><path d="M15.1 6.7 Q17.5 8.5 18.1 11.5 Q18.1 14.5 16.0 16.7 Q13.4 18.4 10.4 17.9 Q7.6 16.8 6.2 14.1 Q5.5 11.1 7.0 8.5 Q9.0 6.2 12.0 5.9 Q15.0 6.2 17.0 8.5"/><path d="M9.7 11.1 Q10.3 9.8 11.7 9.5 Q13.2 9.5 14.1 10.7 Q14.8 12.0 14.1 13.3 Q13.2 14.5 11.7 14.5 Q10.3 14.2 9.7 12.9 Q9.3 11.4 10.2 10.3"/><path d="M18.5 12.9 Q20 13.2 21.4 13.8 M16.0 17.3 Q16.8 18.6 17.4 20.0 M11.1 18.5 Q10.6 19.9 10.2 21.4 M6.7 16.0 Q5.3 16.6 4.0 17.4 M5.5 11.1 Q4 10.7 2.6 10.2 M8.0 6.7 Q7.2 5.4 6.6 4.0 M12.9 5.5 Q13.4 4 13.8 2.6 M17.3 8.0 Q18.7 7.2 20.0 6.6"/></svg></button></div>
     <div class="screen">
       <h1 class="title hand" id="home-greeting">hi there</h1>
       <div class="subtitle">what are we brewing today?</div>
@@ -115,7 +115,7 @@
         </div>
         <div class="pcard sketch soft" id="pcard-recipe">
           <button type="button" class="pc-head" onclick="cardToggle('recipe')">
-            <span class="pc-n hand">recipe</span><span class="pc-sum" id="sum-recipe"></span>
+            <span class="pc-n hand">brew idea</span><span class="pc-sum" id="sum-recipe"></span>
             <span class="pc-arr">&rsaquo;</span></button>
           <div class="pc-body" id="pcb-recipe">
             <div class="link-pick" id="pc-pick"></div>
@@ -373,7 +373,7 @@
   <div id="page-recipe" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;">
     <div class="statusbar"><span>&#9636; &#9689; &#9646;</span></div>
     <div class="screen">
-      <div class="form-head"><div class="h hand" id="rec-title">own recipe</div><button onclick="cancelRecipe()">Cancel</button></div>
+      <div class="form-head"><div class="h hand" id="rec-title">own brew idea</div><button onclick="cancelRecipe()">Cancel</button></div>
       <div class="subtitle">your own pour schedule &mdash; the coach will run it exactly like the built-in ones</div>
 
       <div class="field"><label>name</label><input id="rec-naam" placeholder="e.g. my sunday v60" maxlength="40"></div>
@@ -381,11 +381,11 @@
       <div class="field"><label>method</label><div class="link-pick" id="rec-methods"></div></div>
 
       <div class="field-row">
-        <div class="field"><label>dose (g)</label><input id="rec-dose" type="number" inputmode="decimal" step="0.1" oninput="recWater()"></div>
-        <div class="field"><label id="rec-water-lbl">water (g)</label><input id="rec-water" type="number" inputmode="numeric" oninput="recRatio()"></div>
+        <div class="field"><label>dose (g)</label><input id="rec-dose" type="number" inputmode="decimal" step="0.1" onfocus="recOnthoud()" oninput="recWater()"></div>
+        <div class="field"><label id="rec-water-lbl">water (g)</label><input id="rec-water" type="number" inputmode="numeric" onfocus="recOnthoud()" oninput="recRatio()"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>temp (&deg;C)</label><input id="rec-temp" type="number" inputmode="decimal"></div>
+        <div class="field"><label>temp (&deg;C)</label><input id="rec-temp" type="number" inputmode="decimal" onfocus="recOnthoud()" oninput="recTemp()"></div>
         <div class="field"><label>grind</label><input id="rec-maling" placeholder="e.g. medium"></div>
       </div>
       <div class="field" id="rec-houding-veld" style="display:none"><label>which way up</label>
@@ -394,9 +394,9 @@
       <div class="field"><label>grind setting</label>
         <input id="rec-stand" placeholder="on your grinder, e.g. 22 clicks">
         <div class="link-pick" id="rec-molens"></div>
-        <div class="fx-note" id="rec-stand-note">the number you actually dial &mdash; it lands in the brew form when you pick this recipe</div></div>
+        <div class="fx-note" id="rec-stand-note">the number you actually dial &mdash; it lands in the brew form when you pick this brew idea</div></div>
       <div class="field" id="rec-tijd-veld" style="display:none"><label>target shot time (m:ss)</label>
-        <input id="rec-tijd" placeholder="0:28" inputmode="numeric" oninput="formatTime(this)" onblur="normalizeTime(this)"></div>
+        <input id="rec-tijd" placeholder="0:28" inputmode="numeric" onfocus="recOnthoud()" oninput="formatTime(this)" onblur="normalizeTime(this);recTijd()"></div>
 
       <div class="field"><label>in one line</label><input id="rec-over" placeholder="what makes this recipe yours" maxlength="120"></div>
 
@@ -412,8 +412,8 @@
         <div class="fx-note">leave the gram box empty for a step you do not pour &mdash; a swirl, a wait, the drawdown</div>
       </div>
 
-      <button class="save-btn" onclick="saveRecipe()">save recipe</button>
-      <button class="profile-btn" id="rec-del" onclick="delRecipe()" style="margin-top:2px;display:none">delete this recipe</button>
+      <button class="save-btn" onclick="saveRecipe()">save brew idea</button>
+      <button class="profile-btn" id="rec-del" onclick="delRecipe()" style="margin-top:2px;display:none">delete this brew idea</button>
     </div>
   </div>
 
@@ -830,9 +830,12 @@
         <button type="button" class="adv-head" onclick="setKlap('stem-card')"><span class="set-t hand">coach voice</span><span class="rij-w" id="stem-w"></span><span class="g-arr">▸</span></button>
         <div class="adv-body">
           <div class="set-d" style="margin:4px 0 0">steps out loud in the pour coach, AeroPress coach and shot clock.</div>
+          <div id="stem-bron-wrap"></div>
+          <div id="stem-eigen">
           <div class="set-d" style="margin:6px 0 8px">without a key the coaches use your phone’s own voice. with your own ElevenLabs API key they use an ElevenLabs voice (model eleven_v4), paid from your own ElevenLabs credit. the key stays in this tab only: paste it again after reloading; it is never included in a back-up.</div>
           <input id="stem-key" class="stem-veld" type="password" autocomplete="off" placeholder="sk_..." onchange="stemSleutel()">
-          <button class="profile-btn" style="margin-top:8px" onclick="stemLaad()">load my voices</button>
+          </div>
+          <button class="profile-btn" id="stem-laad" style="margin-top:8px" onclick="stemLaad()">load my voices</button>
           <select id="stem-kies" class="stem-veld" aria-label="ElevenLabs voice" onchange="stemKies()"><option value="">— pick one of your voices —</option></select>
           <div class="set-d" id="stem-status" style="margin-top:8px"></div>
           <button class="profile-btn" style="margin-top:8px" onclick="stemTest()">test the voice</button>
@@ -957,18 +960,6 @@
     </div>
   </div>
 
-  <div id="whatsnew" class="whatsnew" role="dialog" aria-label="Wat is er nieuw" aria-hidden="true">
-    <div class="wn-card sketch">
-      <div class="wn-h">
-        <span class="hand">wat is er nieuw</span>
-        <button class="wn-x" onclick="sluitNieuws()" aria-label="sluiten">
-          <svg viewBox="0 0 24 24" class="acic"><path d="M6.4 6 Q12 11.6 17.8 17.4 M17.6 6.2 Q12 11.8 6.2 17.6"/></svg>
-        </button>
-      </div>
-      <div id="wn-list"></div>
-      <button class="wn-ok hand" onclick="sluitNieuws()">let's go</button>
-    </div>
-  </div>
   <div id="nav" class="nav hidden">
     <button data-p="home" class="on" onclick="go('home')">
       <span class="ic"><svg viewBox="0 0 32 32" class="navic"><path d="M4.2 16.7 Q10 11 16.2 5.3 Q22 10.8 27.8 16.5 M7.6 13.3 Q7.3 20 7.8 26.6 M7.4 26.1 Q16 26.9 24.6 26.2 M24.2 26.6 Q24.7 20 24.3 13.4 M12.7 26.7 Q12.4 22.6 12.9 18.6 Q16 18.2 19.3 18.6 M19.1 18.4 Q19.5 22.6 19.2 26.7"/></svg></span>home</button>

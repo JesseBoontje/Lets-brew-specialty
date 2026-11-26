@@ -1069,9 +1069,8 @@ function bpWensHTML(){
     '<span class="sd">'+(lijst.length?(lijst.length+' not bought yet'):'still empty')+'</span>'+
     '<span class="wens-arr">'+(state.wensDicht?'›':'⌄')+'</span></button>';
   if(state.wensDicht)return '<div class="sect wens-sect">'+kop+'</div>';
-  if(!lijst.length)return '<div class="sect wens-sect">'+kop+'</div>'+
-    '<div class="empty-note">nothing on your list yet. Spot a nice bag somewhere? '+
-    'Put it here via New Bean — with the link.</div>';
+  // lege lijst: alleen de kop, geen uitlegtekst eronder (na live 1)
+  if(!lijst.length)return '<div class="sect wens-sect">'+kop+'</div>';
   return '<div class="sect wens-sect">'+kop+'</div>'+
     lijst.map(w=>{
       const regs=bpRegios(w);

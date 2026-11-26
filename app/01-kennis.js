@@ -8,14 +8,14 @@ const BREW_GUIDES={
       'Start de shot en de timer; mik op ~36 g uit in 25–30 sec.',
       'Te snel & zuur → maal fijner. Te traag & bitter → maal grover.'],
     tip:'Verander één ding tegelijk (maling, dose of yield), anders weet je niet wat werkte.'},
-  aeropress:{ratio:'1:18',recept:'11 g · 200 g water · net van de kook · ~3:00 totaal (Hoffmann)',grind:'medium-fijn',
+  aeropress:{ratio:'1:18',recept:'11 g · 200 g water · net van de kook · ~3:00 totaal',grind:'medium-fijn',
     steps:['Papierfilter in de dop, niet spoelen en niet voorverwarmen. Dop erop en de AeroPress op je kop.',
       'Doe 11 g koffie erin en schud hem vlak.',
       'Start de timer en giet alle 200 g water erop, net van de kook. Al het maalsel moet nat zijn.',
       'Zet de plunjer er meteen zo’n 1 cm in: dat houdt het druppelen tegen.',
       'Op 2:00 kamer en plunjer samen vasthouden en rustig swirlen. Dan 30 seconden laten zakken.',
       'Op 2:30 rustig helemaal doordrukken, in ongeveer 30 seconden.'],
-    tip:'Omgekeerd (inverted) kan ook: dan loopt er niets door tot je omdraait. Het recept "Tay omgekeerd" is dat van de wereldkampioen van 2023.'},
+    tip:'Omgekeerd (inverted) kan ook: dan loopt er niets door tot je omdraait. Kies daarvoor het recept "inverted AeroPress".'},
   v60:{ratio:'1:16',recept:'15 g · 250 g water · 92–94°C · 2:30–3:00',grind:'medium (als fijn zand)',
     steps:['Kook water en laat afkoelen tot 92–94°C; verwarm server en mok voor.',
       'Vouw het filter, plaats in de V60 en spoel goed met heet water.',
@@ -341,7 +341,7 @@ function methodFamily(idOrMethod){
    k = soort stap, d = wat je doet (inhoud, dus Nederlands).
    Het water schaalt mee met je eigen dose: water = dose * ratio.        */
 const FILTER_RECIPES=[
-  {id:'hoffmann', naam:'Hoffmann V60', voor:['v60'], dose:15, ratio:16.7, temp:95, maling:'medium-fijn',
+  {id:'hoffmann', naam:'two-pour V60', voor:['v60'], dose:15, ratio:16.7, temp:95, maling:'medium-fijn',
    over:'Twee gietbeurten en twee keer swirlen. Weinig stappen, maar je pols bepaalt het resultaat.',
    stappen:[
      {t:0,   p:0.12, k:'bloom', d:'giet 2× je dose in cirkels tot alles nat is'},
@@ -351,7 +351,7 @@ const FILTER_RECIPES=[
      {t:105, p:0,    k:'swirl', d:'nog één zachte swirl om het bed vlak te leggen'},
      {t:120, p:0,    k:'doorloop', d:'laten zakken — droog rond 3:00 tot 3:30'}]},
 
-  {id:'kasuya', naam:'Kasuya 4:6', voor:['v60'], dose:20, ratio:15, temp:92, maling:'grof',
+  {id:'kasuya', naam:'4:6 method', voor:['v60'], dose:20, ratio:15, temp:92, maling:'grof',
    over:'Vijf kleine gietbeurten. De eerste 40 % stuurt zuur tegenover zoet, de laatste 60 % de sterkte. Werkt ook zonder zwanenhals.',
    hendels:true,
    stappen:[
@@ -362,7 +362,7 @@ const FILTER_RECIPES=[
      {t:170, p:1.00, k:'giet',  d:'vijfde giet'},
      {t:200, p:0,    k:'doorloop', d:'laten zakken — droog rond 3:30'}]},
 
-  {id:'rao', naam:'Rao spin', voor:['v60'], dose:20, ratio:16, temp:96, maling:'medium',
+  {id:'rao', naam:'one pour + spin', voor:['v60'], dose:20, ratio:16, temp:96, maling:'medium',
    over:'Eén doorlopende giet en een swirl aan het eind. Vlak bed, weinig kans om te knoeien.',
    stappen:[
      {t:0,   p:0.15, k:'bloom', d:'giet 3× je dose op, alles moet nat zijn'},
@@ -371,7 +371,7 @@ const FILTER_RECIPES=[
      {t:100, p:0,    k:'swirl', d:'één zachte swirl — de rand spoelt terug het bed in'},
      {t:110, p:0,    k:'doorloop', d:'laten zakken — droog rond 3:00'}]},
 
-  {id:'chemex', naam:'Chemex klassiek', voor:['chemex'], dose:30, ratio:16.7, temp:95, maling:'medium-grof',
+  {id:'chemex', naam:'classic Chemex', voor:['chemex'], dose:30, ratio:16.7, temp:95, maling:'medium-grof',
    over:'Het dikke filter houdt oliën tegen: heel schoon in de kop, maar het duurt langer.',
    stappen:[
      {t:0,   p:0.12, k:'bloom', d:'giet ~2× je dose op en laat het gas eruit'},
@@ -390,7 +390,7 @@ const FILTER_RECIPES=[
      {t:135, p:1.00, k:'giet',  d:'laatste gietje tot je eindgewicht'},
      {t:170, p:0,    k:'doorloop', d:'laten zakken — droog rond 3:30'}]},
 
-  {id:'switch', naam:'Switch hybride', voor:['switch','v60'], dose:15, ratio:16.7, temp:94, maling:'medium',
+  {id:'switch', naam:'Switch hybrid', voor:['switch','v60'], dose:15, ratio:16.7, temp:94, maling:'medium',
    over:'Eerst dicht laten weken voor zoet en body, daarna open laten lopen voor helderheid.',
    stappen:[
      {t:0,   p:0.20, k:'bloom', klep:'dicht', d:'giet 3× je dose op en laat bloeien'},
@@ -403,9 +403,9 @@ const FILTER_RECIPES=[
      https://youtu.be/j6VlT_jUVPc). Omgekeerd: Tay Wipvasutt, wereldkampioen
      AeroPress 2023 (worldaeropresschampionship.com). Zie docs/opzet-aeropress.html.
      De tijden van schenken, swirlen, lucht eruit en aanvullen zijn aangenomen. */
-  {id:'aeropress', naam:'Hoffmann AeroPress', voor:['aeropress'], dose:11, ratio:200/11, temp:99, maling:'medium-fijn',
+  {id:'aeropress', naam:'standard AeroPress', voor:['aeropress'], dose:11, ratio:200/11, temp:99, maling:'medium-fijn',
    houding:'normaal',
-   over:'James Hoffmann: alles in één keer erop, plunjer erop tegen het druppelen, swirlen en rustig doordrukken. Niet roeren, niet spoelen.',
+   over:'',
    stappen:[
      {t:0,   p:1.00, k:'giet',  d:'giet alle 200 g water erop en maak al het maalsel nat'},
      {t:10,  p:0,    k:'wacht', d:'zet de plunjer er zo’n 1 cm in, dat houdt het druppelen tegen'},
@@ -414,9 +414,9 @@ const FILTER_RECIPES=[
      {t:125, p:0,    k:'wacht', d:'dertig seconden laten zakken'},
      {t:150, p:0,    k:'pers',  d:'druk rustig helemaal door, in ongeveer 30 seconden'}]},
 
-  {id:'aeropress-om', naam:'Tay omgekeerd', voor:['aeropress'], dose:18, ratio:155/18, temp:89, maling:'fijn tot medium',
+  {id:'aeropress-om', naam:'inverted AeroPress', voor:['aeropress'], dose:18, ratio:155/18, temp:89, maling:'fijn tot medium',
    houding:'omgekeerd',
-   over:'Tay Wipvasutt, wereldkampioen 2023: omgekeerd, 16 g en later 2 g, twee keer roeren, na het drukken aanvullen tot 155 g. Hij maalde op een ZP6, 65 klikken.',
+   over:'Omgekeerd: 16 g en later 2 g, twee keer roeren, na het drukken aanvullen tot 155 g.',
    stappen:[
      {t:0,   p:100/155, k:'giet', d:'giet 100 g water op de eerste 16 g koffie (houd 2 g apart)'},
      {t:10,  p:0,  k:'wacht', d:'even laten staan'},
@@ -483,7 +483,7 @@ const ESPRESSO_RECIPES=[
      {t:0,p:0,k:'shot', d:'start; hij komt vrijwel meteen op gang'},
      {t:18,p:0,k:'stop',d:'stop op 50 g uit, ergens tussen 15 en 22 seconden'}]},
 
-  {id:'e-milk', fam:'espresso', naam:'melkbasis', voor:['espresso'], dose:20, ratio:1.8, temp:94,
+  {id:'e-milk', fam:'espresso', naam:'milk base', voor:['espresso'], dose:20, ratio:1.8, temp:94,
    tijd:'0:29', pre:{on:true, s:5, rust:3}, maling:'fijn',
    over:'Iets korter en met een hogere dose, zodat de koffie door de melk heen komt in een flat white of cappuccino.',
    stappen:[
@@ -564,12 +564,28 @@ function libraryFor(m){
   for(const k in IMG_LIBRARY){if(n.includes(k))return IMG_LIBRARY[k];}
   return [];
 }
-// geeft de bron voor een methode-afbeelding: custom upload > standaard img > leeg
-function methodImg(m){ return (m&&(m.customImg||m.img))||''; }
-// render een methode-icoon (afbeelding met glyph-fallback), grootte px
+// standaardtekening bij een methode: op id, anders op naam (zoals mergeMethodImages)
+function standaardMethodeImg(m){
+  if(!m)return '';
+  let d=DEFAULT_METHODS.find(x=>x.id===m.id);
+  if(!d&&m.name){const n=String(m.name).toLowerCase();d=DEFAULT_METHODS.find(x=>n.includes(x.name)||x.name.includes(n));}
+  return (d&&d.img)||'';
+}
+/* geeft de bron voor een methode-afbeelding: custom upload > eigen img > standaard.
+   Een pad of upload dat de veiligheidscheck niet haalt (oude opgeslagen state, een
+   foto in een vorm die we niet tonen) valt terug op de standaardtekening.          */
+function methodImg(m){
+  if(!m)return '';
+  for(const v of [m.customImg,m.img])if(v&&BrewSecurity.imageUrl(v))return v;
+  return standaardMethodeImg(m);
+}
+// render een methode-icoon (afbeelding met glyph-fallback), grootte px. Laadt het
+// plaatje niet, dan eerst de standaardtekening voor die methode, pas daarna de glyph.
 function iconHTML(m,size){
   const src=BrewSecurity.imageUrl(methodImg(m)),glyph=esc((m&&m.glyph)||'☕');
-  if(src)return `<img src="${esc(src)}" style="max-height:${size}px;max-width:100%;mix-blend-mode:multiply" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="glyph" hidden>${glyph}</span>`;
+  const std=BrewSecurity.imageUrl(standaardMethodeImg(m));
+  const reserve=std&&std!==src?` data-std="${esc(std)}"`:'';
+  if(src)return `<img src="${esc(src)}"${reserve} style="max-height:${size}px;max-width:100%;mix-blend-mode:multiply" onerror="if(this.dataset.std){this.src=this.dataset.std;this.removeAttribute('data-std');}else{this.hidden=true;this.nextElementSibling.hidden=false;}"><span class="glyph" hidden>${glyph}</span>`;
   return `<span class="glyph">${glyph}</span>`;
 }
 // handgetekende huisstijl-actie-icoontjes (inline SVG, losse schetsstijl)

@@ -50,20 +50,20 @@ globalThis.BrewModel=(()=>{
    missing:!selectedBean?['Geen specifieke boon gekozen: doe niet alsof er een boon gekozen is.']:[]};
  }
  function validateRecipe(s,input){
-  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Het AI-antwoord bevat geen recept.');
-  const method=s.methods.find(m=>m.id===input.methodId);if(!method)throw Error('Het recept gebruikt een onbekende zetmethode.');
-  if(input.beanId&&!s.beans.some(b=>b.id===input.beanId))throw Error('Het recept verwijst naar een onbekende boon.');
+  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('The AI answer holds no brew idea.');
+  const method=s.methods.find(m=>m.id===input.methodId);if(!method)throw Error('The proposal uses an unknown brew method.');
+  if(input.beanId&&!s.beans.some(b=>b.id===input.beanId))throw Error('The proposal points to an unknown bean.');
   const number=(v,min,max,name)=>{if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)throw Error('Ongeldige '+name+' in het recept.');return v;};
   const dose=number(input.dose,1,100,'dose'),output=number(input.output,5,5000,'opbrengst'),ratio=output/dose;
-  if(ratio<(method.family==='espresso'?.5:4)||ratio>(method.family==='espresso'?6:40))throw Error('De verhouding past niet bij deze zetmethode.');
+  if(ratio<(method.family==='espresso'?.5:4)||ratio>(method.family==='espresso'?6:40))throw Error('The ratio does not fit this brew method.');
   const temp=number(input.temperature,50,100,'temperatuur');
-  if(typeof input.name!=='string'||!input.name.trim()||input.name.length>160)throw Error('Geef het recept een geldige naam.');
-  if(!Array.isArray(input.steps)||!input.steps.length||input.steps.length>20)throw Error('Het recept heeft geen geldig stappenplan.');
+  if(typeof input.name!=='string'||!input.name.trim()||input.name.length>160)throw Error('Give the brew idea a valid name.');
+  if(!Array.isArray(input.steps)||!input.steps.length||input.steps.length>20)throw Error('The proposal has no valid step plan.');
   let previousTime=-1,previousGrams=0;
   const allowed=['bloom','giet','swirl','roer','wacht','keer','pers','doorloop','dose','shot','stop','melk'];
-  const steps=input.steps.map(st=>{const t=number(st.seconds,0,1800,'staptijd');if(t<previousTime)throw Error('De stappen staan niet op tijdvolgorde.');previousTime=t;
-   if(!allowed.includes(st.action)||typeof st.text!=='string'||!st.text.trim()||st.text.length>1000)throw Error('Een receptstap is ongeldig.');
-   let p=0;if(st.grams!=null){const g=number(st.grams,0,output,'stapgewicht');if(g<previousGrams)throw Error('Het cumulatieve gewicht moet oplopen.');previousGrams=g;p=g/output;}
+  const steps=input.steps.map(st=>{const t=number(st.seconds,0,1800,'staptijd');if(t<previousTime)throw Error('The steps are not in time order.');previousTime=t;
+   if(!allowed.includes(st.action)||typeof st.text!=='string'||!st.text.trim()||st.text.length>1000)throw Error('A step in the proposal is invalid.');
+   let p=0;if(st.grams!=null){const g=number(st.grams,0,output,'stapgewicht');if(g<previousGrams)throw Error('The total weight has to go up step by step.');previousGrams=g;p=g/output;}
    return{t,p,k:st.action,d:st.text.trim(),klep:['open','dicht'].includes(st.valve)?st.valve:null};});
   return{id:'r_'+crypto.randomUUID(),eigen:true,mid:method.id,fam:method.family,beanId:input.beanId||null,naam:input.name.trim(),dose,ratio,temp,maling:short(input.grind||'',160),stand:short(input.targetGrind||'',80),over:short(input.explanation||'',2000),tijd:Math.floor(previousTime/60)+':'+String(previousTime%60).padStart(2,'0'),voor:[method.id],stappen:steps,source:'ai',createdAt:Date.now()};
  }

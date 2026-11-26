@@ -14,16 +14,16 @@ async function open(page,mid){
  if(!(await page.locator('#pc-btn').isVisible()))await page.locator('#pcard-pour .pc-head').tap();
 }
 const stand=page=>page.evaluate(()=>ap.stand());
-test('regular (Hoffmann): one pour, plunger, swirl, press; done fills the brew',async({page})=>{
+test('regular (standard): one pour, plunger, swirl, press; done fills the brew',async({page})=>{
  await open(page,'aeropress');
  // beide recepten staan klaar om te kiezen
- await expect(page.locator('#pc-pick')).toContainText('Hoffmann AeroPress');
- await expect(page.locator('#pc-pick')).toContainText('Tay omgekeerd');
+ await expect(page.locator('#pc-pick')).toContainText('standard');
+ await expect(page.locator('#pc-pick')).toContainText('inverted');await expect(page.locator('#pc-pick')).toContainText('standard');await expect(page.locator('#pc-pick')).not.toContainText('omgekeerd');
  await page.locator('#pc-btn').tap();
  const coach=page.locator('#apcoach');
  await expect(coach).toBeVisible();
  await expect(page.locator('#gietcoach')).toHaveCount(0);
- await expect(page.locator('#ap-naam')).toHaveText('Hoffmann AeroPress');
+ await expect(page.locator('#ap-naam')).toHaveText('standard AeroPress');
  await expect(page.locator('#ap-info-l')).toContainText('regular');
  await expect(page.locator('#ap-r-nu')).toContainText('pour to');
  await expect(page.locator('#ap-r-nu')).toContainText('200 g');
@@ -79,10 +79,10 @@ test('regular (Hoffmann): one pour, plunger, swirl, press; done fills the brew',
 test('inverted (Tay): upside down until the flip, then press and top up; next step shifts the rest',async({page})=>{
  await open(page,'aeropress');
  await page.locator('#pcard-recipe .pc-head').tap();
- await page.locator('#pc-pick .lp',{hasText:'Tay omgekeerd'}).tap();
+ await page.locator('#pc-pick .lp',{hasText:'inverted'}).tap();
  if(!(await page.locator('#pc-btn').isVisible()))await page.locator('#pcard-pour .pc-head').tap();
  await page.locator('#pc-btn').tap();
- await expect(page.locator('#ap-naam')).toHaveText('Tay omgekeerd');
+ await expect(page.locator('#ap-naam')).toHaveText('inverted AeroPress');
  await expect(page.locator('#ap-info-l')).toContainText('inverted');
  await expect(page.locator('#ap-r-vorige')).toContainText('upside down');
  let s=await stand(page);
