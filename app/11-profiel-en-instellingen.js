@@ -160,6 +160,7 @@ const FEATURES=[
   {id:'tastememory', n:'taste memory', d:'what your scores say about your palate', def:false, cat:'smart'},
   {id:'voice', n:'voice logging', d:'say "18 in, 36 out, 27 seconds" — hands stay on the machine', def:false, cat:'smart'},
   {id:'weather', n:'weather-aware suggestions', d:'iced on hot days, cozy moka when it rains (uses location)', def:false, cat:'smart'},
+  {id:'account', n:'account & sync', d:'sign in with Face ID and keep a copy of your beans and brews online — the phone stays the source', def:false, cat:'people'},
   {id:'pairing', n:'scale & machine pairing', d:'live weight via Bluetooth where the browser allows it', def:false, cat:'smart'},
 ];
 function featOn(id){
@@ -210,6 +211,7 @@ function renderProfile(){
   const ss=document.getElementById('save-status');
   if(ss)ss.textContent='saved now: '+state.brews.length+' brews · '+state.beans.length+' beans · '+state.methods.length+' methods';
   renderReminder();
+  try{acctRender();}catch(e){}
   try{renderStem();}catch(e){}
   renderGear();
   renderFeatures();

@@ -2,27 +2,12 @@
 // WebAuthn-handtekeningen van een sleutel die de test zelf maakt.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import {DatabaseSync} from 'node:sqlite';
 import {accountRoute,cbor,b64u} from '../account-worker.mjs';
 import site from '../site-worker.mjs';
+import {nepD1} from './nep-d1.mjs';
 
 const ORIGIN='https://letsbrew.djez.app',RP='letsbrew.djez.app';
-const MIGRATIE=readFileSync(new URL('../migrations/0001_init.sql',import.meta.url),'utf8');
 
-function nepD1(){
- const db=new DatabaseSync(':memory:');db.exec(MIGRATIE);
- const conv=v=>v instanceof ArrayBuffer?new Uint8Array(v):v===undefined?null:typeof v==='boolean'?+v:v;
- const rij=r=>r?{...r}:null;
- const stmt=(sql,args=[])=>({
-  bind:(...a)=>stmt(sql,a.map(conv)),
-  first:async()=>rij(db.prepare(sql).get(...args)),
-  all:async()=>({results:db.prepare(sql).all(...args).map(rij),meta:{}}),
-  run:async()=>{const r=db.prepare(sql).run(...args);return {results:[],meta:{changes:Number(r.changes)}};},
-  _exec(){if(/^\s*SELECT|RETURNING/i.test(sql))return {results:db.prepare(sql).all(...args).map(rij),meta:{}};const r=db.prepare(sql).run(...args);return {results:[],meta:{changes:Number(r.changes)}};}
- });
- return {db,prepare:sql=>stmt(sql),batch:async list=>{db.exec('BEGIN');try{const out=list.map(s=>s._exec());db.exec('COMMIT');return out;}catch(e){db.exec('ROLLBACK');throw e;}}};
-}
 const omgeving=()=>({DB:nepD1()});
 const tel=(env,tabel)=>env.DB.db.prepare('SELECT COUNT(*) n FROM '+tabel).get().n;
 

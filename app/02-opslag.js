@@ -121,6 +121,8 @@ function isDialInBrew(x){
 let saveQueue=Promise.resolve(),pendingSaves=0,lastSaveError=null;
 function save(){
   if(storageBlocked){toast('Stored data need checking. Export a backup before changing anything.');return Promise.resolve(false);}
+  // account-sync: updatedAt en tombstones bijhouden (app/11-account.js)
+  try{if(typeof acctStamp==='function')acctStamp();}catch(e){}
   const snapshot=structuredClone(state);pendingSaves++;
   const task=saveQueue.catch(()=>{}).then(()=>idbSet(IDB_KEY,snapshot)).then(()=>{lastSaveError=null;document.getElementById('ws-save-error')?.remove();return true;}).catch(()=>{
     lastSaveError=true;let el=document.getElementById('ws-save-error');if(!el){el=document.createElement('div');el.id='ws-save-error';el.setAttribute('role','alert');el.style.cssText='position:fixed;z-index:9999;top:0;left:0;right:0;background:#fff3d6;color:#6d321d;padding:12px;font-size:14px';document.body.append(el);}el.textContent='Saving failed. Keep this app open and make a backup via Settings → Data and sharing.';return false;
