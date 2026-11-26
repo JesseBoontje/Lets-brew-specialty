@@ -172,6 +172,7 @@ function acctNaInloggen(user){
   s.user={handle:user.handle,visibility:user.visibility||'private'};s.lastHandle=user.handle;s.later=false;
   if(typeof volg!=='undefined'){volg.me=null;volg.fout='';volg.geladen=false;volg.feed=[];}
   save();acctRender();acctSync();
+  if(typeof acctMeHaal==='function')acctMeHaal();
 }
 async function acctLogin(){
   if(!acctKan()){toast('Face ID sign-in is not available in this browser');return;}
@@ -266,7 +267,7 @@ function acctRender(){
 /* bij openen: vingerafdrukken vastleggen en, als je ingelogd bent, meteen syncen */
 function acctStart(){
   if(!acctFp)acctFp=acctVingers();
-  if(featOn('account')&&acctIngelogd())acctSync();
+  if(featOn('account')&&acctIngelogd()){acctSync();if(typeof acctMeHaal==='function')acctMeHaal();}
 }
 window.addEventListener('online',()=>{if(featOn('account')&&acctIngelogd())acctSync();});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&featOn('account')&&acctIngelogd()&&Date.now()-((state.sync||{}).last||0)>60000)acctSync();});

@@ -733,6 +733,11 @@
         <div id="volg-body"></div>
       </div>
 
+      <div class="settings-card sketch soft" id="beheer-card" style="display:none">
+        <div class="set-t hand">accounts</div>
+        <div id="beheer-body"></div>
+      </div>
+
 
       <div class="sect"><span class="hand">your coffee</span><span class="sd">your gear and your palate</span></div>
       <div class="settings-card sketch soft" id="gear-card">
@@ -794,10 +799,13 @@
         </div>
         <div class="adv-body">
         <div id="ai-key-wrap" class="hidden">
+          <div id="ai-lb-wrap"></div>
+          <div id="ai-eigen">
           <div class="set-d" style="margin:6px 0 8px">pick who answers, then paste that provider’s own API key. it stays in this tab only. paste it again after reloading; it is never included in a back-up.</div>
           <div class="aib-chips" id="ai-prov-chips"></div>
           <input id="ai-key" type="password" placeholder="sk-ant-..." onchange="saveKey()">
           <div class="set-d" id="ai-key-status" style="margin-top:6px"></div>
+          </div>
           <div id="ai-model-wrap"></div>
           <div id="ai-bud-wrap" class="aib"></div>
         </div>
@@ -977,6 +985,7 @@
 <script src="app/11-randen.js"></script>
 <script src="app/11-account.js"></script>
 <script src="app/11-volgen.js"></script>
+<script src="app/11-beheer.js"></script>
 <script src="app/12-hulp-en-start.js"></script>
 <script src="brew-workspace.js"></script>
 <script src="brew-voice.js"></script>

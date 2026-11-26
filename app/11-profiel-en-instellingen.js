@@ -204,7 +204,9 @@ for(const provider of ['anthropic','openai']){
   try{sessionAiKeys[provider]=localStorage.getItem(aiSleutelNaam(provider))||'';localStorage.removeItem(aiSleutelNaam(provider));}catch{sessionAiKeys[provider]='';}
 }
 function getKey(id){return sessionAiKeys[id||aiProv()]||'';}
-function aiReady(){return aiEnabled()&&!!getKey();}
+// klaar om te vragen: een eigen sleutel in dit tabblad, of Lets Brew AI voor dit account
+function aiSleutelKlaar(id){id=id||aiProv();return aiAanbieder(id).server?(typeof aiLbKan==='function'&&aiLbKan()):!!getKey(id);}
+function aiReady(){return aiEnabled()&&aiSleutelKlaar();}
 function renderProfile(){
   const on=aiEnabled();
   document.getElementById('ai-toggle').classList.toggle('on',on);
@@ -216,6 +218,7 @@ function renderProfile(){
   renderReminder();
   try{acctRender();}catch(e){}
   try{volgRender();}catch(e){}
+  try{beheerRender();acctMeHaal();}catch(e){}
   try{renderStem();}catch(e){}
   renderGear();
   renderFeatures();
@@ -565,14 +568,16 @@ function aiPerVraag(bron){
   const inTok=g[0]+(AI_MET_CONTEXT.includes(bron)?aiContextTok():0);
   return inTok*t.in+g[1]*(t.denkt?1.8:1)*t.uit;
 }
-function aiTel(usage,bron){
-  if(!usage)return;
+function aiTel(usage,bron,id){
+  id=id||aiProv();
+  // Lets Brew AI kost jou niets: niet als eigen uitgave tellen
+  if(!usage||aiAanbieder(id).server)return;
   const a=aiBud();
   // de app gebruikt geen prompt-caching, dus die twee velden zijn nul -- ze staan
   // erbij zodat een gecachete aanroep later niet per ongeluk gratis lijkt
   const inTok=(usage.input_tokens||0)+(usage.cache_creation_input_tokens||0)+
               (usage.cache_read_input_tokens||0);
-  const t=aiTarief();
+  const t=aiTarief(id);
   const d=inTok*t.in+(usage.output_tokens||0)*t.uit;
   if(!(d>0))return;
   const dag=new Date().getDate();
@@ -580,7 +585,7 @@ function aiTel(usage,bron){
   // per aanbieder apart bijhouden: een vraag aan de een kost iets heel anders
   // dan dezelfde vraag aan de ander
   const naam=AI_BRONNEN.some(x=>x[0]===bron)?bron:'other';
-  const k=aiProv()+':'+naam;
+  const k=id+':'+naam;
   if(!a.bron[k])a.bron[k]={n:0,d:0};
   const r=a.bron[k];
   r.n++;r.d+=d;
@@ -593,7 +598,7 @@ function aiTel(usage,bron){
    app tot de 1e -- ook als je doorgaat tot nul. De kaart in instellingen staat
    er altijd voor wie wil kijken.                                              */
 function aiMeldNa(){
-  if(!featOn('aibudget'))return;
+  if(!featOn('aibudget')||aiAanbieder().server)return;
   const a=aiBud();
   if(a.budget==null||!(a.budget>0))return;
   const deel=aiOver()/a.budget;
@@ -629,8 +634,15 @@ function aiPop(n){
 function aiPopWeg(){const el=document.getElementById('aibud-pop');if(el)el.classList.add('hidden');}
 function renderAiProv(){
   const c=document.getElementById('ai-prov-chips');if(!c)return;
-  const nu=aiProv(),a=aiAanbieder();
-  c.innerHTML=AI_AANBIEDERS.map(x=>'<button class="lp'+(x.id===nu?' sel':'')+
+  const nu=aiProv(),a=aiAanbieder(),lb=typeof aiLbKan==='function'&&aiLbKan();
+  // met Lets Brew AI voor dit account eerst de keuze: de sleutel van de app, of je eigen
+  const lw=document.getElementById('ai-lb-wrap'),eigen=document.getElementById('ai-eigen');
+  if(lw)lw.innerHTML=lb?'<div class="aib-chips lb-keus" role="group" aria-label="who answers">'+
+      '<button class="lp'+(a.server?' sel':'')+'" id="ai-kies-lb" onclick="setAiProv(\'letsbrew\')">Lets Brew AI</button>'+
+      '<button class="lp'+(a.server?'':' sel')+'" id="ai-kies-eigen" onclick="setAiProv(aiEigenProv())">own key</button></div>'+
+      (a.server?aiLbHtml():''):'';
+  if(eigen)eigen.classList.toggle('hidden',!!a.server);
+  c.innerHTML=AI_AANBIEDERS.filter(x=>!x.server).map(x=>'<button class="lp'+(x.id===nu?' sel':'')+
     '" onclick="setAiProv(\''+x.id+'\')">'+esc(x.naam)+'</button>').join('');
   const k=document.getElementById('ai-key');
   if(k){k.placeholder=a.hint;k.value=getKey();}
@@ -638,7 +650,7 @@ function renderAiProv(){
   if(st)st.textContent=getKey()?('✓ '+a.naam+' key in this tab only'):('no '+a.naam+' key yet');
   const m=document.getElementById('ai-model-wrap');
   if(!m)return;
-  if(!getKey()){m.innerHTML='';return;}
+  if(a.server||!getKey()){m.innerHTML='';return;}
   const t=aiTarief();
   const herkomst=t.bron==='list'?'from the app’s price list ('+AI_PRIJZEN_PEIL+') for this model'
     :t.bron==='own'?'your own numbers for this model'
@@ -656,10 +668,12 @@ function renderAiProv(){
         'step="0.01" min="0" value="'+(t.uit*1e6)+'" onchange="setAiPrijs()"></label></div>';
 }
 function setAiProv(id){
-  if(!AI_AANBIEDERS.some(x=>x.id===id))return;
+  const x=AI_AANBIEDERS.find(y=>y.id===id);if(!x)return;
+  if(x.server&&!(typeof aiLbKan==='function'&&aiLbKan()))return;
   localStorage.setItem('scc_ai_prov',id);
+  if(!x.server)localStorage.setItem('scc_ai_prov_eigen',id);
   renderAiProv();renderAiBudget();applyAIVisibility();
-  toast(aiAanbieder().naam+(getKey()?' — key in this tab':' — paste a key'));
+  toast(x.server?'Lets Brew AI — no key needed':aiAanbieder().naam+(getKey()?' — key in this tab':' — paste a key'));
 }
 function setAiModel(v){
   localStorage.setItem('scc_ai_model_'+aiProv(),(v||'').trim());
@@ -728,7 +742,7 @@ function aiLijnSVG(){
 }
 function renderAiBudget(){
   const el=document.getElementById('ai-bud-wrap');if(!el)return;
-  if(!featOn('aibudget')||!aiReady()){el.innerHTML='';return;}
+  if(!featOn('aibudget')||!aiReady()||aiAanbieder().server){el.innerHTML='';return;}
   const a=aiBud(),bud=a.budget,besteed=aiBesteed(),over=aiOver(),nu=new Date();
   const dag=nu.getDate();
   const op=bud!=null&&besteed>=bud*.8;

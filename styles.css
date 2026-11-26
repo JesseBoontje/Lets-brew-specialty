@@ -1760,3 +1760,23 @@ html.randen .sketch.rand-on{filter:none;}
 .feed-knop{background:none;border:0;padding:0;color:var(--paper);font:inherit;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;}
 .feed-zij .feed-knop .acic{width:30px;height:30px;stroke:var(--paper);stroke-width:1.8;}
 .feed-zij .feed-knop.aan .acic{fill:var(--paper);}
+
+/* ---- beheer en Lets Brew AI (stap 3) ---- */
+.lb-keus{margin:4px 0 8px;}
+.lb-kaart{border:2px solid var(--line);border-radius:18px;background:var(--paper);padding:10px 14px 8px;margin:8px 0;filter:url(#wobble);}
+.lb-kaart .k{font-family:'Caveat',cursive;font-weight:700;font-size:22px;line-height:1.05;}
+.lb-kaart .n{font-size:17px;margin-top:2px;}
+.lb-kaart .n b{font-family:'Caveat',cursive;font-weight:700;font-size:28px;}
+.lb-kaart .aib-meter{margin:8px 0 4px;}
+#beheer-card .bh-rij{align-items:center;}
+#beheer-card .bh-wie{min-width:0;display:flex;flex-direction:column;}
+#beheer-card .bh-wie b{font-size:21px;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#beheer-card .bh-wie span{color:var(--ink-soft);font-size:13px;}
+#beheer-card .bh-ai{transform:scale(.86);transform-origin:right center;}
+#beheer-card .bh-totaal{margin:10px 0 2px;}
+#beheer-card .bh-totaal b{color:var(--ink);font-weight:400;}
+#beheer-card .bh-melding{border-bottom:1px dashed var(--line);padding:7px 0;font-size:15px;display:flex;flex-direction:column;gap:4px;}
+#beheer-card .bh-melding b{font-size:17px;}
+#beheer-card .bh-reden{color:var(--ink);font-size:15px;overflow-wrap:anywhere;}
+#beheer-card .bh-melding .volg-acties{justify-content:flex-end;}
+#beheer-card .volg-k.bh-blok{border-style:dashed;}
