@@ -208,7 +208,7 @@ function scene(tt){
     if(!s.g)return;
     const a=w0(j), b=w1(j);
     const show=RM?((tt>=a-0.8&&tt<b+0.8)?1:0):ez(Math.max(0,env(tt,a-0.8,b+0.8,0.8)));
-    if(show>Z.kShow)Z.kShow=show;
+    if(show>Z.kShow){Z.kShow=show;Z.kNa=!!s.na;}
     const tilt=RM?((tt>=a&&tt<b)?1:0):ez(Math.max(0,env(tt,a-0.5,b,0.5)));
     if(tilt>Z.kTilt)Z.kTilt=tilt;
     if(tt>a&&tt<b){Z.pour=true;Z.pourY=s.na?(CUPBODEM-Z.cupG*R.cupg):opp;}
@@ -269,13 +269,15 @@ function teken(Z){
   el.cupCr.setAttribute('y',f2(cy)); el.cupCr.setAttribute('height',Z.cupG>3?2.6:0);
   const RM=RMQ.matches;
   const kt=-22*Z.kTilt, kx=(RM?(Z.kShow>0.5?0:70):(1-Z.kShow)*70);
-  el.kettle.setAttribute('transform','translate('+f2(kx)+' 0) rotate('+f2(kt)+' 262 57)');
+  // omgekeerd staat de rand van de kamer hoger: dan giet de kan 32 hoger, anders gaat de tuit door de rand
+  const ky=(R.om&&!Z.kNa)?-32:0;
+  el.kettle.setAttribute('transform','translate('+f2(kx)+' '+ky+') rotate('+f2(kt)+' 262 57)');
   el.kettle.setAttribute('opacity',RM?(Z.kShow>0.5?1:0):Z.kShow);
   if(Z.pour){
     const [tx,ty]=rot(134,35,262,57,kt);
-    const x=tx+kx, my=(ty+Z.pourY)/2;
-    el.st1.setAttribute('d','M'+x.toFixed(1)+' '+ty.toFixed(1)+' Q'+(x-0.6).toFixed(1)+' '+my.toFixed(1)+' 130 '+Z.pourY.toFixed(1));
-    el.st2.setAttribute('d','M'+(x+2.2).toFixed(1)+' '+(ty+3).toFixed(1)+' Q'+(x+1.6).toFixed(1)+' '+my.toFixed(1)+' 131.4 '+(Z.pourY-2).toFixed(1));
+    const x=tx+kx, y0=ty+ky, my=(y0+Z.pourY)/2;
+    el.st1.setAttribute('d','M'+x.toFixed(1)+' '+y0.toFixed(1)+' Q'+(x-0.6).toFixed(1)+' '+my.toFixed(1)+' 130 '+Z.pourY.toFixed(1));
+    el.st2.setAttribute('d','M'+(x+2.2).toFixed(1)+' '+(y0+3).toFixed(1)+' Q'+(x+1.6).toFixed(1)+' '+my.toFixed(1)+' 131.4 '+(Z.pourY-2).toFixed(1));
   }else{el.st1.setAttribute('d','');el.st2.setAttribute('d','');}
   el.drip.setAttribute('d',Z.drip?('M130 272 Q130.8 '+((272+cy)/2).toFixed(1)+' 130 '+cy.toFixed(1)):'');
   el.rodG.setAttribute('opacity',Z.rodA);
