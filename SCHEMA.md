@@ -342,6 +342,8 @@ Geen eigen vlag: valt onder `account`. De server beslist; de app toont alleen wa
 - `users.locked` (migratie `0002_locked.sql`, `INTEGER NOT NULL DEFAULT 0`): een account
   op slot kan niet inloggen (403 `{code:"locked"}`), en een bestaande sessie telt nergens
   meer (sync, volgen, feed, foto's, AI: 401). Op slot zetten wist ook de sessies.
+  Voor anderen is het account weg: niet in feed, zoeken, profiel, volgers of tellers, foto's
+  404; alleen ontvolgen, volger weghalen en (de)blokkeren werken nog.
 - `users.is_admin` en `users.ai_allowed` bestonden al (0001). `is_admin` zet de beheerder
   zelf in D1; er is geen route voor.
 - `ai_usage(user_id, day, count)` bestond al: `day` is de datum in Europe/Amsterdam
@@ -372,7 +374,8 @@ Anthropic Messages-API; de server laat alleen `model`, `max_tokens`, `messages`,
 `stream` en `system` door (ook binnen een bericht alleen `text` en base64-`image`), kiest
 het model uit een vaste lijst (`AI_MODEL`, komma's toegestaan, de eerste is de standaard;
 zonder `AI_MODEL` hetzelfde model als de app voor Anthropic gebruikt), en zet
-`max_tokens` op hoogstens 4000. Lijf max 6 MB (foto's van zakken). `stream:true` komt
+`max_tokens` op hoogstens 4000. Lijf max 6 MB (foto's van zakken), alle tekst samen (berichten en system) max 200.000
+tekens en max 4 foto's per vraag (anders 413). `stream:true` komt
 terug als `text/event-stream`. Per gebruiker per dag 50 vragen: de teller gaat in één
 statement omhoog vóór het doorsturen (boven de 50: 429 `{error:"Daily limit reached (50).
 Resets at midnight.", code:"limit"}`); mislukt het bij Anthropic, dan telt de vraag niet.

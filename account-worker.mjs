@@ -197,13 +197,14 @@ async function loginVerify(request,env,body){
  const {raw}=await leesClientData(env,request,r.clientDataJSON,'webauthn.get');
  const pk=await env.DB.prepare('SELECT p.user_id,p.public_key,p.sign_count,u.handle,u.visibility,u.locked FROM passkeys p JOIN users u ON u.id=p.user_id WHERE p.id=?').bind(cred.id).first();
  if(!pk)return json({error:'This passkey is not known here. Create an account first.'},401);
- if(pk.locked)return json({error:'This account is locked.',code:'locked'},403);
  const adBytes=b64u.dec(r.authenticatorData),ad=leesAuthData(adBytes,false);
  await controleerAuthData(request,ad);
  const ok=await controleerHandtekening(bytesVan(pk.public_key),b64u.dec(r.signature),concat(adBytes,await sha256(raw)));
  if(!ok)throw fout('sig');
  // een teller die niet oploopt wijst op een gekloonde sleutel (passkeys in iCloud tellen niet, dan 0)
  if((ad.signCount||pk.sign_count)&&ad.signCount<=pk.sign_count)throw fout('teller');
+ // pas na een geldige handtekening zeggen dat het account op slot is (anders verraadt het welke passkeys bestaan)
+ if(pk.locked)return json({error:'This account is locked.',code:'locked'},403);
  await env.DB.prepare('UPDATE passkeys SET sign_count=? WHERE id=?').bind(ad.signCount,cred.id).run();
  const token=await nieuweSessie(env,pk.user_id);
  return json({user:{handle:pk.handle,visibility:pk.visibility}},200,{'Set-Cookie':sessieCookie(token)});

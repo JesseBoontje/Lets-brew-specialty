@@ -7,6 +7,7 @@ import {accountRoute,aiDag} from '../account-worker.mjs';
 import {socialRoute} from '../social-worker.mjs';
 import site from '../site-worker.mjs';
 import {nepD1} from './nep-d1.mjs';
+import {nepR2} from './nep-r2.mjs';
 
 const ORIGIN='https://letsbrew.djez.app',SLEUTEL='sk-ant-test-GEHEIM-0123456789abcdef';
 const hex=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -228,3 +229,58 @@ test('ai: stream wordt als SSE doorgegeven; rate limit met eigen sleutel; 6 MB-g
  }finally{nep.herstel();}
 });
 
+
+test('ai: alle tekst samen max 200.000 tekens (berichten en system), max 4 foto\'s: anders 413, niets doorgestuurd of geteld',async()=>{
+ const nep=nepAnthropic();
+ try{
+  const env=omgeving();const jesse=await gebruiker(env,'jesse',{ai:1});
+  const beeld={type:'image',source:{type:'base64',media_type:'image/jpeg',data:'AAAA'}};
+  const te=[
+   {messages:[{role:'user',content:'x'.repeat(200001)}]},
+   {messages:[{role:'user',content:'x'.repeat(100000)},{role:'assistant',content:[{type:'text',text:'y'.repeat(100001)}]}]},
+   {system:'s'.repeat(150000),messages:[{role:'user',content:'x'.repeat(50001)}]},
+   {system:[{type:'text',text:'s'.repeat(200001)}],messages:[{role:'user',content:'x'}]},
+   {messages:[{role:'user',content:[beeld,beeld,beeld,{type:'text',text:'vijf'}]},{role:'user',content:[beeld,beeld]}]},
+  ];
+  for(const b of te)assert.equal((await vraag(env,jesse,'POST','/api/ai',b)).status,413);
+  assert.equal(nep.calls.length,0);
+  assert.equal(env.DB.db.prepare('SELECT COUNT(*) n FROM ai_usage').get().n,0);
+  // precies op de grens mag wel
+  const ok=await vraag(env,jesse,'POST','/api/ai',{system:'s'.repeat(100000),messages:[{role:'user',content:[beeld,beeld,{type:'text',text:'x'.repeat(100000)}]},{role:'user',content:[beeld,beeld]}]});
+  assert.equal(ok.status,200);assert.equal(nep.calls.length,1);
+ }finally{nep.herstel();}
+});
+
+test('social: een account op slot is voor anderen weg (feed, profiel, zoeken, volgers, tellers, foto), terugdraaien mag nog',async()=>{
+ const env=omgeving({FOTOS:nepR2()});
+ const sanne=await gebruiker(env,'sanne'),troll=await gebruiker(env,'troll');
+ env.DB.db.prepare("UPDATE users SET visibility='public' WHERE id=?").run(troll.id);
+ env.DB.db.prepare("INSERT INTO follows(follower_id,followee_id,status,created_at) VALUES(?,?,'accepted',?),(?,?,'accepted',?)").run(sanne.id,troll.id,Date.now(),troll.id,sanne.id,Date.now());
+ env.DB.db.prepare("INSERT INTO records(user_id,kind,id,data,updated_at,deleted,synced_at,photo_key) VALUES(?,?,?,?,?,0,1,?)").run(troll.id,'brew','t1',JSON.stringify({title:'troll brew',method:'v60'}),Date.now(),troll.id+'.abcdefghijklmnopqrstuv');
+ const s=async(m,p,b)=>{const r=await socialRoute(rq(sanne,m,p,b),env);const t=r.headers.get('Content-Type')||'';return {status:r.status,data:t.includes('json')?await r.json():null};};
+ // eerst zichtbaar
+ assert.equal((await s('GET','/api/social/feed')).data.items.length,1);
+ assert.equal((await s('GET','/api/social/search?q=tro')).data.results.length,1);
+ assert.equal((await s('GET','/api/social/u/troll')).status,200);
+ await env.FOTOS.put('foto/'+troll.id+'.abcdefghijklmnopqrstuv',Uint8Array.of(0xff,0xd8,0xff),{httpMetadata:{contentType:'image/jpeg'}});
+ assert.equal((await socialRoute(rq(sanne,'GET','/api/foto/'+troll.id+'.abcdefghijklmnopqrstuv'),env)).status,200);
+ let me=(await s('GET','/api/social/me')).data;
+ assert.equal(me.followers.length,1);assert.equal(me.following.length,1);assert.equal(me.profile.counts.followers,1);
+ // op slot
+ env.DB.db.prepare('UPDATE users SET locked=1 WHERE id=?').run(troll.id);
+ assert.equal((await s('GET','/api/social/feed')).data.items.length,0);
+ assert.equal((await s('GET','/api/social/search?q=tro')).data.results.length,0);
+ assert.equal((await s('GET','/api/social/u/troll')).status,404);
+ assert.equal((await s('GET','/api/social/u/troll/items')).status,404);
+ assert.equal((await s('POST','/api/social/follow',{handle:'troll'})).status,404);
+ assert.equal((await s('POST','/api/social/like',{handle:'troll',kind:'brew',id:'t1'})).status,404);
+ me=(await s('GET','/api/social/me')).data;
+ assert.equal(me.followers.length,0);assert.equal(me.following.length,0);
+ assert.equal(me.profile.counts.followers,0);assert.equal(me.profile.counts.following,0);
+ assert.equal((await socialRoute(rq(sanne,'GET','/api/foto/'+troll.id+'.abcdefghijklmnopqrstuv'),env)).status,404);
+ // terugdraaien: ontvolgen, volger weg en blokkeren gaan nog
+ assert.equal((await s('DELETE','/api/social/follow',{handle:'troll'})).status,200);
+ assert.equal((await s('DELETE','/api/social/follower',{handle:'troll'})).status,200);
+ assert.equal((await s('POST','/api/social/block',{handle:'troll'})).status,200);
+ assert.equal(env.DB.db.prepare('SELECT COUNT(*) n FROM follows').get().n,0);
+});

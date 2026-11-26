@@ -160,6 +160,9 @@ test('een account op slot (beheer) kan niet inloggen: 403, geen sessie',async()=
  const r=await registreer(env,'op_slot');
  env.DB.db.prepare("UPDATE users SET locked=1 WHERE handle='op_slot'").run();
  const n=tel(env,'sessions');
+ // met een geknoeide handtekening zegt de server niets over het slot
+ const k=await login(env,r.sleutel,{knoei:true});
+ assert.equal(k.status,401);assert.notEqual(k.body.code,'locked');
  const l=await login(env,r.sleutel,{teller:0});
  assert.equal(l.status,403);assert.equal(l.body.code,'locked');assert.equal(l.cookie,null);
  assert.equal(tel(env,'sessions'),n,'geen nieuwe sessie');

@@ -69,14 +69,15 @@ export async function magZien(env,ikId,eigenaar){
  if(r.blok)return false;
  return eigenaar.visibility==='public'||r.ikVolg==='accepted';
 }
-const userOp=(env,handle)=>HANDLE.test(handle)?env.DB.prepare('SELECT id,handle,name,visibility FROM users WHERE handle=?').bind(handle).first():null;
+// een account op slot (beheer) bestaat voor anderen niet; alleen terugdraaien (ontvolgen, volger weg, (de)blokkeren) mag nog
+const userOp=(env,handle,ookOpSlot=false)=>HANDLE.test(handle)?env.DB.prepare('SELECT id,handle,name,visibility FROM users WHERE handle=?'+(ookOpSlot?'':' AND locked=0')).bind(handle).first():null;
 
 async function tellers(env,id){
  const r=await env.DB.prepare(`SELECT
   (SELECT COUNT(*) FROM records WHERE user_id=? AND kind='brew' AND deleted=0 AND ${GEEN_DIAL}) AS brews,
   (SELECT COUNT(*) FROM records WHERE user_id=? AND kind='bean' AND deleted=0) AS beans,
-  (SELECT COUNT(*) FROM follows WHERE followee_id=? AND status='accepted') AS followers,
-  (SELECT COUNT(*) FROM follows WHERE follower_id=? AND status='accepted') AS following`).bind(id,id,id,id).first();
+  (SELECT COUNT(*) FROM follows f JOIN users x ON x.id=f.follower_id WHERE f.followee_id=? AND f.status='accepted' AND x.locked=0) AS followers,
+  (SELECT COUNT(*) FROM follows f JOIN users x ON x.id=f.followee_id WHERE f.follower_id=? AND f.status='accepted' AND x.locked=0) AS following`).bind(id,id,id,id).first();
  return {brews:r.brews,beans:r.beans,followers:r.followers,following:r.following};
 }
 
@@ -97,7 +98,7 @@ async function items(env,ikId,{scope,binds,cursor,limit=PAGINA}){
   (SELECT COUNT(*) FROM likes l WHERE l.owner_id=r.user_id AND l.kind=r.kind AND l.id=r.id) AS likes,
   EXISTS(SELECT 1 FROM likes l WHERE l.user_id=? AND l.owner_id=r.user_id AND l.kind=r.kind AND l.id=r.id) AS liked
   FROM records r JOIN users u ON u.id=r.user_id
-  WHERE ${scope} AND r.kind IN ('bean','brew') AND r.deleted=0 AND ${GEEN_DIAL.replace(/data/g,'r.data')}
+  WHERE ${scope} AND u.locked=0 AND r.kind IN ('bean','brew') AND r.deleted=0 AND ${GEEN_DIAL.replace(/data/g,'r.data')}
   ${c?`AND (r.updated_at<? OR (r.updated_at=? AND ${SLEUTEL}<?))`:''}
   ORDER BY r.updated_at DESC, ${SLEUTEL} DESC LIMIT ?`;
  const args=[ikId,...binds,...(c?[c.t,c.t,c.k]:[]),limit+1];
@@ -122,9 +123,9 @@ async function mij(env,ik){
  const u=await env.DB.prepare('SELECT handle,name,visibility FROM users WHERE id=?').bind(ik.id).first();
  const lijst=async(sql)=>((await env.DB.prepare(sql).bind(ik.id,MAX_LIJST).all()).results||[]).map(x=>({handle:x.handle,name:x.name||x.handle}));
  return json({profile:{handle:u.handle,name:u.name||u.handle,visibility:u.visibility,counts:await tellers(env,ik.id)},
-  requests:await lijst("SELECT u.handle,u.name FROM follows f JOIN users u ON u.id=f.follower_id WHERE f.followee_id=? AND f.status='pending' ORDER BY f.created_at DESC LIMIT ?"),
-  followers:await lijst("SELECT u.handle,u.name FROM follows f JOIN users u ON u.id=f.follower_id WHERE f.followee_id=? AND f.status='accepted' ORDER BY u.handle LIMIT ?"),
-  following:await lijst("SELECT u.handle,u.name,f.status FROM follows f JOIN users u ON u.id=f.followee_id WHERE f.follower_id=? ORDER BY u.handle LIMIT ?"),
+  requests:await lijst("SELECT u.handle,u.name FROM follows f JOIN users u ON u.id=f.follower_id WHERE f.followee_id=? AND f.status='pending' AND u.locked=0 ORDER BY f.created_at DESC LIMIT ?"),
+  followers:await lijst("SELECT u.handle,u.name FROM follows f JOIN users u ON u.id=f.follower_id WHERE f.followee_id=? AND f.status='accepted' AND u.locked=0 ORDER BY u.handle LIMIT ?"),
+  following:await lijst("SELECT u.handle,u.name,f.status FROM follows f JOIN users u ON u.id=f.followee_id WHERE f.follower_id=? AND u.locked=0 ORDER BY u.handle LIMIT ?"),
   blocked:await lijst("SELECT u.handle,u.name FROM blocks b JOIN users u ON u.id=b.blocked_id WHERE b.user_id=? ORDER BY u.handle LIMIT ?")});
 }
 async function profielZetten(env,ik,body){
@@ -147,7 +148,7 @@ async function zoek(env,ik,q){
  if(!q)return json({results:[]});
  const rows=(await env.DB.prepare(`SELECT u.id,u.handle,u.name,u.visibility,
    (SELECT status FROM follows WHERE follower_id=? AND followee_id=u.id) AS status
-  FROM users u WHERE substr(u.handle,1,?)=? AND u.id<>?
+  FROM users u WHERE substr(u.handle,1,?)=? AND u.id<>? AND u.locked=0
    AND NOT EXISTS(SELECT 1 FROM blocks b WHERE (b.user_id=? AND b.blocked_id=u.id) OR (b.user_id=u.id AND b.blocked_id=?))
   ORDER BY (u.handle=?) DESC, u.handle LIMIT 20`).bind(ik.id,q.length,q,ik.id,ik.id,ik.id,q).all()).results||[];
  return json({results:rows.map(r=>({handle:r.handle,name:r.name||r.handle,visibility:r.visibility,status:r.status||null}))});
@@ -174,7 +175,7 @@ async function volg(env,ik,body){
  return json({status:f?f.status:null});
 }
 async function ontvolg(env,ik,body){
- const u=await userOp(env,handleUit(body.handle));if(!u)return nietGevonden();
+ const u=await userOp(env,handleUit(body.handle),true);if(!u)return nietGevonden();
  await env.DB.prepare('DELETE FROM follows WHERE follower_id=? AND followee_id=?').bind(ik.id,u.id).run();
  return json({status:null});
 }
@@ -185,7 +186,7 @@ async function verzoek(env,ik,body){
  return mij(env,ik);
 }
 async function volgerWeg(env,ik,body){
- const u=await userOp(env,handleUit(body.handle));if(!u)return nietGevonden();
+ const u=await userOp(env,handleUit(body.handle),true);if(!u)return nietGevonden();
  await env.DB.prepare('DELETE FROM follows WHERE follower_id=? AND followee_id=?').bind(u.id,ik.id).run();
  return mij(env,ik);
 }
@@ -206,7 +207,7 @@ async function like(env,ik,body,aan){
 
 /* ---------- blokkeren en melden ---------- */
 async function blok(env,ik,body,aan){
- const u=await userOp(env,handleUit(body.handle));if(!u||u.id===ik.id)return nietGevonden();
+ const u=await userOp(env,handleUit(body.handle),true);if(!u||u.id===ik.id)return nietGevonden();
  if(aan)await env.DB.batch([
   env.DB.prepare('INSERT INTO blocks(user_id,blocked_id) VALUES(?,?) ON CONFLICT DO NOTHING').bind(ik.id,u.id),
   // volgen verbreken, over en weer; ook de likes op elkaars records
@@ -266,7 +267,7 @@ async function fotoWeg(env,ik,url){
 async function fotoHaal(env,ik,key){
  if(!FOTO_KEY.test(key))return nietGevonden();
  const eigenaar=key.split('.')[0];
- const rec=await env.DB.prepare('SELECT r.kind,u.id,u.visibility FROM records r JOIN users u ON u.id=r.user_id WHERE r.user_id=? AND r.photo_key=? AND r.deleted=0').bind(eigenaar,key).first();
+ const rec=await env.DB.prepare('SELECT r.kind,u.id,u.visibility FROM records r JOIN users u ON u.id=r.user_id WHERE r.user_id=? AND r.photo_key=? AND r.deleted=0 AND (u.locked=0 OR u.id=?)').bind(eigenaar,key,ik.id).first();
  if(!rec||!await magZien(env,ik.id,{id:rec.id,visibility:rec.visibility}))return nietGevonden();
  const obj=await env.FOTOS.get('foto/'+key);if(!obj)return nietGevonden();
  const type=obj.httpMetadata?.contentType==='image/webp'?'image/webp':'image/jpeg';

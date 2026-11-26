@@ -102,3 +102,21 @@ query in `gebruiker()` (dus inloggen/sync/social) met een 500.
   teller gaat alleen terug bij een niet-2xx of netwerkfout vóór het antwoord).
 - Geen AI-verbruik in tokens per gebruiker; alleen het aantal vragen per dag.
 - Webkit niet lokaal getest; niet op een echte iPhone. Handleiding niet bijgewerkt.
+
+## Herstel na keuring (26-11, goedgekeurd met 2 moet + 1 mag)
+1. **Invoer begrensd** (`ai-worker.mjs`, `aiLijf`): alle tekst samen (string-content,
+   text-blokken en system, string of blokken) max 200.000 tekens, en max 4 image-blokken per
+   verzoek; daarboven `fout('groot')` → 413, niets doorgestuurd en niet geteld. Test: "ai: alle
+   tekst samen max 200.000 tekens…" (vijf gevallen 413, precies op de grens 200).
+2. **Op slot = onzichtbaar voor anderen** (`social-worker.mjs`): `userOp` vindt een account op
+   slot niet (profiel, items, volgen, verzoek, like, melden → 404), behalve bij terugdraaien
+   (ontvolgen, volger weg, (de)blokkeren). Feed (`items`) filtert `u.locked=0`, zoeken ook,
+   in `/me` de verzoeken, volgers en gevolgden, de volger-tellers tellen alleen accounts
+   zonder slot, en foto's van een account op slot geven 404. Test: "social: een account op slot
+   is voor anderen weg…" (eerst zichtbaar incl. foto 200, na slot overal weg, terugdraaien gaat).
+3. **403 locked pas na een geldige handtekening** (`account-worker.mjs`, `loginVerify`): een
+   geknoeide handtekening op een account op slot geeft gewoon 401 zonder `code:"locked"`
+   (test in `tests/account.test.mjs` uitgebreid).
+
+Uitkomst na herstel: build groen; Node **53 groen, 0 rood** (was 51); Playwright chromium
+**55 groen, 0 rood**. Geen nieuwe migratie: alleen 0002 (users.locked).

@@ -10,7 +10,7 @@ import {json,leesBody,gebruiker,wisCookie,AI_LIMIET,aiDag} from './account-worke
 const ANTHROPIC='https://api.anthropic.com/v1/messages';
 // standaard hetzelfde model als de app (app/08-ai.js) voor anthropic gebruikt
 export const AI_MODEL_STANDAARD='claude-sonnet-4-6';
-const MAX_AI_BODY=6*1024*1024, MAX_TOKENS=4000, MAX_BERICHTEN=60;
+const MAX_AI_BODY=6*1024*1024, MAX_TOKENS=4000, MAX_BERICHTEN=60, MAX_TEKST=200000, MAX_BEELDEN=4;
 const HANDLE=/^[a-z0-9_]{3,20}$/;
 const fout=e=>Object.assign(Error(e),{fout:e});
 
@@ -29,23 +29,28 @@ export function aiLijf(body,env){
  mx=Math.min(MAX_TOKENS,mx);
  const m=body.messages;
  if(!Array.isArray(m)||!m.length||m.length>MAX_BERICHTEN)throw fout('vorm');
+ // alle tekst bij elkaar (berichten en system) max 200.000 tekens, en max 4 foto's per vraag
+ let tekens=0,beelden=0;
+ const tel=t=>{tekens+=t.length;if(tekens>MAX_TEKST)throw fout('groot');return t;};
  const messages=m.map(x=>{
   if(!x||typeof x!=='object'||!['user','assistant'].includes(x.role))throw fout('vorm');
-  if(typeof x.content==='string')return {role:x.role,content:x.content};
+  if(typeof x.content==='string')return {role:x.role,content:tel(x.content)};
   if(!Array.isArray(x.content)||!x.content.length||x.content.length>40)throw fout('vorm');
   return {role:x.role,content:x.content.map(c=>{
-   if(c&&c.type==='text'&&typeof c.text==='string')return {type:'text',text:c.text};
-   if(c&&c.type==='image'&&c.source&&c.source.type==='base64'&&/^image\/(jpeg|png|webp|gif)$/.test(c.source.media_type)&&typeof c.source.data==='string')
+   if(c&&c.type==='text'&&typeof c.text==='string')return {type:'text',text:tel(c.text)};
+   if(c&&c.type==='image'&&c.source&&c.source.type==='base64'&&/^image\/(jpeg|png|webp|gif)$/.test(c.source.media_type)&&typeof c.source.data==='string'){
+    if(++beelden>MAX_BEELDEN)throw fout('groot');
     return {type:'image',source:{type:'base64',media_type:c.source.media_type,data:c.source.data}};
+   }
    throw fout('vorm');
   })};
  });
  const out={model,max_tokens:mx,messages};
  if(body.stream===true)out.stream=true;
- if(typeof body.system==='string')out.system=body.system;
+ if(typeof body.system==='string')out.system=tel(body.system);
  else if(Array.isArray(body.system)){
   if(!body.system.every(c=>c&&c.type==='text'&&typeof c.text==='string'))throw fout('vorm');
-  out.system=body.system.map(c=>({type:'text',text:c.text}));
+  out.system=body.system.map(c=>({type:'text',text:tel(c.text)}));
  }
  return out;
 }
