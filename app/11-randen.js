@@ -12,6 +12,17 @@
    Laadt na 11 (featOn) en vóór 12; bij het laden draait hier niets.       */
 const RAND_SEL='.sketch,.ws-card,.ws-actions>button,.ws-filters>button,.lp,#page-home .method,.btn-reco,.peak-line';
 let randTimer=null, randSeedTeller=0;
+// ResizeObserver: alleen tekst veranderd (geen nieuw element) maar het kader wel groter of kleiner.
+// randTeken tekent alleen opnieuw als de maat anders is; de svg zelf staat absoluut en verandert
+// de maat niet, dus dit loopt niet rond.
+let randRO=null, randGezien=new WeakSet();
+function randKijk(el){
+  if(!randRO){
+    if(typeof ResizeObserver!=='function')return;
+    randRO=new ResizeObserver(es=>{if(!featOn('drawnedges'))return;for(const e of es)randTeken(e.target);});
+  }
+  if(!randGezien.has(el)){randGezien.add(el);randRO.observe(el);}
+}
 function randRng(seed){let s=(seed>>>0)||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
 function randPass(r,x,y,w,h,R,ver){
   const j=()=>(r()-.5)*2*ver, rr=()=>Math.max(5,Math.min(R+(r()-.5)*R*.5,w/2-2,h/2-2));
@@ -30,6 +41,7 @@ function randPass(r,x,y,w,h,R,ver){
   return p;
 }
 function randTeken(el){
+  randKijk(el);                                         // ook verborgen: tekent zodra hij maat krijgt
   const w=el.offsetWidth,h=el.offsetHeight;
   if(!w||!h||!el.getClientRects().length)return;       // verborgen: later
   const maat=w+'x'+h, oud=el.querySelector(':scope>svg.rand-svg');
@@ -59,6 +71,7 @@ function randAlles(){
   if(!aan){
     document.querySelectorAll('svg.rand-svg').forEach(s=>s.remove());
     document.querySelectorAll('.rand-on').forEach(el=>{el.classList.remove('rand-on');delete el.dataset.randMaat;});
+    if(randRO){randRO.disconnect();randRO=null;randGezien=new WeakSet();}
     return;
   }
   document.querySelectorAll(RAND_SEL).forEach(randTeken);

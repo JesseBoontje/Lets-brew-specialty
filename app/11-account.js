@@ -237,20 +237,25 @@ const ACCT_PRIVACY='<b>what is online:</b> a copy of your beans, brews, gear, ow
 function acctRender(){
   const card=document.getElementById('acct-card');if(!card)return;
   const aan=featOn('account');card.style.display=aan?'block':'none';
+  try{renderSetGroot();setWaarden();}catch(e){}
   const body=document.getElementById('acct-body');if(!aan||!body)return;
   const s=state.sync||{};
+  // niet ingelogd: de rij staat open, inloggen is dan het enige wat hier te doen is
+  if(!acctIngelogd())card.classList.add('open');
+  // de vlag gaat uit met een knop onderaan (hij staat niet meer in de lijst met functies)
+  const uit='<button class="profile-btn acct-uit" onclick="toggleFeature(\'account\')">turn off account &amp; sync</button>';
   if(acctIngelogd()){
     body.innerHTML='<div class="acct-wie">signed in as <b class="hand">'+esc(s.user.handle)+'</b></div>'+
       '<div class="set-d" id="acct-status">last sync: '+esc(acctWanneer(s.last))+(acctMelding?' · '+esc(acctMelding):'')+'</div>'+
       '<button class="profile-btn acct-hoofd" id="acct-sync" onclick="acctSync(true)"'+(acctBezig?' disabled':'')+'>sync now</button>'+
       '<div class="set-d acct-privacy">'+ACCT_PRIVACY+'</div>'+
       '<button class="profile-btn" onclick="acctLogout()">sign out on this phone</button>'+
-      '<button class="profile-btn acct-wis" id="acct-wis" onclick="acctWis()">delete account and everything online</button>';
+      '<button class="profile-btn acct-wis" id="acct-wis" onclick="acctWis()">delete account and everything online</button>'+uit;
     return;
   }
   if(s.later&&!acctNieuw){
     body.innerHTML='<div class="set-d">not signed in. Everything stays on this phone.</div>'+
-      '<button class="profile-btn" onclick="acctSync0().later=false;acctRender()">sign in with Face ID</button>';
+      '<button class="profile-btn" onclick="acctSync0().later=false;acctRender()">sign in with Face ID</button>'+uit;
     return;
   }
   body.innerHTML='<div class="set-d" style="margin:2px 0 10px">Keep your beans and brews safe, on every device.</div>'+
@@ -262,7 +267,7 @@ function acctRender(){
     '<button class="profile-btn acct-later" onclick="acctNieuw=false;acctLater()">not now, keep it on this phone</button>'+
     (acctMelding?'<div class="set-d">'+esc(acctMelding)+'</div>':'')+
     '<div class="set-d" style="font-size:14px">No password. Your iPhone keeps the key in iCloud Keychain.</div>'+
-    '<div class="set-d acct-privacy">'+ACCT_PRIVACY+'</div>';
+    '<div class="set-d acct-privacy">'+ACCT_PRIVACY+'</div>'+uit;
 }
 /* bij openen: vingerafdrukken vastleggen en, als je ingelogd bent, meteen syncen */
 function acctStart(){

@@ -54,7 +54,7 @@ test('two accounts: ask, accept, feed shows the brew and photo, try fills recipe
  expect(env.DB.db.prepare("SELECT photo_key FROM records WHERE id='sbean'").get().photo_key).toMatch(/^sanne_{17}\./);
 
  // jesse: profielkaart, zoeken en volgverzoek
- await pJ.evaluate(()=>go('profile'));
+ await pJ.evaluate(()=>{go('profile');setToon('volg-card');});
  const kaart=pJ.locator('#volg-card');
  await expect(kaart).toBeVisible();
  await expect(kaart).toContainText('@jesse');
@@ -65,7 +65,7 @@ test('two accounts: ask, accept, feed shows the brew and photo, try fills recipe
  await expect(kaart).toContainText('requested');
 
  // sanne accepteert
- await pS.evaluate(()=>go('profile'));
+ await pS.evaluate(()=>{go('profile');setToon('volg-card');});
  const kaartS=pS.locator('#volg-card');
  await expect(kaartS).toContainText('follow requests');
  await kaartS.getByRole('button',{name:'accept'}).click();

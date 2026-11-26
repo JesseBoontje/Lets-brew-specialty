@@ -282,7 +282,7 @@ function beanCardHTML(b){
     <div class="brow">
       <div class="bean-head" onclick="toggleBeanCard('${b.id}')"><div class="bn hand">${esc(b.name)}</div><span class="bchev">▾</span></div>
       <div class="brow-btns">
-        <button class="icon-btn" title="send this bean" onclick="shareOneBean('${b.id}')">${ICO.send}</button>
+        <button class="icon-btn" title="share this bean" onclick="deelOpen('bean','${b.id}')">${ICO.send}</button>
         <button class="icon-btn" title="edit" onclick="editBean('${b.id}')">${ICO.edit}</button>
         <button class="icon-btn" title="delete" onclick="delBean('${b.id}')">${ICO.del}</button>
       </div></div>

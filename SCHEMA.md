@@ -418,6 +418,10 @@ ElevenLabs-lijst (`scc_el_voice`, de stem-id, en `scc_el_voice_naam`) en of de
 stappen hardop gaan (`scc_gc_stem`, gedeeld door gietcoach, AeroPress-coach en
 shot clock).
 
+Ook alleen voor dit toestel: wanneer je voor het laatst een back-up maakte
+(`scc_last_backup`, ms sinds 1970), voor de regel "last: today" bij
+Settings › your data › back-up & restore.
+
 Hetzelfde geldt voor de AI-teller onder `state.ai`. Die houdt per maand bij wat
 de app zelf aan Claude uitgaf — `{budget, maand, dagen:{dag:dollars},
 bron:{"aanbieder:naam":{n,d}}, gemeld:{p20,p10}}`, waarbij `budget` het plafond in dollars is

@@ -70,9 +70,8 @@ function openDetail(id){
     <div class="detail-actions sketch soft">
       <button class="act" onclick="delBrew('${id}')"><span class="ic">${ICO.del}</span>delete</button>
       <button class="act primary hand" onclick="brewAgain('${id}')">brew again</button>
-      <button class="act" onclick="shareOneBrew('${id}')"><span class="ic">${ICO.send}</span>send</button>
+      <button class="act" onclick="deelOpen('brew','${id}')"><span class="ic">${ICO.send}</span>share</button>
       <button class="act" onclick="shareBrew('${id}')"><span class="ic">${ICO.chat}</span>text</button>
-      <button class="act" onclick="printBrew('${id}')"><span class="ic"><svg viewBox="0 0 24 24" class="acic"><path d="M6.9 9.4 Q6.8 4.9 7.2 4.2 Q12 3.8 16.8 4.3 Q17.2 8.2 17.1 9.4 M5.4 9.5 Q4.1 9.1 4.3 11 Q4.1 14.6 4.5 16.6 Q6.1 16.8 8.2 16.6 M18.6 9.5 Q19.9 9.1 19.7 11 Q19.9 14.6 19.5 16.6 Q17.9 16.8 15.8 16.6 M7.3 13.3 Q12 12.8 16.9 13.4 M16.6 13.1 Q16.9 17 16.8 20.3 M17 19.9 Q12 20.6 7.1 20.1 M7.4 20.4 Q7 16.9 7.2 13"/></svg></span>PDF</button>
       ${featOn('sharecards')?`<button class="act" onclick="shareCard('${id}')"><span class="ic"><svg viewBox="0 0 24 24" class="acic"><path d="M4.3 6.2 Q12 5.8 19.8 6.5 M19.5 6.1 Q20.1 12 19.6 17.9 M19.8 17.6 Q12 18.2 4.2 17.6 M4.5 17.9 Q3.8 12 4.4 6"/><path d="M6.8 10 Q9.5 9.6 12.2 10.2 M6.8 13.5 Q10 13.1 13.2 13.7" opacity="0.6"/><path d="M18 11 Q18.5 12.4 17 13 Q15.5 12.8 15.6 11.3 Q16.1 10.2 17.5 10.5" opacity="0.7"/></svg></span>card</button>`:''}
     </div>`;
   go('detail');
@@ -338,12 +337,7 @@ function runPrint(html){
   window.addEventListener('afterprint',after);
   setTimeout(()=>window.print(),60);
 }
-function printBrew(id){
-  const b=state.brews.find(x=>x.id===id);if(!b)return;
-  const html='<div class="p-h1">'+pesc((b.title&&b.title.trim())?b.title:(methodById(b.method)?.name||'brew'))+'</div>'+
-    '<div class="p-sub">lets brew specialty — brew recipe</div>'+brewSheetHTML(b);
-  runPrint(html);
-}
+// één brew als PDF: zie deelPdf in app/06-delen.js
 function printLogbook(){
   if(!state.brews.length){toast('no brews to save yet');return;}
   const brews=[...state.brews].sort((a,b)=>(b.ts||0)-(a.ts||0));

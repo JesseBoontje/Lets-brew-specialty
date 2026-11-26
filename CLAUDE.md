@@ -11,10 +11,11 @@ werk/overdracht.md.
   gebruiken. Een nieuw bestand ook toevoegen aan index.html en service-worker.js.
   - 01 kennis (zetgidsen, maalstand, recepten, iconen) · 02 opslag (IndexedDB)
   - 03 navigatie en home · 04 brew-formulier, gietcoach, recepten
-  - 05 espresso dial-in · 06 detail, print, methodes en gear
+  - 05 espresso dial-in · 06 detail, print, methodes en gear (06-delen brew/boon delen als pagina of PDF)
   - 07 bonen · 08 AI · 09 leren, latte art, cupping, delen
   - 10 bonenkeuzehulp en kaart · 11 profiel, instellingen, budget, export
-    (11-account account en sync, 11-volgen profiel, volgen en feed, 11-beheer accounts-beheer en Lets Brew AI)
+    (11-account account en sync, 11-volgen profiel, volgen en feed, 11-beheer accounts-beheer en Lets Brew AI,
+    11-instellingen indeling van Settings: grote kaart, functies per onderwerp)
   - 12 hulpfuncties en het starten van de app (moet als laatste)
 - `security.js`, `brew-model.js`, `brew-workspace.js`, `brew-voice.js` losse modules.
   `brew-stem.js` stem voor de coaches (ElevenLabs met eigen sleutel, anders telefoonstem).

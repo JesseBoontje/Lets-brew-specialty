@@ -1780,3 +1780,37 @@ html.randen .sketch.rand-on{filter:none;}
 #beheer-card .bh-reden{color:var(--ink);font-size:15px;overflow-wrap:anywhere;}
 #beheer-card .bh-melding .volg-acties{justify-content:flex-end;}
 #beheer-card .volg-k.bh-blok{border-style:dashed;}
+
+/* Settings per onderwerp (app/11-instellingen.js, opzet 26-11) */
+#page-profile .sect{margin:20px 2px 8px;}
+#page-profile .sect .hand{font-size:24px;}
+.set-groot{background:var(--ink);color:var(--paper);border-radius:24px;padding:14px 18px 15px;margin:0 0 4px;cursor:pointer;}
+.set-groot.sketch{--sketch-stroke:var(--ink);}
+/* potloodlijnen op de donkere kaart: licht, anders vallen ze weg tegen de inkt */
+.set-groot>.rand-svg{stroke:var(--paper);opacity:.65;}
+.set-groot b{font-family:'Caveat',cursive;font-weight:700;font-size:32px;display:block;line-height:1;}
+.set-groot>span{display:block;font-size:15px;line-height:1.35;opacity:.88;margin-top:3px;}
+.set-groot .rij2{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+.set-groot .pil{border:1.5px solid var(--paper);border-radius:12px;padding:2px 10px;font-size:14px;}
+.set-groot .groot-knop{background:var(--paper);color:var(--ink);font:inherit;font-size:15px;border:none;border-radius:14px;padding:5px 13px;cursor:pointer;}
+.set-rij{padding:11px 16px;margin-bottom:9px;}
+.set-rij .set-t{font-size:22px;}
+.set-rij .adv-head{gap:8px;min-height:30px;}
+.set-rij .rij-w{margin-left:auto;font-size:14px;color:var(--ink-soft);white-space:nowrap;}
+.set-rij .rij-w:empty{display:none;}
+.set-rij.open>.adv-body{padding-top:4px;}
+.set-rij .set-row{gap:10px;}
+.set-deel{border-top:1.5px dashed var(--line);margin-top:12px;padding-top:2px;}
+.set-deel:first-child{border-top:none;margin-top:0;}
+.set-sub{font-size:21px;margin:10px 0 2px;}
+.feat-plek:empty{display:none;}
+/* Home met volgen en feed aan: Learn als kaart, en een rustige regel bij een volgverzoek */
+.home-leer{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:var(--ink);font:inherit;
+  padding:12px 16px;margin:0 0 14px;cursor:pointer;}
+.home-leer .navic{width:34px;height:34px;flex:none;}
+.home-leer .hl-t{flex:1;display:flex;flex-direction:column;}
+.home-leer .hl-t .hand{font-size:25px;line-height:1;}
+.home-leer .hl-d{font-size:14.5px;color:var(--ink-soft);}
+.home-leer .g-arr{color:var(--ink-soft);font-size:20px;}
+#volg-melding svg{stroke:var(--ink-soft);}
+#volg-melding b{font-weight:400;font-family:'Caveat',cursive;font-size:19px;}
