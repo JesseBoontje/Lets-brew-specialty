@@ -1,5 +1,6 @@
 import {VOICE_TOOLS,VOICE_INSTRUCTIONS} from './voice-contract.mjs';
 import {accountRoute} from './account-worker.mjs';
+import {socialRoute} from './social-worker.mjs';
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000'}});
 export async function realtimeSession(request,env={}){
  if(request.method!=='POST')return json({error:'Alleen POST is toegestaan.'},405);
@@ -118,6 +119,7 @@ export default{async fetch(request,env){
  if(path.startsWith('/api/stem/'))return stemRoute(request,env);
  if(path==='/api/pagina')return paginaRoute(request,env);
  if(path.startsWith('/api/auth/')||path==='/api/sync'||path==='/api/account')return accountRoute(request,env);
+ if(path.startsWith('/api/social/')||path==='/api/foto'||path.startsWith('/api/foto/'))return socialRoute(request,env);
  if(path.startsWith('/api/'))return json({error:'Niet gevonden.'},404);
  const response=await env.ASSETS.fetch(request),headers=new Headers(response.headers);
  headers.set('X-Content-Type-Options','nosniff');headers.set('X-Frame-Options','DENY');headers.set('Referrer-Policy','strict-origin-when-cross-origin');

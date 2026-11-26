@@ -9,7 +9,7 @@ const KINDS=['bean','brew','gear','recipe','dial'];
 const MAX_RECORD=64*1024, MAX_CHANGES=500, MAX_SYNC_BODY=10*1024*1024, MAX_PULL=500, MAX_RECORDS=5000;
 const enc=new TextEncoder(), dec=new TextDecoder();
 const HEADERS={'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000'};
-const json=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{...HEADERS,...extra}});
+export const json=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{...HEADERS,...extra}});
 
 /* ---------- kleine hulpjes ---------- */
 const fout=e=>Object.assign(Error(e),{fout:e});
@@ -87,7 +87,7 @@ async function controleerHandtekening(coseBytes,sig,data){
 }
 
 /* ---------- verzoek ---------- */
-async function leesBody(request,max){
+export async function leesBody(request,max){
  const reader=request.body?.getReader();if(!reader)return {};
  const delen=[];let size=0;
  while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>max){await reader.cancel();throw fout('groot');}delen.push(value);}
@@ -101,9 +101,9 @@ function cookie(request,naam){
  return '';
 }
 const sessieCookie=token=>`lb_s=${token}; HttpOnly; Secure; SameSite=Strict; Path=/api/; Max-Age=${SESSIE_DAGEN*86400}`;
-const wisCookie='lb_s=; HttpOnly; Secure; SameSite=Strict; Path=/api/; Max-Age=0';
+export const wisCookie='lb_s=; HttpOnly; Secure; SameSite=Strict; Path=/api/; Max-Age=0';
 
-async function gebruiker(request,env){
+export async function gebruiker(request,env){
  const token=cookie(request,'lb_s');
  if(!/^[A-Za-z0-9_-]{43}$/.test(token))return null;
  const row=await env.DB.prepare('SELECT u.id,u.handle,u.visibility,s.expires_at FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=?').bind(hex(await sha256(token))).first();
@@ -244,13 +244,19 @@ async function sync(request,env,user,body){
     slaat dat over (zelfde updatedAt). */
  let verloren=[];
  if(schrijf.length){
+  // foto's van records die nu gewist worden: na het schrijven ook uit R2 (stap 2)
+  const fotoWeg=[];
+  for(const {c,deleted} of schrijf)if(deleted){const r=await env.DB.prepare('SELECT photo_key FROM records WHERE user_id=? AND kind=? AND id=? AND photo_key IS NOT NULL').bind(user.id,c.kind,c.id).first();if(r)fotoWeg.push({c,key:r.photo_key});}
   const stmts=schrijf.map(({c,deleted,data})=>env.DB.prepare(
    `INSERT INTO records(user_id,kind,id,data,shareable,updated_at,deleted,synced_at)
     VALUES(?,?,?,?,0,?,?,(SELECT COALESCE(MAX(synced_at),0)+1 FROM records WHERE user_id=?))
-    ON CONFLICT(user_id,kind,id) DO UPDATE SET data=excluded.data,updated_at=excluded.updated_at,deleted=excluded.deleted,synced_at=excluded.synced_at
+    ON CONFLICT(user_id,kind,id) DO UPDATE SET data=excluded.data,updated_at=excluded.updated_at,deleted=excluded.deleted,synced_at=excluded.synced_at,
+     photo_key=CASE WHEN excluded.deleted=1 THEN NULL ELSE records.photo_key END
     WHERE excluded.updated_at>=records.updated_at`).bind(user.id,c.kind,c.id,deleted?null:data,c.updatedAt,deleted?1:0,user.id));
   const res=await env.DB.batch(stmts);
   verloren=schrijf.filter((_,i)=>!(res[i]?.meta?.changes));
+  const weg=fotoWeg.filter(f=>!verloren.some(v=>v.c===f.c)).map(f=>'foto/'+f.key);
+  if(weg.length&&env.FOTOS)await env.FOTOS.delete(weg);
  }
  const rows=(await env.DB.prepare('SELECT kind,id,data,updated_at,deleted,synced_at FROM records WHERE user_id=? AND synced_at>? ORDER BY synced_at LIMIT ?').bind(user.id,since,MAX_PULL+1).all()).results||[];
  const more=rows.length>MAX_PULL;if(more)rows.length=MAX_PULL;
@@ -266,6 +272,10 @@ async function sync(request,env,user,body){
 }
 async function wisAccount(env,user){
  const u=user.id;
+ if(env.FOTOS){
+  const f=(await env.DB.prepare('SELECT photo_key FROM records WHERE user_id=? AND photo_key IS NOT NULL').bind(u).all()).results||[];
+  for(let i=0;i<f.length;i+=500)await env.FOTOS.delete(f.slice(i,i+500).map(x=>'foto/'+x.photo_key));
+ }
  await env.DB.batch([
   env.DB.prepare('DELETE FROM records WHERE user_id=?').bind(u),
   env.DB.prepare('DELETE FROM passkeys WHERE user_id=?').bind(u),
