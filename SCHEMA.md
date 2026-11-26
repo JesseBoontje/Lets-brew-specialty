@@ -222,6 +222,56 @@ ooit ingevuld — het volledige bereik van die molen, in wat voor eenheid hij
 ook gebruikt (klikken, een schaal 1–100, noem het). Zonder opgegeven bereik
 zijn beide `null`.
 
+## Account en sync (vlag `account`, stap 1)
+
+Een account is optioneel en staat standaard uit (*profile → features → account &
+sync*). Zonder account verandert er niets: alles blijft op de telefoon.
+
+### `updatedAt` en tombstones
+
+- Elke bean, brew, gear en eigen recept krijgt bij elk opslaan waarin hij
+  veranderde een `updatedAt` (ms sinds 1970, klok van de telefoon). De app ziet
+  zelf welke records veranderden (vingerafdruk per record in `save()`), dus elk
+  scherm doet mee zonder eigen code. Dat stempelen loopt altijd, ook zonder
+  account, zodat een later account niets mist.
+- De dial-in-pogingen (`dialLog`) zijn lijsten zonder eigen veld; hun tijd staat
+  in `sync.dialAt["<beanId>--<methodId>"]`.
+- Bestaande data zonder `updatedAt` krijgt bij de eerste sync zijn eigen tijd
+  (`ts` of `at`), anders het moment van syncen.
+- Wat je wist terwijl je ingelogd bent, komt als tombstone in `sync.tomb`:
+  `{kind, id, at}`. Na een geslaagde sync verdwijnt de tombstone weer.
+
+### `sync` (intern, in de back-up)
+
+```json
+{ "user":{"handle":"jesse","visibility":"private"}, "lastHandle":"jesse",
+  "since":1764150000000000, "sentUpTo":1764150000000, "last":1764150000000,
+  "tomb":[{"kind":"brew","id":"abc1234","at":1764150000000}],
+  "dialAt":{"abc1234--espresso":1764150000000}, "later":false }
+```
+
+`user` is `null` als je niet (meer) ingelogd bent. `since` is de servertijd van
+de vorige sync (in microseconden), `sentUpTo` de telefoontijd tot waar alles al
+online staat. `later` onthoudt "not now, keep it on this phone". De sessie zelf
+zit in een HttpOnly-cookie (`lb_s`) en is voor de app onzichtbaar.
+
+### Wat online staat
+
+Cloudflare D1 (EU), tabel `records`: per gebruiker `(kind, id)` met
+`kind` = `bean` | `brew` | `gear` | `recipe` | `dial` en `data` = het record zoals
+de telefoon het heeft, zonder `data:`-foto's (die blijven voorlopig op de
+telefoon; bij binnenkomst zet de app de eigen foto terug). Max 64 KB per record.
+Een `dial`-record is `{key:"<beanId>|<methodId>", attempts:[…]}`. Merge per record
+op `updatedAt`: de nieuwste wint, op de server en op de telefoon. Prijs en eigen
+notities gaan wel mee naar je eigen online kopie, maar worden nooit aan anderen
+getoond. *delete account and everything online* wist alles van je account in één
+keer; de telefoon houdt zijn eigen kopie.
+
+Routes (alleen voor de app zelf, `Origin` moet kloppen): `/api/auth/register/*`,
+`/api/auth/login/*`, `/api/auth/logout`, `/api/auth/me`, `POST /api/sync`
+`{since, changes:[{kind,id,data,updatedAt,deleted}]}` → `{now, more, changes,
+rejected}`, en `DELETE /api/account`.
+
 ## Waar de maalstand vandaan komt
 
 `grind` en `dials[].grind` zijn vrije tekst, met opzet. De ene molen heeft

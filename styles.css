@@ -1695,3 +1695,14 @@ html.randen .sketch.rand-on{filter:none;}
 /* Brews-tab: my brews / brew ideas, even breed */
 .brews-kant{margin:4px 0 14px;}
 .brews-kant button{flex:1;}
+
+/* account & sync (vlag account) */
+#acct-card .acct-wie{font-size:17px;margin:6px 0 2px;}
+#acct-card .acct-wie b{font-size:24px;}
+#acct-card .profile-btn{color:var(--ink);font:inherit;font-family:'Caveat',cursive;font-weight:700;font-size:21px;}
+#acct-card .profile-btn.acct-hoofd{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--cream);margin-top:10px;}
+#acct-card .profile-btn.acct-later{background:var(--paper);font-family:'Patrick Hand',cursive;font-weight:400;font-size:17px;}
+#acct-card .profile-btn.acct-wis{background:var(--paper);border-style:dashed;font-family:'Patrick Hand',cursive;font-weight:400;font-size:17px;}
+#acct-card .profile-btn:disabled{opacity:.6;}
+#acct-card .acct-privacy{font-size:14px;margin:8px 0 12px;border-top:1.5px dashed var(--line);padding-top:10px;}
+#acct-card .acct-privacy b{color:var(--ink);font-weight:400;}
