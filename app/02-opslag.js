@@ -152,5 +152,13 @@ function demoBeans(){return [
 ];}
 function uid(){return Math.random().toString(36).slice(2,9);}
 function beanById(id){return state.beans.find(b=>b.id===id);}
-function methodById(id){return state.methods.find(m=>m.id===id)||{name:id,glyph:'☕',tint:'--card'};}
+/* een brew kan een methode noemen die niet (meer) in state.methods staat: een
+   gesyncte brew van een ander toestel, of een oude state. Dan de standaardmethode
+   met die id (met tekening en kleur), anders een neutrale met een passende standaardtekening. */
+function methodById(id){
+  const m=state.methods.find(x=>x.id===id);if(m)return m;
+  const d=DEFAULT_METHODS.find(x=>x.id===id);if(d)return {...d,on:false};
+  const fam=typeof id==='string'&&/espresso/i.test(id)?'espresso':'filter';
+  return {id,name:id,glyph:'☕',tint:'--card',img:fam==='espresso'?'m-espresso.png':'m-v60.png'};
+}
 

@@ -464,15 +464,46 @@ function saveKey(){
    je uit je eigen ElevenLabs-lijst; de app verzint geen stem-id.            */
 function renderStem(){
   const st=BrewStem.stand(),el=document.getElementById('stem-status');if(!el)return;
+  const lb=st.bron==='letsbrew';
+  // met Lets Brew AI voor dit account eerst de keuze: de stem van de app, of je eigen sleutel
+  const bw=document.getElementById('stem-bron-wrap'),eigen=document.getElementById('stem-eigen');
+  if(bw)bw.innerHTML=st.lb?'<div class="aib-chips lb-keus" role="group" aria-label="whose voice">'+
+      '<button class="lp'+(lb?' sel':'')+'" id="stem-kies-lb" onclick="stemBron(\'letsbrew\')">Lets Brew voice</button>'+
+      '<button class="lp'+(lb?'':' sel')+'" id="stem-kies-eigen" onclick="stemBron(\'eigen\')">own key</button></div>'+
+      (lb?'<div class="set-d" style="margin:6px 0 8px">no key needed: the voice runs on the Lets Brew server, up to 300 lines a day. load the voices to pick one, or keep the house voice.</div>':''):'';
+  if(eigen)eigen.classList.toggle('hidden',lb);
+  const lk=document.getElementById('stem-laad');if(lk)lk.textContent=lb?'load the voices':'load my voices';
   const sel=document.getElementById('stem-kies');
+  // zonder standaardstem op de server is er geen "house voice": dan moet je er een kiezen
+  const leegTekst=lb?(st.standaard?'— house voice —':'— pick a voice —'):'— pick one of your voices —';
+  if(sel&&sel.dataset.bron!==st.bron){
+    // andere lijst: de stemmen van de server horen niet bij je eigen account
+    sel.textContent='';const o=document.createElement('option');o.value='';
+    o.textContent=leegTekst;sel.appendChild(o);sel.dataset.bron=st.bron;
+  }
+  if(sel&&sel.options[0]&&sel.options[0].value==='')sel.options[0].textContent=leegTekst;
   if(sel&&st.stem&&!Array.from(sel.options).some(o=>o.value===st.stem)){
     const o=document.createElement('option');o.value=st.stem;o.textContent=st.naam||'your chosen voice';sel.appendChild(o);
   }
   if(sel)sel.value=st.stem||'';
+  if(lb){
+    el.textContent=st.lbUit==='limit'?'today’s Lets Brew voice lines are used up — phone voice until midnight.'
+      :st.lbUit==='not_set_up'?'the Lets Brew voice is not set up yet — the coaches use the phone voice.'
+      :st.lbUit==='400'?'pick a voice from the list first — until then: phone voice.'
+      :st.lbUit?'the Lets Brew voice is not available right now — phone voice.'
+      :(!st.stem&&!st.standaard)?'load the voices and pick one.'
+      :'Lets Brew voice on'+(st.naam?': '+st.naam:'')+'.';
+    return;
+  }
   el.textContent=st.actief?('ElevenLabs voice on: '+(st.naam||'your chosen voice')+'.')
     :st.afgewezen?'ElevenLabs refused this key — the coaches use the phone voice.'
     :!st.sleutel?(st.stem?'voice '+(st.naam||'chosen')+' is remembered; paste your key in this tab to use it. until then: phone voice.':'no key — the coaches use the phone voice.')
     :'key in this tab — load your voices and pick one. until then: phone voice.';
+}
+function stemBron(v){
+  if(!BrewStem.kiesBron(v))return;
+  renderStem();try{setWaarden();}catch(e){}
+  toast(v==='letsbrew'?'Lets Brew voice — no key needed':'own ElevenLabs key');
 }
 function stemSleutel(){
   const i=document.getElementById('stem-key'),v=i.value.trim();
@@ -482,12 +513,13 @@ function stemSleutel(){
 }
 async function stemLaad(){
   const el=document.getElementById('stem-status');
-  if(!BrewStem.stand().sleutel){toast('paste your ElevenLabs key first');return;}
-  el.textContent='loading your voices…';
+  const st0=BrewStem.stand(),lb=st0.bron==='letsbrew';
+  if(!lb&&!st0.sleutel){toast('paste your ElevenLabs key first');return;}
+  el.textContent=lb?'loading the voices…':'loading your voices…';
   try{
     const lijst=await BrewStem.stemmen(),sel=document.getElementById('stem-kies');
     sel.textContent='';
-    const leeg=document.createElement('option');leeg.value='';leeg.textContent=lijst.length?'— pick one of your voices —':'— no voices in your account —';sel.appendChild(leeg);
+    const leeg=document.createElement('option');leeg.value='';leeg.textContent=lb?(BrewStem.stand().standaard?'— house voice —':'— pick a voice —'):lijst.length?'— pick one of your voices —':'— no voices in your account —';sel.appendChild(leeg);sel.dataset.bron=st0.bron;
     lijst.forEach(v=>{const o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.category?' · '+v.category:'');o.dataset.naam=v.name;sel.appendChild(o);});
     renderStem();
     if(lijst.length)toast('✓ '+lijst.length+' voices — pick one');
@@ -987,37 +1019,4 @@ function importData(ev){
   r.readAsText(file);
 }
 
-/* ---------------- wat is er nieuw ---------------- */
-const NIEUWS=[
-  ['pour coach','filterrecepten lopen mee met de klok'],
-  ['zeven recepten','Hoffmann, 4:6, Rao en meer, op jouw dose'],
-  ['filterkompas','wat je proefde \u2192 \u00e9\u00e9n vervolgstap'],
-  ['doorlooptijd','plus hoe het bed erbij lag'],
-  ['waterkaart','reken je eigen recept uit'],
-  ['filter skills','een eigen leerspoor bij learn'],
-];
-function toonNieuws(){
-  const el=document.getElementById('wn-list');if(!el)return;
-  const bolletje='<svg viewBox="0 0 16 16"><path d="M12.6 5.2 C14 8.6 11.4 12.6 7.6 12 C3.6 11 3 6 6 3.6 C8.6 1.8 12 3.4 12.8 6.4"/></svg>';
-  el.innerHTML=NIEUWS.map(([k,t])=>
-    `<div class="wn-i">${bolletje}<span><b>${esc(k)}</b> — ${esc(t)}</span></div>`).join('');
-  const p=document.getElementById('whatsnew');
-  p.classList.add('on');p.setAttribute('aria-hidden','false');
-}
-function sluitNieuws(){
-  const p=document.getElementById('whatsnew');if(!p)return;
-  p.classList.remove('on');p.setAttribute('aria-hidden','true');
-  try{localStorage.setItem('scc_seen_version',APP_VERSION);}catch(e){}
-}
-/* Alleen tonen aan wie de vorige versie al draaide. Een verse installatie
-   krijgt niets te zien — die heeft immers niets gemist. */
-function nieuwsMisschien(){
-  let seen=null;
-  try{seen=localStorage.getItem('scc_seen_version');}catch(e){}
-  if(seen===APP_VERSION)return;
-  if(!seen && !hadOpgeslagenData){
-    try{localStorage.setItem('scc_seen_version',APP_VERSION);}catch(e){}
-    return;
-  }
-  setTimeout(toonNieuws,900);
-}
+/* het blok "wat is er nieuw" is weg (26-11, op verzoek): het mag niet meer verschijnen */

@@ -91,7 +91,7 @@ function setWaarden(){
   zet('week-w',featOn('tastememory')?'':'off');
   zet('ai-w',aiEnabled()?aiAanbieder().naam:'off');
   let st=null;try{st=BrewStem.stand();}catch(e){}
-  zet('stem-w',st&&st.actief?'ElevenLabs':'phone');
+  zet('stem-w',st&&st.actief?(st.bron==='letsbrew'?'Lets Brew voice':'ElevenLabs'):'phone');
   zet('shortcut-w',featOn('shortcuts')?'':'off');
   zet('backup-w',setLaatsteBackup());
 }

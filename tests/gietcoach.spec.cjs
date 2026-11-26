@@ -19,7 +19,7 @@ test('V60: countdown, steps follow the clock, next step shifts the rest, done fi
  await page.locator('#pc-btn').tap();
  const coach=page.locator('#gietcoach');
  await expect(coach).toBeVisible();
- await expect(page.locator('#gc-naam')).toHaveText('Hoffmann V60');
+ await expect(page.locator('#gc-naam')).toHaveText('two-pour V60');
  await expect(page.locator('#gc-r-nu')).toContainText('bloom');
  await expect(page.locator('#gc-r-nu')).toContainText('30 g');
  await expect(page.locator('#gc-r-volg')).toContainText('swirl');
@@ -78,7 +78,7 @@ test('V60: countdown, steps follow the clock, next step shifts the rest, done fi
 test('Switch: valve closed until the drawdown, then open; closing mid-brew asks first',async({page})=>{
  await open(page,'switch');
  await page.locator('#pc-btn').tap();
- await expect(page.locator('#gc-naam')).toHaveText('Switch hybride');
+ await expect(page.locator('#gc-naam')).toHaveText('Switch hybrid');
  await expect(page.locator('#gc-klep-tag')).toBeVisible();
  await expect(page.locator('#gc-v60-lijn')).toBeHidden();
  await expect(page.locator('#gc-r-vorige')).toContainText('valve closed');

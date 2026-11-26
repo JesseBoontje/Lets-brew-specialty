@@ -330,7 +330,7 @@ function renderSheet(){
     '<button type="button" class="sc-step" aria-label="longer rest" '+(on?'':'disabled')+' data-a="r+">'+PLUS+'</button></div>';
   h+='<div class="sc-op">target: <b>'+mss(p.F)+'</b> of full pressure, good '+mss(p.lo)+'–'+mss(p.hi)+
     (p.on?' · pre-infusion and rest come on top, total about '+mss(p.Tc):'')+'</div>';
-  h+='<div class="sc-row"><div class="sc-rl">steps out loud<small>'+(stem?(BrewStem.stand().actief?'on · ElevenLabs voice':'on · phone voice'):'off')+
+  h+='<div class="sc-row"><div class="sc-rl">steps out loud<small>'+(stem?(BrewStem.stand().actief?(BrewStem.stand().bron==='letsbrew'?'on · Lets Brew voice':'on · ElevenLabs voice'):'on · phone voice'):'off')+
     '</small></div><button type="button" class="sc-tog" aria-label="steps out loud" aria-pressed="'+stem+'" data-a="stem"><span class="knob"></span></button></div>';
   h+='<button type="button" class="sc-btn pri" data-a="sheet-dicht">done</button>';
   $('sheet').innerHTML=h;

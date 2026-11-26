@@ -80,7 +80,7 @@ test('two accounts: ask, accept, feed shows the brew and photo, try fills recipe
  await expect(reel.locator('.feed-kaart').first()).toContainText('Kenya Nyeri, v60');
  await expect(reel.locator('.feed-kaart').first()).toContainText('15 g → 250 g · 93 °C · 3:05 · score 8.5');
  for(const geheim of ['geheime','privé','21.5','22 clicks'])await expect(reel).not.toContainText(geheim);
- const snap=await pJ.evaluate(()=>{const r=document.getElementById('feed-reel'),k=r.querySelector('.feed-plek');return {snap:getComputedStyle(r).scrollSnapType,align:getComputedStyle(k).scrollSnapAlign,h:k.getBoundingClientRect().height,rh:r.clientHeight,bg:getComputedStyle(r.querySelector('.feed-kaart')).backgroundColor,ink:getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()};});
+ const snap=await pJ.evaluate(()=>{const r=document.getElementById('feed-reel'),k=r.querySelector('.feed-plek');return {snap:getComputedStyle(r).scrollSnapType,align:getComputedStyle(k).scrollSnapAlign,h:k.getBoundingClientRect().height,rh:r.clientHeight,bg:getComputedStyle(r.querySelector('.feed-kaart')).backgroundColor,ink:getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()};});
  expect(snap.snap).toContain('y mandatory');expect(snap.align).toContain('start');expect(Math.abs(snap.h-snap.rh)).toBeLessThan(2);
  expect(snap.bg).toBe('rgb('+[1,3,5].map(i=>parseInt(snap.ink.slice(i,i+2),16)).join(', ')+')');
  const img=reel.locator('img.feed-img');
@@ -92,7 +92,7 @@ test('two accounts: ask, accept, feed shows the brew and photo, try fills recipe
  // try: de brew wordt een eigen recept, de boon gaat op de wishlist
  const brewKaart=reel.locator('.feed-kaart',{hasText:'Kenya Nyeri, v60'});
  await brewKaart.getByRole('button',{name:'try'}).click();
- await expect(pJ.locator('#toast')).toContainText('in your recipes');
+ await expect(pJ.locator('#toast')).toContainText('in your brew ideas');
  const rec=await pJ.evaluate(()=>state.recipes.find(r=>r.van==='sanne/brew/sbrew'));
  expect(rec).toMatchObject({eigen:true,mid:'v60',dose:15,ratio:16.7,temp:93,tijd:'3:05'});
  expect(rec.stappen.length).toBeGreaterThan(0);
@@ -146,7 +146,7 @@ test('try on an espresso brew gives a recipe with steps; brew ideas open without
  await page.evaluate(()=>go('feed'));
  const kaart=page.locator('#feed-reel .feed-kaart',{hasText:'Brazil Cerrado'});
  await kaart.getByRole('button',{name:'try'}).click();
- await expect(page.locator('#toast')).toContainText('in your recipes');
+ await expect(page.locator('#toast')).toContainText('in your brew ideas');
  const rec=await page.evaluate(()=>state.recipes.find(r=>r.van==='anna/brew/e1'));
  expect(rec.mid).toBe('espresso');
  expect(rec.stappen.map(x=>x.k)).toEqual(['dose','tamp','shot','stop']);

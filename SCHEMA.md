@@ -395,6 +395,19 @@ uit), en staat er een eigen sleutel in dit tabblad, dan vraagt de app die (reser
 Lets Brew AI telt niet mee in `state.ai` (AI-budget): het kost jou niets.
 De kaart *accounts* in Settings is er alleen voor `admin`.
 
+### Lets Brew voice (`/api/stem/voices`, `/api/stem/zeg`, na live 1)
+
+Stuurt de app geen `Authorization` mee, dan geldt de sessie: ingelogd, niet op slot en
+`ai_allowed=1` (anders 401 / 403 `{code:"not_allowed"}`). De Worker gebruikt dan het secret
+`ELEVENLABS_API_KEY`; ontbreekt dat, dan 503 `{code:"not_set_up"}` en de app praat met de
+telefoonstem. Optioneel `ELEVENLABS_VOICE_ID`: de standaardstem als de app geen `voice_id`
+meestuurt (`/voices` geeft hem terug als `standaard`). Elke zin telt in `ai_usage` met
+`day = "stem:JJJJ-MM-DD"` (Amsterdamse datum, geen migratie), max 300 per dag, in één
+statement (atomair); vol = 429 `{code:"limit"}`, kop `X-Stem-Left`. Mislukt ElevenLabs,
+dan telt de zin niet. Met een eigen sleutel in `Authorization` blijft alles als voorheen en
+telt er niets. De AI-teller van `/api/ai` en `/api/admin/users` kijkt alleen naar de
+gewone datum, dus de stemzinnen tellen daar niet mee.
+
 ## Waar de maalstand vandaan komt
 
 `grind` en `dials[].grind` zijn vrije tekst, met opzet. De ene molen heeft
@@ -414,7 +427,9 @@ actief is staat in `scc_ai_prov`, met daarnaast per aanbieder een modelnaam
 De ElevenLabs-sleutel voor de stem van de coaches staat nergens op schijf: alleen
 in het geheugen van het tabblad (`BrewStem` in `brew-stem.js`). Wel bewaard, in
 `localStorage` en niet in de back-up: de gekozen stem uit je eigen
-ElevenLabs-lijst (`scc_el_voice`, de stem-id, en `scc_el_voice_naam`) en of de
+ElevenLabs-lijst (`scc_el_voice`, de stem-id, en `scc_el_voice_naam`), de stem uit de
+lijst van de server bij Lets Brew voice (`scc_el_voice_lb`, `scc_el_voice_lb_naam`), de keuze
+tussen die twee (`scc_stem_bron`: `letsbrew` of `eigen`) en of de
 stappen hardop gaan (`scc_gc_stem`, gedeeld door gietcoach, AeroPress-coach en
 shot clock).
 

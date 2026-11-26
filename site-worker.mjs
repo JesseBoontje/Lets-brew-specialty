@@ -2,69 +2,115 @@ import {VOICE_TOOLS,VOICE_INSTRUCTIONS} from './voice-contract.mjs';
 import {accountRoute} from './account-worker.mjs';
 import {socialRoute} from './social-worker.mjs';
 import {aiRoute} from './ai-worker.mjs';
-const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000'}});
+import {gebruiker,aiDag} from './account-worker.mjs';
+const json=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{...extra,'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000'}});
 export async function realtimeSession(request,env={}){
- if(request.method!=='POST')return json({error:'Alleen POST is toegestaan.'},405);
- if(request.headers.get('Origin')!==new URL(request.url).origin)return json({error:'Deze aanvraag hoort niet bij de app.'},403);
- if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))return json({error:'JSON vereist.'},415);
+ if(request.method!=='POST')return json({error:'Only POST is allowed.'},405);
+ if(request.headers.get('Origin')!==new URL(request.url).origin)return json({error:'This request does not belong to the app.'},403);
+ if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))return json({error:'JSON required.'},415);
  const key=request.headers.get('Authorization')||'';
- if(!/^Bearer sk-[A-Za-z0-9_-]{20,}$/.test(key))return json({error:'Voer je eigen OpenAI API-sleutel in bij Instellingen → AI.'},401);
- if(env.RATE_LIMITER){const limit=await env.RATE_LIMITER.limit({key:request.headers.get('CF-Connecting-IP')||'unknown'});if(!limit.success)return json({error:'Wacht even voordat je opnieuw een gesprek start.'},429);}
- let config;try{const reader=request.body.getReader();let text='',size=0;const dec=new TextDecoder();while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>4096){await reader.cancel();return json({error:'Aanvraag te groot.'},413);}text+=dec.decode(value,{stream:true});}config=JSON.parse(text);}catch{return json({error:'Ongeldige aanvraag.'},400);}
+ if(!/^Bearer sk-[A-Za-z0-9_-]{20,}$/.test(key))return json({error:'Paste your own OpenAI API key in Settings → AI.'},401);
+ if(env.RATE_LIMITER){const limit=await env.RATE_LIMITER.limit({key:request.headers.get('CF-Connecting-IP')||'unknown'});if(!limit.success)return json({error:'Wait a moment before you start another conversation.'},429);}
+ let config;try{const reader=request.body.getReader();let text='',size=0;const dec=new TextDecoder();while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>4096){await reader.cancel();return json({error:'Request too large.'},413);}text+=dec.decode(value,{stream:true});}config=JSON.parse(text);}catch{return json({error:'Invalid request.'},400);}
  const models=['gpt-realtime','gpt-realtime-2.1','gpt-realtime-mini','gpt-realtime-2.1-mini'];
- if(!models.includes(config?.model))return json({error:'Onbekend spraakmodel.'},400);
+ if(!models.includes(config?.model))return json({error:'Unknown voice model.'},400);
  try{
   const response=await fetch('https://api.openai.com/v1/realtime/client_secrets',{method:'POST',redirect:'error',headers:{Authorization:key,'Content-Type':'application/json'},body:JSON.stringify({expires_after:{anchor:'created_at',seconds:60},session:{type:'realtime',model:config.model,instructions:VOICE_INSTRUCTIONS,tools:VOICE_TOOLS,max_output_tokens:1000,audio:{input:{turn_detection:{type:'server_vad'}},output:{voice:'marin'}}}}),signal:AbortSignal.timeout(20000)});
-  if(!response.ok)return json({error:'OpenAI kon geen spraaksessie starten. Controleer je eigen API-sleutel, modeltoegang en tegoed.',providerStatus:response.status},response.status===429?429:502);
-  const data=await response.json();if(typeof data.value!=='string'||data.value.length>2000)return json({error:'OpenAI gaf geen bruikbare spraaksessie terug.'},502);
+  if(!response.ok)return json({error:'OpenAI could not start a voice session. Check your own API key, model access and credit.',providerStatus:response.status},response.status===429?429:502);
+  const data=await response.json();if(typeof data.value!=='string'||data.value.length>2000)return json({error:'OpenAI returned no usable voice session.'},502);
   return json({value:data.value,expires_at:data.expires_at});
- }catch{return json({error:'De spraakdienst is tijdelijk niet bereikbaar.'},502);}
+ }catch{return json({error:'The voice service is not reachable right now.'},502);}
 }
 
-/* ElevenLabs-stem (eleven_v4): de gebruiker stuurt zijn eigen sleutel mee; de Worker bewaart en logt hem nooit. */
+/* ElevenLabs-stem (eleven_v4). Twee manieren:
+   - eigen sleutel: de app stuurt hem mee (Authorization); de Worker bewaart en logt hem nooit.
+   - Lets Brew voice: geen sleutel mee, wel ingelogd, niet op slot en ai_allowed=1. Dan de
+     sleutel van de server (env.ELEVENLABS_API_KEY) en max STEM_LIMIET zinnen per dag per
+     gebruiker, geteld in ai_usage met dag 'stem:JJJJ-MM-DD' (zelfde tabel als /api/ai, geen
+     migratie). Standaardstem optioneel in env.ELEVENLABS_VOICE_ID. */
 const EL_API='https://api.elevenlabs.io';
 const EL_MODEL='eleven_v4';
+export const STEM_LIMIET=300;
+const STEM_ID=/^[A-Za-z0-9]{10,40}$/;
+export const stemDag=(t=Date.now())=>'stem:'+aiDag(t);
 async function leesJson(request,max){
  const reader=request.body?.getReader();if(!reader)throw Error('leeg');let text='',size=0;const dec=new TextDecoder();
  while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>max){await reader.cancel();const e=Error('groot');e.groot=true;throw e;}text+=dec.decode(value,{stream:true});}
  return JSON.parse(text);
 }
+// één zin erbij, alleen onder de limiet: één statement, dus atomair (zoals /api/ai)
+async function stemTel(env,userId,day){
+ const r=await env.DB.prepare('INSERT INTO ai_usage(user_id,day,count) VALUES(?,?,1) ON CONFLICT(user_id,day) DO UPDATE SET count=count+1 WHERE count<? RETURNING count').bind(userId,day,STEM_LIMIET).first();
+ return r?r.count:null;
+}
+async function stemTerug(env,userId,day){
+ try{await env.DB.prepare('UPDATE ai_usage SET count=count-1 WHERE user_id=? AND day=? AND count>0').bind(userId,day).run();}catch{}
+}
+/* wie betaalt: {key, gebruiker|null} of een Response met de fout */
+async function stemSleutel(request,env){
+ const auth=request.headers.get('Authorization')||'';
+ if(auth){
+  const m=/^Bearer ((?:sk_)?[A-Za-z0-9]{32,128})$/.exec(auth);
+  if(!m)return json({error:'That does not look like an ElevenLabs key.'},401);
+  return {key:m[1],user:null};
+ }
+ if(!env.DB)return json({error:'Paste your own ElevenLabs key in Settings, or sign in for the Lets Brew voice.',code:'no_key'},401);
+ const user=await gebruiker(request,env);
+ if(!user)return json({error:'Sign in for the Lets Brew voice, or use your own key.',code:'sign_in'},401);
+ if(!user.ai_allowed)return json({error:'The Lets Brew voice is not on for this account.',code:'not_allowed'},403);
+ const key=typeof env.ELEVENLABS_API_KEY==='string'?env.ELEVENLABS_API_KEY.trim():'';
+ if(!key)return json({error:'The Lets Brew voice is not set up yet. The app uses the phone voice.',code:'not_set_up'},503);
+ return {key,user};
+}
 export async function stemRoute(request,env={}){
  const url=new URL(request.url),soort=url.pathname==='/api/stem/voices'?'voices':url.pathname==='/api/stem/zeg'?'zeg':null;
- if(!soort)return json({error:'Niet gevonden.'},404);
- if(request.method!=='POST')return json({error:'Alleen POST is toegestaan.'},405);
- if(request.headers.get('Origin')!==url.origin)return json({error:'Deze aanvraag hoort niet bij de app.'},403);
- if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))return json({error:'JSON vereist.'},415);
- const auth=request.headers.get('Authorization')||'';
- const m=/^Bearer ((?:sk_)?[A-Za-z0-9]{32,128})$/.exec(auth);
- if(!m)return json({error:'Vul je eigen ElevenLabs-sleutel in bij Instellingen.'},401);
- const key=m[1];
+ if(!soort)return json({error:'Not found.'},404);
+ if(request.method!=='POST')return json({error:'Only POST is allowed.'},405);
+ if(request.headers.get('Origin')!==url.origin)return json({error:'This request does not belong to the app.'},403);
+ if(!/^application\/json(?:;|$)/i.test(request.headers.get('Content-Type')||''))return json({error:'JSON required.'},415);
+ let wie;
+ try{wie=await stemSleutel(request,env);}catch{return json({error:'Something went wrong on the server.'},500);}
+ if(wie instanceof Response)return wie;
+ const {key,user}=wie;
  const rem=env.STEM_LIMITER||env.RATE_LIMITER;
- if(rem){const limit=await rem.limit({key:'stem:'+(request.headers.get('CF-Connecting-IP')||'unknown')});if(!limit.success)return json({error:'Even wachten: te veel stemverzoeken achter elkaar.'},429);}
- let body;try{body=await leesJson(request,2048);}catch(e){return e.groot?json({error:'Aanvraag te groot.'},413):json({error:'Ongeldige aanvraag.'},400);}
- if(!body||typeof body!=='object'||Array.isArray(body))return json({error:'Ongeldige aanvraag.'},400);
- const fout=status=>status===401||status===403?json({error:'ElevenLabs accepteert deze sleutel niet. Controleer je eigen sleutel.'},401):status===429?json({error:'ElevenLabs remt: te veel verzoeken of tegoed op.'},429):json({error:'ElevenLabs gaf een fout. De app gebruikt de gewone stem.'},502);
+ if(rem){const limit=await rem.limit({key:'stem:'+(user?user.id:(request.headers.get('CF-Connecting-IP')||'unknown'))});if(!limit.success)return json({error:'Wait a moment: too many voice requests in a row.'},429);}
+ let body;try{body=await leesJson(request,2048);}catch(e){return e.groot?json({error:'Request too large.'},413):json({error:'Invalid request.'},400);}
+ if(!body||typeof body!=='object'||Array.isArray(body))return json({error:'Invalid request.'},400);
+ const standaard=user&&typeof env.ELEVENLABS_VOICE_ID==='string'&&STEM_ID.test(env.ELEVENLABS_VOICE_ID.trim())?env.ELEVENLABS_VOICE_ID.trim():'';
+ const fout=status=>status===401||status===403?(user?json({error:'The Lets Brew voice is not available right now. The app uses the phone voice.'},502):json({error:'ElevenLabs does not accept this key. Check your own key.'},401)):status===429?json({error:'ElevenLabs is slowing down: too many requests or no credit left.'},429):json({error:'ElevenLabs gave an error. The app uses the phone voice.'},502);
  try{
   if(soort==='voices'){
-   if(Object.keys(body).length)return json({error:'Ongeldige aanvraag.'},400);
+   if(Object.keys(body).length)return json({error:'Invalid request.'},400);
    const r=await fetch(EL_API+'/v1/voices',{method:'GET',redirect:'error',headers:{'xi-api-key':key,Accept:'application/json'},signal:AbortSignal.timeout(15000)});
    if(!r.ok)return fout(r.status);
    const data=await r.json();
-   const lijst=(Array.isArray(data?.voices)?data.voices:[]).filter(v=>typeof v?.voice_id==='string'&&/^[A-Za-z0-9]{10,40}$/.test(v.voice_id)).slice(0,200)
+   const lijst=(Array.isArray(data?.voices)?data.voices:[]).filter(v=>typeof v?.voice_id==='string'&&STEM_ID.test(v.voice_id)).slice(0,200)
     .map(v=>({voice_id:v.voice_id,name:String(v.name||v.voice_id).slice(0,60),category:String(v.category||'').slice(0,20)}));
-   return json({voices:lijst});
+   return json(user?{voices:lijst,server:true,standaard:standaard||null}:{voices:lijst});
   }
   const keys=Object.keys(body);
-  if(keys.some(k=>k!=='text'&&k!=='voice_id'))return json({error:'Ongeldige aanvraag.'},400);
+  if(keys.some(k=>k!=='text'&&k!=='voice_id'))return json({error:'Invalid request.'},400);
   const text=typeof body.text==='string'?body.text.trim():'';
-  if(!text||text.length>300||/[\u0000-\u001f\u007f]/.test(text))return json({error:'Tekst ontbreekt of is te lang.'},400);
-  if(typeof body.voice_id!=='string'||!/^[A-Za-z0-9]{10,40}$/.test(body.voice_id))return json({error:'Kies eerst een stem uit je eigen lijst.'},400);
-  const r=await fetch(EL_API+'/v1/text-to-speech/'+body.voice_id+'?output_format=mp3_44100_128',{method:'POST',redirect:'error',headers:{'xi-api-key':key,'Content-Type':'application/json',Accept:'audio/mpeg'},body:JSON.stringify({text,model_id:EL_MODEL}),signal:AbortSignal.timeout(20000)});
-  if(!r.ok)return fout(r.status);
-  if(!/^audio\//i.test(r.headers.get('Content-Type')||''))return json({error:'ElevenLabs gaf geen geluid terug.'},502);
-  const len=+(r.headers.get('Content-Length')||0);if(len>2000000)return json({error:'Geluid te groot.'},502);
-  return new Response(r.body,{status:200,headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000'}});
- }catch{return json({error:'De stemdienst is tijdelijk niet bereikbaar. De app gebruikt de gewone stem.'},502);}
+  if(!text||text.length>300||/[\u0000-\u001f\u007f]/.test(text))return json({error:'Text is missing or too long.'},400);
+  let voice=body.voice_id;
+  if(voice===undefined&&standaard)voice=standaard;
+  if(typeof voice!=='string'||!STEM_ID.test(voice))return json({error:'Pick a voice from the list first.'},400);
+  // Lets Brew voice: tellen vóór het doorsturen; mislukt het, dan telt de zin niet
+  let day='',n=0;
+  if(user){
+   day=stemDag();n=await stemTel(env,user.id,day);
+   if(n==null)return json({error:`Daily voice limit reached (${STEM_LIMIET} lines). The app uses the phone voice until midnight.`,code:'limit'},429,{'X-Stem-Left':'0'});
+  }
+  const left=user?{'X-Stem-Left':String(Math.max(0,STEM_LIMIET-n))}:{};
+  let r;
+  try{r=await fetch(EL_API+'/v1/text-to-speech/'+voice+'?output_format=mp3_44100_128',{method:'POST',redirect:'error',headers:{'xi-api-key':key,'Content-Type':'application/json',Accept:'audio/mpeg'},body:JSON.stringify({text,model_id:EL_MODEL}),signal:AbortSignal.timeout(20000)});}
+  catch(e){if(user)await stemTerug(env,user.id,day);throw e;}
+  const terug=async res=>{if(user)await stemTerug(env,user.id,day);try{await r.body?.cancel();}catch{}return res;};
+  if(!r.ok)return terug(fout(r.status));
+  if(!/^audio\//i.test(r.headers.get('Content-Type')||''))return terug(json({error:'ElevenLabs returned no audio.'},502));
+  const len=+(r.headers.get('Content-Length')||0);if(len>2000000)return terug(json({error:'Audio too large.'},502));
+  return new Response(r.body,{status:200,headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000',...left}});
+ }catch{return json({error:'The voice service is not reachable right now. The app uses the phone voice.'},502);}
 }
 /* Pagina van een brander ophalen, zodat de AI echt leest wat er op de zak staat in plaats van te gokken.
    Alleen GET, alleen https/http naar een gewone domeinnaam, max 1,5 MB, 8 s; terug gaat platte tekst. */
