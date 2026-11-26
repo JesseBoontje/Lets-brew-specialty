@@ -519,3 +519,7 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
   ongespiegeld 0.33x, tip 134,35, pivot 262,57; script scratchpad zet-ap.py = zet.py met S=0.33, geen spiegeling),
   (2) BREWER_ART v60/chemex/aeropress -> m-*.png als masker met waterstand, (3) E61/Switch/leerkaarten losser: per tekening, later.
 - Wacht op keuze Jesse. Na bouwen: CACHE ophogen, keuring, PR, preview handmatig (trigger abb758cd).
+- 26-11 Jesse (aanwijzing op mockup): splash-1..4 hertekenen, 'vorm en tekst is goed alleen lijnenspel'; groen = logo/icoon/m-*.png goed en voorbeeld.
+  Proef: scratchpad/splash/schoon2.py (skelet -> gekoppelde paden, min 45 px) + overtrek.py --halen 3 --los 2.4 --kriskras 2 --zaad 6+n,
+  samen2.py legt de halen over de originele lijn (vorm exact). Eerdere pogingen (puur skelet, 7/3.6/3) gaven rommel bij kop/schotel.
+  Scripts nog niet in de repo; bij akkoord naar de skill-map en splash-*.png vervangen (+CACHE).
