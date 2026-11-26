@@ -531,3 +531,13 @@ Volgorde, elk een eigen stap met push en keuring vóór testlink, alles achter f
 3. beheerscherm (alleen admin Jesse), ai_allowed per account, /api/ai met sleutel als Worker-secret, 50/dag
 Jesse moet zelf: AI-sleutel als secret plakken in het dashboard (nooit in de chat). Eerst checken of het token D1/R2 mag aanmaken.
 Feed staat in de schets op de plek van Learn: bij bouwen voorstel doen waar Learn komt.
+
+## 26-11 nacht: stap 1-3 klaar op functie/slot-en-sleutel (5d5aab3)
+- Verslagen: werk/verslag-stap1-account.md, -stap2-volgen.md, -stap3-ai.md. Opdrachten werk/opdracht-stap*.md.
+- D1 lets-brew b737aed4..., lets-brew-preview 4f37078c... (migraties 0001, 0002 via API door architect).
+  R2 lets-brew-fotos(-preview), EU. Vlaggen: account, social (def uit).
+- Testlink (wrangler preview --name account, vanuit een worktree): https://account-lets-brew-specialty.jesseboontje-1aa.workers.dev
+  workers.dev is vanuit de cloudomgeving niet bereikbaar (proxy 403): controleer via D1-queries.
+- Na registratie Jesse: UPDATE users SET is_admin=1,ai_allowed=1 WHERE handle=... (preview-D1, later live).
+- Jesse moet ANTHROPIC_API_KEY als secret zetten; voor previews mogelijk apart (wrangler preview secret). Nagaan.
+- Open: feed sorteert op updated_at; geen melding bij volgverzoek; stream-afbreek telt als vraag; niet getest op iPhone/WebKit; handleiding niet bijgewerkt; 6 tabs krap (voorstel Learn naar Home).
