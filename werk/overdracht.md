@@ -523,3 +523,6 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
   Proef: scratchpad/splash/schoon2.py (skelet -> gekoppelde paden, min 45 px) + overtrek.py --halen 3 --los 2.4 --kriskras 2 --zaad 6+n,
   samen2.py legt de halen over de originele lijn (vorm exact). Eerdere pogingen (puur skelet, 7/3.6/3) gaven rommel bij kop/schotel.
   Scripts nog niet in de repo; bij akkoord naar de skill-map en splash-*.png vervangen (+CACHE).
+- 26-11 Jesse: 'alles bouwen', splash samen 2 s met doortikken, splash-tekening opnieuw volgens de skill.
+  Gedaan: docs/tekeningen/splash-teken.py tekent de schone svg's (kop uit splash-1, kan rechtop uit splash-2, kan schenkt uit splash-3,
+  per scherm geplaatst); overtrek 5/2.2/1.6 (7/3.6/3 was op 900 px veel losser dan Jesse's V60); tekst = originele letterpixels.
