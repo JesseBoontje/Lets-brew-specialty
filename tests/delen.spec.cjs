@@ -24,15 +24,18 @@ test('a brew: one share menu with page, PDF and app file; the page holds the rec
  await expect(pop).toBeVisible();
  await expect(pop).toContainText('share this brew');
  for(const t of ['send as a page','save as PDF','send to a Lets Brew user'])await expect(pop.getByRole('button',{name:new RegExp(t)})).toBeVisible();
+ // de tekening staat al klaar als het menu open is (share direct uit de tik)
+ await expect.poll(()=>page.evaluate(()=>typeof deelBeeld.klaar==='string'&&deelBeeld.klaar.startsWith('data:image/png'))).toBe(true);
  const dl=page.waitForEvent('download');
  await pop.getByRole('button',{name:/send as a page/}).click();
  expect((await dl).suggestedFilename()).toBe('kenya-nyeri.html');
  await expect(pop).toBeHidden();
  const html=await page.evaluate(()=>window.__deelLaatste.html);
  expect(html.startsWith('<!doctype html>')).toBe(true);
+ expect(html).toContain('-apple-system,system-ui,sans-serif');
  for(const t of ['Kenya Nyeri','brewed by Jesse, 24 Nov 2026','v60, 15 g to 250 g, 2:45, 94 °C','<b>15 g</b><span>coffee</span>','<b>8.5</b><span>score</span>',
-  '<i>0:45</i> giet tot 150 g','taste: blackcurrant, lime, sweet','made with Lets Brew Specialty, letsbrew.djez.app','src="data:image/jpeg'])expect(html,t).toContain(t);
- for(const t of ['PRIVE BREW NOTITIE','ANDERE BREW','MIJN EIGEN NOTITIE','sk-ant','<script','http://','https://'])expect(html,t).not.toContain(t);
+  '<i>0:45</i> giet tot 150 g','taste: blackcurrant, lime, sweet','made with Lets Brew Specialty, letsbrew.djez.app','src="data:image/png'])expect(html,t).toContain(t);
+ for(const t of ['Segoe Print','Comic Sans','cursive','PRIVE BREW NOTITIE','ANDERE BREW','MIJN EIGEN NOTITIE','sk-ant','<script','http://','https://'])expect(html,t).not.toContain(t);
  // de pagina opent op zichzelf, zonder app
  const p2=await page.context().newPage();await p2.setContent(html);
  await expect(p2.locator('h1')).toHaveText('Kenya Nyeri');await p2.close();

@@ -90,6 +90,8 @@ test('big card: off shows "turn on account", which turns the flag on and opens s
  // getekende potloodlijnen op de grote kaart en op de rijen
  await page.waitForTimeout(400);
  expect(await page.evaluate(()=>!!document.querySelector('#set-groot>svg.rand-svg')&&!!document.querySelector('#gear-card>svg.rand-svg')&&!!document.querySelector('#feat-g-beans>svg.rand-svg'))).toBe(true);
+ // op de donkere kaart lichte lijnen (papierkleur), anders vallen ze weg
+ expect(await page.evaluate(()=>{const c=getComputedStyle(document.querySelector('#set-groot>svg.rand-svg'));return c.stroke===getComputedStyle(document.getElementById('set-groot')).color&&+c.opacity<1;})).toBe(true);
  // knoppen: inkt en lettertype van de app, geen systeemblauw
  const k=await page.evaluate(()=>{const b=document.getElementById('groot-volg'),c=getComputedStyle(b),d=getComputedStyle(document.body);return{kleur:c.color,ink:getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(),font:c.fontFamily,bodyFont:d.fontFamily};});
  const rgb=hex=>'rgb('+[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(', ')+')';

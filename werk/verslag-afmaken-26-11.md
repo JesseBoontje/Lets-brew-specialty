@@ -59,14 +59,23 @@ service-worker.js, CLAUDE.md, tests/delen.spec.cjs (nieuw).
 
 ## Tests
 - node: 53 van 53 groen.
-- Playwright (alleen chromium, /opt/pw-browsers/chromium, --trace off): 63 van 63 groen
+- Playwright (alleen chromium, /opt/pw-browsers/chromium, --trace off): 63 van 63 groen (ook na herstel)
   (was 55; nieuw 3 voor A, 3 voor B, 2 voor C). Webkit niet gedraaid (niet in deze omgeving).
 
+## Herstel na keuring (GOEDGEKEURD met vier punten)
+1. Blad: lettertypes eindigen op -apple-system, system-ui, sans-serif (geen cursive, Segoe Print of
+   Comic Sans). Geen fonts ingebakken; met Caveat/Patrick Hand op het toestel worden die gebruikt.
+2. Tekening op het blad: png zonder vulling; het papier van de tekening wordt doorzichtig
+   (licht weg, donker blijft inkt). Geen donker vlak meer achter de tekening.
+3. De tekening wordt al klaargezet als het deelmenu opent (`deelBeeld`), zodat navigator.share
+   zonder await direct uit de tik draait (iOS user activation). Wie razendsnel tikt wacht even.
+4. #set-groot: potloodlijnen in papierkleur, opacity .65, zichtbaar op de donkere kaart.
+Ook: waarden in de vakjes van het blad breken niet meer midden in een woord ("medium").
+Stappen op het blad blijven Nederlands: dat is receptinhoud (zoals BREW_GUIDES), bewust zo gelaten.
+Tests na herstel: node 53/53, Playwright 63/63 (chromium); delen- en instellingen-test controleren
+de punten 1 t/m 4.
+
 ## Open / onzeker
-- Op het gedeelde blad staat de tekening met de papierkleur van de PNG zelf: een iets donkerder vlak
-  achter de tekening (in de app valt dat weg tegen de kaartkleur).
-- Fonts (Caveat/Patrick Hand) zitten niet in het losse bestand: zonder internet valt het blad terug op
-  een systeemletter. Inbakken zou het bestand ~100 kB groter maken.
 - iPhone-gedrag van "send as a page" (deelvenster met .html-bestand) en "save as PDF" alleen in Chromium
   getest; de keurmeester moet dit op een echte iPhone nalopen.
 - Handleiding nog niet bijgewerkt (skill lets-brew-handleiding) voor de nieuwe Settings en het deelmenu.

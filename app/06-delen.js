@@ -61,14 +61,14 @@ function deelData(kind,id){
 }
 // het blad zelf; alle stijl hangt onder .lb-blad, zodat hij in de app niets raakt
 const DEEL_CSS=
-  '.lb-blad{max-width:560px;margin:0 auto;padding:26px 22px 30px;background:#efe9dd;color:#3a302a;font-family:"Patrick Hand","Segoe Print","Comic Sans MS",cursive;}'+
-  '.lb-blad h1{font-family:Caveat,"Segoe Print",cursive;font-weight:700;font-size:44px;line-height:1;margin:0;}'+
+  '.lb-blad{max-width:560px;margin:0 auto;padding:26px 22px 30px;background:#efe9dd;color:#3a302a;font-family:"Patrick Hand",-apple-system,system-ui,sans-serif;}'+
+  '.lb-blad h1{font-family:Caveat,-apple-system,system-ui,sans-serif;font-weight:700;font-size:44px;line-height:1;margin:0;}'+
   '.lb-blad .o{color:#7a6c5e;font-size:17px;margin:4px 0 0;}'+
   '.lb-blad .r{font-size:18px;margin:8px 0 0;}'+
   '.lb-blad .tek{text-align:center;margin:14px 0 6px;}.lb-blad .tek img{max-height:190px;max-width:70%;mix-blend-mode:multiply;}'+
   '.lb-blad .vak{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}'+
   '.lb-blad .vak div{border:2px solid #b8a98f;border-radius:16px 13px 17px 12px;padding:8px 6px;text-align:center;}'+
-  '.lb-blad .vak b{display:block;font-family:Caveat,cursive;font-size:24px;line-height:1.05;overflow-wrap:anywhere;}'+
+  '.lb-blad .vak b{display:block;font-family:Caveat,-apple-system,system-ui,sans-serif;font-size:clamp(18px,5.4vw,24px);line-height:1.05;overflow-wrap:break-word;}'+
   '.lb-blad .vak span{font-size:14px;color:#7a6c5e;}'+
   '.lb-blad ol{list-style:none;padding:0;margin:12px 0;}.lb-blad li{padding:7px 0;border-bottom:1.5px dashed #b8a98f;font-size:17px;}'+
   '.lb-blad li i{font-style:normal;display:inline-block;min-width:46px;color:#7a6c5e;}'+
@@ -93,7 +93,8 @@ function deelPaginaHTML(d,beeld){
     '<style>html,body{margin:0;background:#efe9dd;}'+DEEL_CSS+'</style></head><body>'+
     deelBladHTML(d,beeld)+'</body></html>';
 }
-// de tekening van de methode als kleine jpg (papierkleur eronder), zodat het bestand klein blijft
+// de tekening van de methode als kleine png zonder vulling: het papier van de tekening zelf wordt
+// doorzichtig (licht = weg, donker = inkt), zodat er geen donker vlak achter staat op het blad
 function deelTekening(m){
   return new Promise(klaar=>{
     const src=m?BrewSecurity.imageUrl(methodImg(m)):'';
@@ -105,8 +106,15 @@ function deelTekening(m){
       try{
         const k=Math.min(1,380/Math.max(img.naturalWidth||1,img.naturalHeight||1));
         const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*k));c.height=Math.max(1,Math.round(img.naturalHeight*k));
-        const x=c.getContext('2d');x.fillStyle='#efe9dd';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
-        klaar(c.toDataURL('image/jpeg',.82));
+        const x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);
+        const px=x.getImageData(0,0,c.width,c.height),p=px.data;
+        for(let i=0;i<p.length;i+=4){
+          const l=(p[i]+p[i+1]+p[i+2])/3;                 // 200+ is papier, 90- is inkt
+          const a=l>=200?0:l<=90?1:(200-l)/110;
+          p[i+3]=Math.round(p[i+3]*a);
+        }
+        x.putImageData(px,0,0);
+        klaar(c.toDataURL('image/png'));
       }catch(e){klaar('');}
     };
     img.onerror=()=>{clearTimeout(t);klaar('');};
@@ -114,10 +122,27 @@ function deelTekening(m){
   });
 }
 function deelBestandsnaam(d){return (String(d.titel).replace(/[^a-z0-9]+/gi,'-').toLowerCase().replace(/^-|-$/g,'')||'lets-brew')+'.html';}
+// de tekening wordt al klaargezet als het menu opent: dan kan navigator.share meteen in de
+// klik draaien (iOS wil een share direct uit een tik, zonder await ervoor)
+const deelBeeld={sleutel:'',belofte:null,klaar:undefined};
+function deelBeeldKlaar(kind,id,d){
+  const k=kind+':'+id;
+  if(deelBeeld.sleutel===k&&deelBeeld.belofte)return;
+  deelBeeld.sleutel=k;deelBeeld.klaar=undefined;
+  const b=deelBeeld.belofte=deelTekening(d.methode);
+  b.then(v=>{if(deelBeeld.belofte===b)deelBeeld.klaar=v;});
+}
+async function deelBeeldVoor(kind,id,d){
+  deelBeeldKlaar(kind,id,d);
+  return deelBeeld.klaar!==undefined?deelBeeld.klaar:await deelBeeld.belofte;
+}
 async function deelPagina(kind,id){
   const d=deelData(kind,id);if(!d)return;
   deelWeg();
-  const html=deelPaginaHTML(d,await deelTekening(d.methode));
+  deelBeeldKlaar(kind,id,d);
+  // klaar: geen await vóór navigator.share; nog niet klaar (snel getikt): dan toch even wachten
+  const beeld=deelBeeld.klaar!==undefined?deelBeeld.klaar:await deelBeeld.belofte;
+  const html=deelPaginaHTML(d,beeld);
   const naam=deelBestandsnaam(d);
   window.__deelLaatste={naam,html};                     // voor de test
   const file=new File([html],naam,{type:'text/html'});
@@ -133,7 +158,7 @@ async function deelPagina(kind,id){
 async function deelPdf(kind,id){
   const d=deelData(kind,id);if(!d)return;
   deelWeg();
-  runPrint('<style>'+DEEL_CSS+'</style>'+deelBladHTML(d,await deelTekening(d.methode)));
+  runPrint('<style>'+DEEL_CSS+'</style>'+deelBladHTML(d,await deelBeeldVoor(kind,id,d)));
 }
 function deelApp(kind,id){deelWeg();if(kind==='bean')shareOneBean(id);else shareOneBrew(id);}
 function deelOpen(kind,id){
@@ -151,5 +176,6 @@ function deelOpen(kind,id){
     k('send to a Lets Brew user','they can add it to their own app','deelApp',ICO.send)+
     '<div class="aib-knoppen"><button class="naar" onclick="deelWeg()">close</button></div></div>';
   el.classList.remove('hidden');
+  deelBeeldKlaar(kind,id,d);
 }
 function deelWeg(){const el=document.getElementById('deel-pop');if(el){el.classList.add('hidden');el.innerHTML='';}}
