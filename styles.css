@@ -1802,3 +1802,13 @@ html.randen .sketch.rand-on{filter:none;}
 .set-deel:first-child{border-top:none;margin-top:0;}
 .set-sub{font-size:21px;margin:10px 0 2px;}
 .feat-plek:empty{display:none;}
+/* Home met volgen en feed aan: Learn als kaart, en een rustige regel bij een volgverzoek */
+.home-leer{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:var(--ink);font:inherit;
+  padding:12px 16px;margin:0 0 14px;cursor:pointer;}
+.home-leer .navic{width:34px;height:34px;flex:none;}
+.home-leer .hl-t{flex:1;display:flex;flex-direction:column;}
+.home-leer .hl-t .hand{font-size:25px;line-height:1;}
+.home-leer .hl-d{font-size:14.5px;color:var(--ink-soft);}
+.home-leer .g-arr{color:var(--ink-soft);font-size:20px;}
+#volg-melding svg{stroke:var(--ink-soft);}
+#volg-melding b{font-weight:400;font-family:'Caveat',cursive;font-size:19px;}

@@ -8,7 +8,23 @@ const VOLG_H=/^[a-z0-9_]{3,20}$/, VOLG_ID=/^[A-Za-z0-9_-]{1,100}$/, VOLG_FOTO=/^
 const volg={me:null,meLaden:false,fout:'',feed:[],next:null,klaar:false,bezig:false,geladen:false,persoon:null,zoek:[],zoekQ:'',items:new Map(),fotoBezig:false};
 let volgZoekTimer=null;
 function volgAan(){return featOn('social')&&featOn('account')&&acctIngelogd();}
-function volgNav(){const b=document.getElementById('nav-feed');if(b)b.style.display=volgAan()?'':'none';}
+// met volgen en feed aan: Feed in de balk en Learn als kaart op Home, zo blijven het 5 tabs
+function volgNav(){
+  const aan=volgAan(),b=document.getElementById('nav-feed');if(b)b.style.display=aan?'':'none';
+  const l=document.querySelector('#nav [data-p="learn"]');if(l)l.style.display=aan?'none':'';
+  const k=document.getElementById('home-learn');if(k)k.style.display=aan?'':'none';
+}
+// "sanne wants to follow you" op Home; tik = naar je profiel in Settings
+function volgHomeRegel(){
+  const el=document.getElementById('volg-melding');if(!el)return;
+  const r=volgAan()&&volg.me&&Array.isArray(volg.me.requests)?volg.me.requests:[];
+  if(!r.length){el.style.display='none';el.innerHTML='';return;}
+  const h=esc(volgH(r[0].handle));
+  el.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.6 7.4 Q15.9 10 13.6 11.9 Q11.2 13.2 9 11.5 Q7.4 9.3 9.3 7 Q11.8 5 14.2 6.8 Q14.8 7.3 15.1 8.2"/><path d="M4.6 19.8 Q4.8 14.4 11.6 14.3 Q15.3 14.4 16.6 16.4"/><path d="M19.2 12.6 Q19.4 15.3 19.1 18.1 M17.7 15.4 Q19.3 15.2 21 15.5"/></svg>'+
+    '<span><b>'+h+'</b> '+(r.length===1?'wants':'and '+(r.length-1)+' more want')+' to follow you</span>';
+  el.style.display='flex';
+}
+function volgMeldingOpen(){go('profile');setToon('volg-card');}
 const volgH=h=>typeof h==='string'&&VOLG_H.test(h)?h:'';
 const volgSleutel=it=>it.owner.handle+'/'+it.kind+'/'+it.id;
 function volgGet(path){return acctApi(path,{method:'GET'});}

@@ -92,6 +92,8 @@ function renderHome(){
     recent.length?recent.map(brewCard).join(''):'<div class="empty-note">no brews yet.<br>tap ＋ new brew to get started.</div>';
   try{refreshWeather();}catch(e){}
   renderPeakLine();
+  // volgen aan: een rustige regel bij een volgverzoek (profiel laden als dat nog niet gebeurd is)
+  try{volgNav();volgHomeRegel();if(volgAan()&&!volg.me&&!volg.meLaden&&!volg.fout)volgLaadMij();}catch(e){}
   const sb=document.getElementById('surprise-btn');if(sb)sb.style.display=featOn('surprise')?'':'none';
   const ms=document.getElementById('methods-scroll');
   ms.innerHTML=state.methods.filter(m=>m.on).map(m=>
