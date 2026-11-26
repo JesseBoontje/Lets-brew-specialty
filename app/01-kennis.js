@@ -531,7 +531,7 @@ function recipeSteps(r,dose,hendels,ratio){
   const water=Math.round((dose||r.dose)*(ratio>0?ratio:r.ratio));
   const basis=Math.round((r.dose||dose||1)*r.ratio);   // waar de tekst voor geschreven is
   const schaal=basis?water/basis:1;
-  let st=r.stappen.map(x=>Object.assign({},x,{d:schaalGrammen(x.d,schaal)}));
+  let st=(Array.isArray(r.stappen)?r.stappen:[]).map(x=>Object.assign({},x,{d:schaalGrammen(x.d,schaal)}));
   if(r.hendels&&hendels){
     // eerste 40 %: zoeter = een kleiner eerste gietje, zuurder = een groter
     const zoet=Math.max(0,Math.min(1,hendels.zoet==null?0.5:hendels.zoet));

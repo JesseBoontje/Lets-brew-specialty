@@ -259,8 +259,8 @@ zit in een HttpOnly-cookie (`lb_s`) en is voor de app onzichtbaar.
 
 Cloudflare D1 (EU), tabel `records`: per gebruiker `(kind, id)` met
 `kind` = `bean` | `brew` | `gear` | `recipe` | `dial` en `data` = het record zoals
-de telefoon het heeft, zonder `data:`-foto's (die blijven voorlopig op de
-telefoon; bij binnenkomst zet de app de eigen foto terug). Max 64 KB per record.
+de telefoon het heeft, zonder `data:`-foto's (bij binnenkomst zet de app de eigen foto terug; met de
+vlag `social` gaat een verkleinde kopie apart naar R2, zie hieronder). Max 64 KB per record.
 Een `dial`-record is `{key:"<beanId>|<methodId>", attempts:[…]}`. Merge per record
 op `updatedAt`: de nieuwste wint, op de server en op de telefoon. Prijs en eigen
 notities gaan wel mee naar je eigen online kopie, maar worden nooit aan anderen
@@ -271,6 +271,66 @@ Routes (alleen voor de app zelf, `Origin` moet kloppen): `/api/auth/register/*`,
 `/api/auth/login/*`, `/api/auth/logout`, `/api/auth/me`, `POST /api/sync`
 `{since, changes:[{kind,id,data,updatedAt,deleted}]}` → `{now, more, changes,
 rejected}`, en `DELETE /api/account`.
+
+## Volgen en feed (vlag `social`, stap 2)
+
+Staat standaard uit (*Settings → features → follow & feed*) en werkt alleen met
+een account. Zonder de vlag gaat er niets extra's online.
+
+### Zichtrechten
+
+Een ander ziet jouw brews en beans alleen als jouw account `public` is, of als
+hij een geaccepteerde volger is. Nooit als een van jullie de ander blokkeerde.
+Private: een volgverzoek staat op `pending` tot jij accepteert; public: meteen
+`accepted` (en wie wachtte, wordt bij omzetten naar public geaccepteerd).
+Blokkeren verbergt over en weer (profiel, zoeken, feed, foto's), verbreekt
+volgen beide kanten op en wist de likes op elkaars records. Gear, eigen
+recepten en dial-in-pogingen (`dialIn`/`kind:"dial-in"`) worden nooit gedeeld.
+
+### Wat een ander krijgt (allowlist, `DEEL_VELDEN` in social-worker.mjs)
+
+| kind | velden |
+|---|---|
+| bean | `name` `roaster` `origin` `process` `variety` `roast` `roasternotes` (max 140 tekens) |
+| brew | `title` `drink` `beans` (naam van de boon) `method` (id) `brewer` `dose` `yield` `ratio` `time` `temp` `score` `tags` (max 12) `ts`, en uit `beanSnapshot` alleen `roaster` `origin` `process` |
+
+Alles daarbuiten gaat nooit naar een ander: `price`, `bagsize`, `notes`, `url`,
+`roastdate`, `grind`, `grinder`, `custom`, `prep`, `target`, wishlist, budget.
+Een item in feed of profiel is `{kind, id, owner:{handle,name}, at, data,
+photo, likes, liked}`; `photo` is `/api/foto/<sleutel>` of `null`.
+
+### Foto's (R2, binding `FOTOS`)
+
+Na een geslaagde sync verkleint de app de eigen `data:`-foto van een bean of brew
+(max 1280 px, jpeg 0.8, max 1 MB) en zet hem online; `sync.fotos["bean/<id>"] =
+{h}` onthoudt wat er al staat. Online heet hij `foto/<user-id>.<willekeurig>` en
+staat de sleutel in `records.photo_key`. Ophalen kan alleen met dezelfde
+zichtrechten als het record. Wissen via sync, `DELETE /api/foto` of account
+wissen haalt hem ook uit R2. De telefoon houdt zijn eigen foto. Zet je de vlag
+`social` uit, dan gaat je account online terug naar `private` (lukt dat niet, dan bij de
+volgende sync: `sync.socialUit`), maar foto's die al online staan blijven daar tot je het
+record of je account wist. Opgehaald worden ze met `Cache-Control: private, no-store`.
+Een private profiel zonder geaccepteerd volgen toont alleen handle en naam (`counts:null`).
+
+### Routes (sessie nodig, `Origin` moet kloppen bij POST/DELETE)
+
+`GET /api/social/me` (profiel, tellers, verzoeken, volgers, gevolgd, geblokkeerd) ·
+`POST /api/social/profile {name?, visibility?}` · `GET /api/social/search?q=`
+(begin van de handle, max 20) · `GET /api/social/u/<handle>` en
+`/api/social/u/<handle>/items?cursor=` · `POST|DELETE /api/social/follow {handle}` ·
+`POST /api/social/request {handle, accept}` · `DELETE /api/social/follower {handle}` ·
+`GET /api/social/feed?cursor=` (10 per pagina, nieuwste `updated_at` eerst) ·
+`POST|DELETE /api/social/like {handle, kind, id}` · `POST|DELETE /api/social/block {handle}` ·
+`POST /api/social/report {handle, reason}` · `POST /api/foto?kind=&id=` (body = jpeg/webp) ·
+`DELETE /api/foto?kind=&id=` · `GET /api/foto/<sleutel>`.
+Rate limit via `STEM_LIMITER` met sleutel `social:<soort>:<user-id>` op zoeken,
+volgen, likes, blokkeren, melden en foto's opladen/wissen.
+
+### In de app
+
+"try" op een brew maakt een eigen recept (`state.recipes`, bij *brew ideas*) met
+`van:"<handle>/brew/<id>"`; op een bean een wens in `wishlist` met hetzelfde
+`van`-veld. Een gedeelde link is `/?u=<handle>`.
 
 ## Waar de maalstand vandaan komt
 

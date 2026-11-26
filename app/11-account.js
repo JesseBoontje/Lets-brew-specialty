@@ -104,7 +104,7 @@ async function acctApi(path,{method='POST',body}={}){
   if(!r.ok){const e=new Error((data&&data.error)||('error '+r.status));e.status=r.status;throw e;}
   return data||{};
 }
-function acctUitgelogd(){const s=acctSync0();s.user=null;clearTimeout(acctTimer);save();}
+function acctUitgelogd(){const s=acctSync0();s.user=null;clearTimeout(acctTimer);if(typeof volg!=='undefined'){volg.me=null;volg.feed=[];volg.geladen=false;}save();try{volgNav();}catch(e){}}
 /* Eén sync: alles sinds de vorige keer heen, en wat er online nieuw is terug. */
 async function acctSync(handmatig){
   if(!featOn('account')||!acctIngelogd()||acctBezig)return false;
@@ -143,6 +143,8 @@ async function acctSync(handmatig){
     acctMelding=(binnen?binnen+' change'+(binnen===1?'':'s')+' from online':'')+(teGroot?(binnen?' · ':'')+teGroot+' too big to sync':'');
     await save();
     if(handmatig)toast('✓ synced');
+    if(typeof volgFotos==='function')volgFotos();
+    if(s.socialUit&&!featOn('social')&&typeof volgVlagUit==='function')volgVlagUit();
     return true;
   }catch(e){
     if(e.status===401){acctMelding='signed out — sign in again to sync';acctUitgelogd();}
@@ -166,8 +168,9 @@ function acctKan(){return !!(window.PublicKeyCredential&&navigator.credentials&&
 function acctNaInloggen(user){
   const s=acctSync0();
   // een ander account op deze telefoon: online begint dan bij nul
-  if(s.lastHandle!==user.handle){s.since=0;s.sentUpTo=0;s.tomb=[];}
+  if(s.lastHandle!==user.handle){s.since=0;s.sentUpTo=0;s.tomb=[];s.fotos={};}
   s.user={handle:user.handle,visibility:user.visibility||'private'};s.lastHandle=user.handle;s.later=false;
+  if(typeof volg!=='undefined'){volg.me=null;volg.fout='';volg.geladen=false;volg.feed=[];}
   save();acctRender();acctSync();
 }
 async function acctLogin(){
@@ -226,7 +229,7 @@ function acctWanneer(t){
   if(s<86400)return Math.round(s/3600)+' h ago';
   return new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 }
-const ACCT_PRIVACY='<b>what is online:</b> a copy of your beans, brews, gear, own recipes and dial-in attempts. Photos stay on this phone for now. '+
+const ACCT_PRIVACY='<b>what is online:</b> a copy of your beans, brews, gear, own recipes and dial-in attempts. Photos stay on this phone, unless you turn on follow & feed: then a smaller copy goes online for the people who may see it; photos already online stay there until you delete the bean or brew, or your account. '+
   '<b>where:</b> Cloudflare, in the EU. '+
   '<b>private:</b> price and your own notes are never shown to anyone else — also not later, when you share. No password and no email: your iPhone keeps the key in iCloud Keychain. '+
   '<b>delete:</b> the button below removes your account and everything online at once. This phone keeps its own copy.';

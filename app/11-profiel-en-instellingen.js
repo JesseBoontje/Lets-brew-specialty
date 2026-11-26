@@ -161,6 +161,7 @@ const FEATURES=[
   {id:'voice', n:'voice logging', d:'say "18 in, 36 out, 27 seconds" — hands stay on the machine', def:false, cat:'smart'},
   {id:'weather', n:'weather-aware suggestions', d:'iced on hot days, cozy moka when it rains (uses location)', def:false, cat:'smart'},
   {id:'account', n:'account & sync', d:'sign in with Face ID and keep a copy of your beans and brews online — the phone stays the source', def:false, cat:'people'},
+  {id:'social', n:'follow & feed', d:'a profile, follow people you know and swipe through their brews and beans — needs account & sync', def:false, cat:'people'},
   {id:'pairing', n:'scale & machine pairing', d:'live weight via Bluetooth where the browser allows it', def:false, cat:'smart'},
 ];
 function featOn(id){
@@ -171,6 +172,8 @@ function featOn(id){
 function toggleFeature(id){
   if(!state.features)state.features={};
   state.features[id]=!featOn(id);
+  if(id==='social'&&!featOn('social')&&typeof volgVlagUit==='function')volgVlagUit();
+  if(typeof volgNav==='function')volgNav();
   save();applyFeatures();
   if(currentPage==='profile')renderProfile();else renderFeatures();
   const f=FEATURES.find(x=>x.id===id);
@@ -212,6 +215,7 @@ function renderProfile(){
   if(ss)ss.textContent='saved now: '+state.brews.length+' brews · '+state.beans.length+' beans · '+state.methods.length+' methods';
   renderReminder();
   try{acctRender();}catch(e){}
+  try{volgRender();}catch(e){}
   try{renderStem();}catch(e){}
   renderGear();
   renderFeatures();
