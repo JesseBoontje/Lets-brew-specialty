@@ -474,11 +474,14 @@ function renderStem(){
   if(eigen)eigen.classList.toggle('hidden',lb);
   const lk=document.getElementById('stem-laad');if(lk)lk.textContent=lb?'load the voices':'load my voices';
   const sel=document.getElementById('stem-kies');
+  // zonder standaardstem op de server is er geen "house voice": dan moet je er een kiezen
+  const leegTekst=lb?(st.standaard?'— house voice —':'— pick a voice —'):'— pick one of your voices —';
   if(sel&&sel.dataset.bron!==st.bron){
     // andere lijst: de stemmen van de server horen niet bij je eigen account
     sel.textContent='';const o=document.createElement('option');o.value='';
-    o.textContent=lb?'— house voice —':'— pick one of your voices —';sel.appendChild(o);sel.dataset.bron=st.bron;
+    o.textContent=leegTekst;sel.appendChild(o);sel.dataset.bron=st.bron;
   }
+  if(sel&&sel.options[0]&&sel.options[0].value==='')sel.options[0].textContent=leegTekst;
   if(sel&&st.stem&&!Array.from(sel.options).some(o=>o.value===st.stem)){
     const o=document.createElement('option');o.value=st.stem;o.textContent=st.naam||'your chosen voice';sel.appendChild(o);
   }
@@ -488,6 +491,7 @@ function renderStem(){
       :st.lbUit==='not_set_up'?'the Lets Brew voice is not set up yet — the coaches use the phone voice.'
       :st.lbUit==='400'?'pick a voice from the list first — until then: phone voice.'
       :st.lbUit?'the Lets Brew voice is not available right now — phone voice.'
+      :(!st.stem&&!st.standaard)?'load the voices and pick one.'
       :'Lets Brew voice on'+(st.naam?': '+st.naam:'')+'.';
     return;
   }
@@ -515,7 +519,7 @@ async function stemLaad(){
   try{
     const lijst=await BrewStem.stemmen(),sel=document.getElementById('stem-kies');
     sel.textContent='';
-    const leeg=document.createElement('option');leeg.value='';leeg.textContent=lb?'— house voice —':lijst.length?'— pick one of your voices —':'— no voices in your account —';sel.appendChild(leeg);sel.dataset.bron=st0.bron;
+    const leeg=document.createElement('option');leeg.value='';leeg.textContent=lb?(BrewStem.stand().standaard?'— house voice —':'— pick a voice —'):lijst.length?'— pick one of your voices —':'— no voices in your account —';sel.appendChild(leeg);sel.dataset.bron=st0.bron;
     lijst.forEach(v=>{const o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.category?' · '+v.category:'');o.dataset.naam=v.name;sel.appendChild(o);});
     renderStem();
     if(lijst.length)toast('✓ '+lijst.length+' voices — pick one');

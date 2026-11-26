@@ -70,9 +70,11 @@ globalThis.BrewStem=(()=>{
   const r=await fetch('/api/stem/zeg',{method:'POST',headers:kop(),credentials:'same-origin',
    body:JSON.stringify(id||!lb?{text:tekst,voice_id:id}:{text:tekst}),signal:AbortSignal.timeout(8000)});
   if(lb&&!r.ok&&r.status!==502){
-   // niet blijven proberen tot de app herlaadt of je iets anders kiest
-   const b=await r.clone().json().catch(()=>null);
-   if(!lbUit){lbUit=(b&&typeof b.code==='string'&&b.code.slice(0,20))||String(r.status);
+   // blijvend uit (tot herladen of een andere keuze) alleen als het echt niet kan; een rem
+   // (429 zonder code) of een tijdelijke fout: alleen deze zin via de telefoonstem
+   const b=await r.clone().json().catch(()=>null),code=b&&typeof b.code==='string'?b.code:'';
+   const blijvend=['limit','not_set_up','not_allowed','sign_in'].includes(code)||r.status===400;
+   if(blijvend&&!lbUit){lbUit=code||String(r.status);
     try{if(typeof toast==='function')toast(lbUit==='limit'?'today’s Lets Brew voice lines are used up — using the phone voice':'Lets Brew voice unavailable — using the phone voice');}catch(e){}}
   }
   if(!lb&&r.status===401){afgewezen=true;try{if(typeof toast==='function')toast('ElevenLabs refused your key — using the phone voice');}catch(e){}}

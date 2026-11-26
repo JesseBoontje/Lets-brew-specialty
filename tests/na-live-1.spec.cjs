@@ -258,3 +258,25 @@ test('brew idea editor: methods in one sideways row, only active ones, V60 can r
  await page.evaluate(()=>{state.gear=[];openRecipe(null,'v60');});
  await expect(page.locator('#rec-switch')).toBeHidden();
 });
+
+test('Lets Brew voice: a rate limit without a code only skips that line; no default voice asks you to pick one',async({page})=>{
+ let n=0;
+ await page.route('**/api/auth/me',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({user:{handle:'jesse',ai:true},ai:{used:0,limit:50}})}));
+ await page.route('**/api/stem/voices',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({voices:[{voice_id:VOICE,name:'House',category:''}],server:true,standaard:null})}));
+ await page.route('**/api/stem/zeg',r=>{n++;r.fulfill({status:429,contentType:'application/json',body:JSON.stringify({error:'Wait a moment'})});});
+ await open(page,()=>{window.__tel=[];const ss={speak:u=>window.__tel.push(u.text),cancel(){},getVoices:()=>[],addEventListener(){}};Object.defineProperty(window,'speechSynthesis',{value:ss,configurable:true});window.SpeechSynthesisUtterance=function(t){this.text=t;};HTMLMediaElement.prototype.play=function(){return Promise.resolve();};});
+ await lbAan()(page);
+ await page.evaluate(()=>BrewStem.zeg('Een.'));
+ await expect.poll(()=>page.evaluate(()=>window.__tel)).toContain('Een.');
+ expect(await page.evaluate(()=>BrewStem.stand().lbUit)).toBe('');
+ await page.evaluate(()=>BrewStem.zeg('Twee.'));
+ await expect.poll(()=>page.evaluate(()=>window.__tel)).toContain('Twee.');
+ expect(n).toBe(2);
+ // geen standaardstem op de server en niets gekozen: kies er een
+ await page.evaluate(()=>{go('profile');setToon('stem-card');});
+ await page.locator('#stem-laad').click();
+ await expect(page.locator('#stem-kies option').first()).toHaveText('— pick a voice —');
+ await expect(page.locator('#stem-status')).toHaveText('load the voices and pick one.');
+ await page.locator('#stem-kies').selectOption(VOICE);
+ await expect(page.locator('#stem-status')).toContainText('Lets Brew voice on: House');
+});

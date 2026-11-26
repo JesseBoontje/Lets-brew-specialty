@@ -118,7 +118,7 @@ toestel een heel andere oorzaak heeft (bv. Safari en `mix-blend-mode` + filter),
   toegang/503, server-sleutel + telling + standaardstem, atomaire daglimiet + terugtellen + geen lek,
   eigen sleutel telt niets).
 - Playwright chromium (executablePath /opt/pw-browsers/chromium, --trace off, lokale config niet
-  gecommit): **73/73** groen (was 63; +10 in `tests/na-live-1.spec.cjs`).
+  gecommit): **74/74** groen (was 63; +11 in `tests/na-live-1.spec.cjs`). Na de keuring: placeholder "brew idea", "— pick a voice —" zonder standaardstem, rem zonder code alleen voor die ene zin.
 - Aangepaste bestaande tests: kleine-punten (tabbalk met social, tandwiel), aeropress/gietcoach/
   kleine-klussen (nieuwe receptnamen, standard/inverted), volgen (feedkleur `--accent`, toast
   "in your brew ideas"), workspace (Engelse statusregel).
