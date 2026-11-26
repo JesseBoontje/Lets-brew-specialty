@@ -568,3 +568,11 @@ Akkoord Jesse op opzet docs/opzet-instellingen.html (https://claude.ai/artifact/
 - 26-11 Jesse: 'alles bouwen', splash samen 2 s met doortikken, splash-tekening opnieuw volgens de skill.
   Gedaan: docs/tekeningen/splash-teken.py tekent de schone svg's (kop uit splash-1, kan rechtop uit splash-2, kan schenkt uit splash-3,
   per scherm geplaatst); overtrek 5/2.2/1.6 (7/3.6/3 was op 900 px veel losser dan Jesse's V60); tekst = originele letterpixels.
+
+## 26-11 middag: LIVE via PR #25 (main 3849596, scc-v126)
+Account, volgen/feed, beheer/AI, Settings herindeeld, delen als pagina/PDF, kleine punten, handleiding
+(nieuwe link https://claude.ai/artifact/DDGgEX5u7XbHMToy1F2RqB). Nakijkversie opnieuw gepubliceerd:
+https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7. Live gecontroleerd: 200, sw v126, /api/auth/me 401 met user null,
+bindingen DB, FOTOS. Open voor Jesse: ANTHROPIC_API_KEY als secret (Production, en Previews Base),
+account op letsbrew.djez.app maken → architect zet is_admin/ai_allowed in live-D1 b737aed4.
+Wacht op nakijkopdracht van Jesse ("Opdracht voor Lets Brew").
