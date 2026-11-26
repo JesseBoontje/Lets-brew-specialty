@@ -378,7 +378,8 @@
 
       <div class="field"><label>name</label><input id="rec-naam" placeholder="e.g. my sunday v60" maxlength="40"></div>
 
-      <div class="field"><label>method</label><div class="link-pick" id="rec-methods"></div></div>
+      <div class="field"><label>method</label><div class="link-pick" id="rec-methods"></div>
+        <button type="button" class="rec-switch" id="rec-switch" style="display:none" aria-pressed="false" onclick="recSwitch()"><span class="rs-bol"></span>with Switch <small>valve per step</small></button></div>
 
       <div class="field-row">
         <div class="field"><label>dose (g)</label><input id="rec-dose" type="number" inputmode="decimal" step="0.1" onfocus="recOnthoud()" oninput="recWater()"></div>

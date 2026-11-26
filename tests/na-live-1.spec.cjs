@@ -220,3 +220,41 @@ test('brew idea editor: dose, water and temp at the top flow into the schedule, 
  expect(Math.round(r.dose*r.ratio)).toBe(320);
  expect(r.stappen.filter(s=>s.p>0).at(-1).p).toBeCloseTo(1,5);
 });
+
+test('brew idea editor: methods in one sideways row, only active ones, V60 can run on a Switch, nothing irrelevant',async({page})=>{
+ await open(page);
+ await page.setViewportSize({width:390,height:844});
+ await page.evaluate(()=>{state.methods.find(m=>m.id==='chemex').on=false;state.gear=[{id:'g1',kind:'brewer',name:'Hario Switch',category:'filter'}];openRecipe(null,'v60');});
+ const rij=page.locator('#rec-methods');
+ // alleen actieve methodes
+ const namen=await rij.locator('.lp').allTextContents();
+ const aan=await page.evaluate(()=>state.methods.filter(m=>m.on).map(m=>m.name));
+ expect(namen).toEqual(aan);expect(namen).not.toContain('chemex');
+ // één rij, alleen zijwaarts
+ const st=await rij.evaluate(e=>{const c=getComputedStyle(e),tops=[...e.querySelectorAll('.lp')].map(b=>Math.round(b.offsetTop));return {wrap:c.flexWrap,y:c.overflowY,x:c.overflowX,rijen:new Set(tops).size,sh:e.scrollHeight,ch:e.clientHeight};});
+ expect(st).toMatchObject({wrap:'nowrap',y:'hidden',x:'auto',rijen:1});
+ expect(st.sh).toBeLessThanOrEqual(st.ch+1);
+ // V60 met Switch: schakelaar zichtbaar, zet de klep per stap aan
+ const sw=page.locator('#rec-switch');
+ await expect(sw).toBeVisible();
+ await expect(page.locator('#rec-steps .r-klep')).toHaveCount(0);
+ // een dripper is geen molen: niet bij de maalstand
+ await expect(page.locator('#rec-molens')).not.toContainText('Hario Switch');
+ await sw.click();
+ await expect(sw).toHaveAttribute('aria-pressed','true');
+ expect(await page.locator('#rec-steps .r-klep').count()).toBeGreaterThan(0);
+ await expect(page.locator('#rec-steps .r-klep').first().locator('option')).toHaveText(['valve —','valve closed','valve open']);
+ // stap-soorten in het Engels en passend bij filter
+ const soorten=await page.locator('#rec-steps .r-rij select').first().locator('option').allTextContents();
+ expect(soorten).toContain('pour');expect(soorten).not.toContain('giet');expect(soorten).not.toContain('shot');expect(soorten).not.toContain('flip');
+ // espresso: geen Switch, geen AI-giet-schema-knop, geen filter-soorten
+ await page.locator('#rec-methods .lp',{hasText:'espresso'}).click();
+ await expect(sw).toBeHidden();
+ await expect(page.locator('#rec-ai')).toBeHidden();
+ await expect(page.locator('#rec-steps .r-klep')).toHaveCount(0);
+ const esp=await page.locator('#rec-steps .r-rij select').first().locator('option').allTextContents();
+ expect(esp).toContain('shot');expect(esp).not.toContain('swirl');expect(esp).not.toContain('pour');
+ // zonder Switch in gear of methodes: geen schakelaar bij V60
+ await page.evaluate(()=>{state.gear=[];openRecipe(null,'v60');});
+ await expect(page.locator('#rec-switch')).toBeHidden();
+});

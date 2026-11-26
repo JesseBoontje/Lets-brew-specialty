@@ -495,6 +495,14 @@ function methodForRecipe(r){
    elk gietdoel als deel van het totaal, zodat het meeschaalt als je een andere
    dose gebruikt dan waarmee je het opschreef.                              */
 const STAP_SOORTEN=['bloom','giet','swirl','roer','wacht','keer','pers','doorloop','dose','shot','stop','melk'];
+// wat je in de keuzelijst leest (Engels); de waarde blijft de interne soort
+const STAP_LABEL={bloom:'bloom',giet:'pour',swirl:'swirl',roer:'stir',wacht:'wait',keer:'flip',pers:'press',doorloop:'drawdown',dose:'dose',shot:'shot',stop:'stop',melk:'milk',tamp:'tamp',spoel:'flush',temp:'temp'};
+// alleen de soorten die bij deze methode iets betekenen; een opgeslagen andere soort blijft staan
+function recSoorten(mid,huidig){
+  const esp=methodFamily(mid)==='espresso',ap=isAeropress(mid);
+  const l=esp?['dose','shot','wacht','stop','melk']:['bloom','giet','swirl','roer','wacht','doorloop','dose','stop'].concat(ap?['keer','pers']:[]);
+  return huidig&&!l.includes(huidig)?l.concat([huidig]):l;
+}
 /* Zet je omgekeerd, dan is er precies één moment dat er echt iets gebeurt: het
    omkeren. Dat moet je niet hoeven lezen -- je moet het zien. */
 const HOUDINGEN=[
@@ -511,9 +519,9 @@ function isAeropress(mid){return brewerArtKey(mid)==='aeropress';}
    De klep is dus geen aparte stap maar een stand die pér stap geldt. */
 function isSwitch(mid){return brewerArtKey(mid)==='switch';}
 const KLEP_STANDEN=[
-  {v:'',      n:'klep —'},
-  {v:'dicht', n:'klep dicht'},
-  {v:'open',  n:'klep open'},
+  {v:'',      n:'valve —'},
+  {v:'dicht', n:'valve closed'},
+  {v:'open',  n:'valve open'},
 ];
 /* dicht = een gesloten poortje met het water erbovenop, open = het poortje
    staat uit elkaar en de druppel valt erdoor. Geen plusje, geen minnetje. */
@@ -546,6 +554,7 @@ function openRecipe(id,mid){
     setVal('rec-temp',best.temp);setVal('rec-maling',best.maling);setVal('rec-over',best.over||'');
     setVal('rec-stand',best.stand||'');setVal('rec-tijd',best.tijd||'');recBewerk.molen=best.molen||null;
     recBewerk.houding=best.houding||'normaal';
+    recBewerk.metSwitch=recBewerk.stappen.some(x=>x.klep);
   }else{
     // beginnen vanaf het recept dat nu geselecteerd staat, scheelt overtypen
     const basis=best||recipeById((state.lastRecipe||{})[methode])||recipesFor(methode)[0];
@@ -562,6 +571,7 @@ function openRecipe(id,mid){
     setVal('rec-tijd',(basis&&basis.tijd)||'');
     recBewerk.molen=(basis&&basis.molen)||(filterMolens()[0]||{}).name||null;
     recBewerk.houding=(basis&&basis.houding)||'normaal';
+    recBewerk.metSwitch=recBewerk.stappen.some(x=>x.klep);
   }
   document.getElementById('rec-title').textContent=(best&&best.eigen)?'edit brew idea':'own brew idea';
   document.getElementById('rec-del').style.display=(best&&best.eigen)?'block':'none';
@@ -574,8 +584,9 @@ function openRecipe(id,mid){
 // je filtermolens uit de gear-lijst, zodat de maalstand bij een molen hoort
 function filterMolens(){
   const mid=(recBewerk&&recBewerk.mid)||formMethod;
-  const bij=gearVoor(mid).filter(g=>g.name);
-  return bij.length?bij:(state.gear||[]).filter(g=>g.name&&(g.category==='filter'||g.category==='algemeen'));
+  // alleen molens: een dripper of weegschaal hoort niet bij de maalstand
+  const bij=gearVoor(mid).filter(g=>g.name&&g.kind==='grinder');
+  return bij.length?bij:(state.gear||[]).filter(g=>g.name&&g.kind==='grinder');
 }
 function recMolens(){
   const el=document.getElementById('rec-molens');if(!el)return;
@@ -622,15 +633,39 @@ function recPickHouding(v){
   if(v==='normaal')recBewerk.stappen=recBewerk.stappen.filter(x=>x.k!=='keer');
   recHouding();recSteps();
 }
+/* Alleen methodes die aan staan, in één rij die zijwaarts scrollt. Bij een V60 kan
+   het schema op een Switch lopen (klep per stap), net als de vaste Switch-recepten
+   die bij de V60 staan: dat kan als je een Switch als methode of in je gear hebt. */
+function recHeeftSwitch(){
+  return state.methods.some(m=>isSwitch(m.id))||(state.gear||[]).some(g=>/switch/i.test(g.name||''));
+}
+function recMetKlep(){return !!recBewerk&&(isSwitch(recBewerk.mid)||(brewerArtKey(recBewerk.mid)==='v60'&&!!recBewerk.metSwitch));}
 function recMethods(){
   const el=document.getElementById('rec-methods');if(!el)return;
-  el.innerHTML=state.methods.filter(m=>m.on).map(m=>
+  const aan=state.methods.filter(m=>m.on);
+  el.innerHTML=aan.map(m=>
     `<button class="lp ${m.id===recBewerk.mid?'sel':''}" onclick="recPickMethod('${m.id}')">${esc(m.name)}</button>`).join('')
     ||'<span class="rec-empty">turn on a method under methods first</span>';
+  const sw=document.getElementById('rec-switch');
+  if(sw){
+    const kan=brewerArtKey(recBewerk.mid)==='v60'&&methodFamily(recBewerk.mid)!=='espresso'&&recHeeftSwitch();
+    sw.style.display=kan?'':'none';
+    sw.classList.toggle('on',!!recBewerk.metSwitch);sw.setAttribute('aria-pressed',String(!!recBewerk.metSwitch));
+  }
+  // de AI schrijft alleen giet-schema's: bij espresso heeft die knop geen zin
+  const esp=methodFamily(recBewerk.mid)==='espresso';
+  for(const id of ['rec-ai','rec-ai-note']){const x=document.getElementById(id);if(x)x.classList.toggle('rec-weg',esp);}
   recFamilie();
 }
+function recSwitch(){
+  if(!recBewerk)return;
+  recBewerk.metSwitch=!recBewerk.metSwitch;
+  recMethods();recSteps();
+}
 function recPickMethod(id){
-  recBewerk.mid=id;recMethods();recMolens();recHouding();recSteps();
+  recBewerk.mid=id;
+  // een methode in de editor kiezen mag de pagina niet laten verspringen
+  recMethods();recMolens();recHouding();recSteps();
   const ai=document.getElementById('rec-ai');
   if(ai)ai.style.display='';
 }
@@ -713,7 +748,7 @@ function recOnthoud(){
 }
 function recSteps(){
   const el=document.getElementById('rec-steps');if(!el)return;
-  const klep=isSwitch(recBewerk.mid);   // alleen een Switch heeft een klep
+  const klep=recMetKlep();   // alleen een Switch (of een V60 op een Switch) heeft een klep
   if(!recBewerk.stappen.length){el.innerHTML='<div class="rec-empty">no steps yet &mdash; add one, or let AI draft it</div>';return;}
   el.innerHTML=recBewerk.stappen.map((st,i)=>`<div class="rec-row">
     <div class="r-t"><input value="${esc(pourFmt(st.t||0))}" inputmode="numeric" placeholder="0:00"
@@ -721,7 +756,7 @@ function recSteps(){
     <div class="r-mid">
       <div class="r-rij">
         <select onchange="recSet(${i},'k',this.value)">
-          ${STAP_SOORTEN.map(k=>`<option value="${k}" ${st.k===k?'selected':''}>${k}</option>`).join('')}
+          ${recSoorten(recBewerk.mid,st.k).map(k=>`<option value="${k}" ${st.k===k?'selected':''}>${STAP_LABEL[k]||k}</option>`).join('')}
         </select>
         ${klep?`<select class="r-klep" onchange="recSet(${i},'klep',this.value)">
           ${KLEP_STANDEN.map(o=>`<option value="${o.v}" ${(st.klep||'')===o.v?'selected':''}>${o.n}</option>`).join('')}
@@ -771,7 +806,7 @@ function saveRecipe(){
   if(!recBewerk.stappen.length){toast('add at least one step');return;}
   const stappen=recBewerk.stappen.slice().sort((a,b)=>a.t-b.t).map(st=>({
     t:st.t||0, p:(st.g===''||st.g==null)?0:Math.max(0,Math.min(1.5,st.g/water)),
-    k:st.k||'giet', klep:(isSwitch(recBewerk.mid)&&st.klep)||null,
+    k:st.k||'giet', klep:(recMetKlep()&&st.klep)||null,
     d:(st.d||'').trim()||st.k||'giet'}));
   const r={id:recBewerk.id||('r_'+uid().slice(0,6)),eigen:true,mid:recBewerk.mid,
     fam:methodFamily(recBewerk.mid),

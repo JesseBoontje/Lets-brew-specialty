@@ -538,6 +538,15 @@
   .link-pick{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;}
   /* de recept-keuze in het brewformulier staat stil: geen overgang of beweging op de knoppen */
   #pc-pick .lp{transition:none;animation:none;transform:none;}
+  /* methodes in de recepteditor: één rij, alleen zijwaarts scrollen */
+  #rec-methods{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;overscroll-behavior-x:contain;padding:5px 4px 8px;}
+  .rec-switch{display:flex;align-items:center;gap:8px;margin:6px 0 0;padding:6px 2px;background:none;border:none;font-family:inherit;font-size:17px;color:var(--ink);cursor:pointer;min-height:44px;}
+  .rec-switch small{color:var(--ink-soft);font-size:14px;}
+  .rec-switch .rs-bol{width:38px;height:22px;border-radius:12px;border:2px solid var(--line);background:var(--card);position:relative;flex:none;}
+  .rec-switch .rs-bol::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--line);}
+  .rec-switch.on .rs-bol{background:var(--accent-soft);border-color:var(--accent-soft);}
+  .rec-switch.on .rs-bol::after{left:18px;background:var(--cream);}
+  .rec-weg{display:none !important;}
   .link-pick::-webkit-scrollbar{display:none;}
   .lp{flex:none;padding:10px 16px;border-radius:16px;background:var(--card);border:2px solid var(--line);filter:url(#wobble);font-family:inherit;font-size:18px;color:var(--ink-soft);cursor:pointer;white-space:nowrap;}
   .lp.sel{border-color:var(--ink);color:var(--ink);}

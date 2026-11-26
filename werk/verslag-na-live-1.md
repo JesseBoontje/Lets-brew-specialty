@@ -1,7 +1,7 @@
 # Verslag na live 1 (26-11, aannemer)
 
 Branch `functie/na-live-1` vanaf origin/main. Opdracht: `werk/opdracht-na-live-1.md` (punt 1-5)
-plus de extra punten 6-14 van de architect. Niets gedeployd, geen Cloudflare-acties, geen secrets,
+plus de extra punten 6-15 van de architect. Niets gedeployd, geen Cloudflare-acties, geen secrets,
 niets naar main. CACHE `scc-v126` → `scc-v127` (één keer).
 
 ## Wat er gedaan is
@@ -85,6 +85,19 @@ niets naar main. CACHE `scc-v126` → `scc-v127` (één keer).
     toont afgerond); de laatste giet in het schema aanpassen schrijft het totale water bovenaan (dus
     niet twee keer invullen); temp en doeltijd veranderen mee in staptekst ("93°C", "0:28").
     Beginwaarden worden bij focus vastgelegd, zodat ook een AI-voorstel dat de velden zet klopt.
+15. **Recepteditor, methode-rij** (`#rec-methods`): één rij, alleen zijwaarts scrollen
+    (`flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; touch-action:pan-x`); alleen methodes met
+    `on`. Bij een V60 een schakelaar **with Switch · valve per step** als je een Switch als methode of in
+    je gear hebt (zelfde klep-per-stap als de vaste Switch-recepten bij de V60 in de gietcoach);
+    aan = klep-kolom in het schema en de klep wordt opgeslagen. Opent een recept met klep-stappen,
+    dan staat hij vanzelf aan. Verborgen omdat ze voor de gekozen methode nergens toe doen:
+    - "let AI draft the schedule" + uitlegregel bij espresso (de AI schrijft alleen giet-schema's);
+    - de klep-kolom behalve bij Switch / V60 met Switch;
+    - stap-soorten die niet bij de methode horen (filter: geen shot/milk, flip/press alleen AeroPress;
+      espresso: geen bloom/pour/swirl/stir/drawdown); een opgeslagen andere soort blijft wel staan;
+    - bij "grind setting" stonden ook drippers/weegschalen uit je gear als molen-knop: nu alleen molens.
+    Stap-soorten en klep staan nu in het Engels in de keuzelijst (pour, stir, wait, drawdown, valve
+    closed/open …); de opgeslagen waarden blijven gelijk.
 
 ## Oorzaak methode-plaatjes (punt 8)
 
@@ -105,7 +118,7 @@ toestel een heel andere oorzaak heeft (bv. Safari en `mix-blend-mode` + filter),
   toegang/503, server-sleutel + telling + standaardstem, atomaire daglimiet + terugtellen + geen lek,
   eigen sleutel telt niets).
 - Playwright chromium (executablePath /opt/pw-browsers/chromium, --trace off, lokale config niet
-  gecommit): **72/72** groen (was 63; +9 in `tests/na-live-1.spec.cjs`).
+  gecommit): **73/73** groen (was 63; +10 in `tests/na-live-1.spec.cjs`).
 - Aangepaste bestaande tests: kleine-punten (tabbalk met social, tandwiel), aeropress/gietcoach/
   kleine-klussen (nieuwe receptnamen, standard/inverted), volgen (feedkleur `--accent`, toast
   "in your brew ideas"), workspace (Engelse statusregel).
@@ -114,6 +127,7 @@ toestel een heel andere oorzaak heeft (bv. Safari en `mix-blend-mode` + filter),
 
 - `werk/screens-na-live-1/settings.png` — Settings met bruine grote kaart
 - `werk/screens-na-live-1/settings-coach-voice.png` — coach voice met Lets Brew voice / own key (social aan: tandwiel-modus)
+- `werk/screens-na-live-1/recepteditor.png` — recepteditor: methode-rij, with Switch, dose/water
 - `werk/screens-na-live-1/beans.png` — Beans, "In stock" bruin, lege wishlist zonder tekst
 - `werk/screens-na-live-1/ai-vraagscherm.png` — Coffee coach met "Ask Lets Brew AI" en getekende iconen
 - `werk/screens-na-live-1/home.png`, `home-social.png` — Home zonder intro, knoppen, tabbalk met/zonder social
