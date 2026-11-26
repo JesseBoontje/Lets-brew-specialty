@@ -332,6 +332,66 @@ volgen, likes, blokkeren, melden en foto's opladen/wissen.
 `van:"<handle>/brew/<id>"`; op een bean een wens in `wishlist` met hetzelfde
 `van`-veld. Een gedeelde link is `/?u=<handle>`.
 
+## Beheer en Lets Brew AI (vlag `account`, stap 3)
+
+Geen eigen vlag: valt onder `account`. De server beslist; de app toont alleen wat
+`/api/auth/me` zegt.
+
+### Wat erbij kwam in D1
+
+- `users.locked` (migratie `0002_locked.sql`, `INTEGER NOT NULL DEFAULT 0`): een account
+  op slot kan niet inloggen (403 `{code:"locked"}`), en een bestaande sessie telt nergens
+  meer (sync, volgen, feed, foto's, AI: 401). Op slot zetten wist ook de sessies.
+- `users.is_admin` en `users.ai_allowed` bestonden al (0001). `is_admin` zet de beheerder
+  zelf in D1; er is geen route voor.
+- `ai_usage(user_id, day, count)` bestond al: `day` is de datum in Europe/Amsterdam
+  (`YYYY-MM-DD`), dus de teller begint om middernacht Nederlandse tijd opnieuw.
+
+### `/api/auth/me`
+
+`{user:{handle, visibility, admin, ai}, ai:{used, limit}}`; `ai` alleen als het account
+Lets Brew AI mag. De app bewaart `admin` en `ai` in `state.sync.user`, zodat de keuze na
+het openen meteen klopt; bij elke keer Settings openen wordt het opnieuw gevraagd.
+
+### Routes voor de beheerder (`is_admin=1`, anders 403; `Origin` en JSON bij POST)
+
+`GET /api/admin/users` → `{users:[{handle, name, created, ai_allowed, locked, admin,
+ai_today}], total_today, limit, day}` · `POST /api/admin/user {handle, ai_allowed?,
+locked?}` (jezelf op slot zetten kan niet) · `GET /api/admin/reports` → `{reports:[{id,
+reason, at, by, about, about_locked}]}` (nieuwste eerst, max 200) · `POST
+/api/admin/reports {id, action:"dismiss"|"block"}`: dismiss wist de melding; block zet het
+gemelde account op slot en wist alle meldingen over dat account. Interne user-id's gaan
+nooit naar buiten, alleen handles.
+
+### `POST /api/ai`
+
+Alleen ingelogd, `ai_allowed=1` en niet op slot (anders 401/403 `{code:"not_allowed"}`).
+De sleutel staat alleen in de Worker-secret `ANTHROPIC_API_KEY`; ontbreekt hij: 503
+`{error:"AI is not set up yet.", code:"not_set_up"}`. Het lijf heeft de vorm van de
+Anthropic Messages-API; de server laat alleen `model`, `max_tokens`, `messages`,
+`stream` en `system` door (ook binnen een bericht alleen `text` en base64-`image`), kiest
+het model uit een vaste lijst (`AI_MODEL`, komma's toegestaan, de eerste is de standaard;
+zonder `AI_MODEL` hetzelfde model als de app voor Anthropic gebruikt), en zet
+`max_tokens` op hoogstens 4000. Lijf max 6 MB (foto's van zakken). `stream:true` komt
+terug als `text/event-stream`. Per gebruiker per dag 50 vragen: de teller gaat in één
+statement omhoog vóór het doorsturen (boven de 50: 429 `{error:"Daily limit reached (50).
+Resets at midnight.", code:"limit"}`); mislukt het bij Anthropic, dan telt de vraag niet.
+Elk antwoord heeft de kop `X-AI-Left` met wat er vandaag nog over is. Rate limit:
+`STEM_LIMITER` met sleutel `ai:<user-id>`. Fouttekst van Anthropic gaat niet door naar de
+app, de sleutel en de berichten worden nergens gelogd.
+
+### In de app
+
+Aanbieder `letsbrew` ("Lets Brew AI") in `AI_AANBIEDERS`: url `/api/ai`, geen sleutel,
+`credentials:"same-origin"`, verder dezelfde vorm als Anthropic. Kiesbaar in *Settings →
+AI* (keuze "Lets Brew AI" / "own key") alleen met vlag `account`, ingelogd en `ai`.
+`scc_ai_prov` kan nu ook `letsbrew` zijn; `scc_ai_prov_eigen` onthoudt welke
+eigen-sleutel-aanbieder je daarnaast had. Mag het account het niet (meer), dan valt de
+keuze vanzelf terug op die eigen aanbieder. Is de daglimiet op (of staat AI op de server
+uit), en staat er een eigen sleutel in dit tabblad, dan vraagt de app die (reserve).
+Lets Brew AI telt niet mee in `state.ai` (AI-budget): het kost jou niets.
+De kaart *accounts* in Settings is er alleen voor `admin`.
+
 ## Waar de maalstand vandaan komt
 
 `grind` en `dials[].grind` zijn vrije tekst, met opzet. De ene molen heeft
