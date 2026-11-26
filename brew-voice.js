@@ -28,7 +28,7 @@ globalThis.BrewVoice=(()=>{
  }
  async function start(){
   if(starting||peer)return;const key=getKey('openai');
-  if(!aiEnabled()||!key){setAiProv('openai');go('profile');renderProfile();document.getElementById('ai-card').classList.add('open');document.getElementById('ai-card').closest('details')?.setAttribute('open','');toast('Live spraak gebruikt je eigen OpenAI API-sleutel.');return;}
+  if(!aiEnabled()||!key){setAiProv('openai');go('profile');renderProfile();setToon('ai-card');toast('Live spraak gebruikt je eigen OpenAI API-sleutel.');return;}
   if(!isSecureContext||!navigator.mediaDevices?.getUserMedia||!globalThis.RTCPeerConnection){status('Live spraak vraagt HTTPS, microfoontoegang en een browser met WebRTC. Je kunt hieronder gewoon typen.');return;}
   if(!confirm('Live spraak gebruikt je eigen OpenAI API-tegoed. Je stem en de gekozen koffiecontext gaan naar OpenAI. Het gesprek stopt uiterlijk na 10 minuten. Starten?'))return;
   starting=true;const ownTurn=++turn;document.getElementById('ws-voice-start').disabled=true;document.getElementById('ws-voice-stop').disabled=false;status('Microfoon en beveiligde spraaksessie starten…');

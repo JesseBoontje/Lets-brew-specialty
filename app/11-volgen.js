@@ -189,10 +189,11 @@ function volgTellers(c){
 }
 function volgRender(){
   volgNav();
+  try{renderSetGroot();setWaarden();volgHomeRegel();}catch(e){}
   const card=document.getElementById('volg-card');if(!card)return;
   const aan=featOn('social');card.style.display=aan?'block':'none';
   const body=document.getElementById('volg-body');if(!aan||!body)return;
-  if(!featOn('account')||!acctIngelogd()){body.innerHTML='<div class="set-d">Turn on account & sync and sign in above to follow people.</div>';return;}
+  if(!featOn('account')||!acctIngelogd()){body.innerHTML='<div class="set-d">Turn on account & sync and sign in above to follow people.</div>'+'<button class="profile-btn" id="volg-uit" onclick="toggleFeature(\'social\')">turn off follow &amp; feed</button>';return;}
   const me=volg.me;
   if(!me){body.innerHTML='<div class="set-d">'+esc(volg.fout||'loading…')+'</div>';if(!volg.meLaden&&!volg.fout)volgLaadMij();return;}
   const p=me.profile,pub=p.visibility==='public';
@@ -208,7 +209,7 @@ function volgRender(){
     lijst('followers',me.followers,h=>'<button class="volg-k" onclick="volgVolgerWeg(\''+h+'\')">remove</button>','nobody yet')+
     lijst('following',me.following,h=>{const f=me.following.find(x=>x.handle===h);return (f&&f.status==='pending'?'<span class="volg-st">requested</span>':'')+'<button class="volg-k" onclick="volgOntvolg(\''+h+'\')">'+(f&&f.status==='pending'?'cancel':'unfollow')+'</button>';},'nobody yet')+
     (me.blocked.length?lijst('blocked',me.blocked,h=>'<button class="volg-k" onclick="volgDeblok(\''+h+'\')">unblock</button>',''):'')+
-    '<div class="set-d acct-privacy"><b>what others see:</b> bean name, roaster, origin, process, method, dose, yield, ratio, time, temperature, score, taste tags and the photo. <b>never:</b> price, your own notes, wishlist, budget, gear and grind. Turning follow & feed off makes your account private again; photos already online stay until you delete the bean or brew, or your account.</div>';
+    '<div class="set-d acct-privacy"><b>what others see:</b> bean name, roaster, origin, process, method, dose, yield, ratio, time, temperature, score, taste tags and the photo. <b>never:</b> price, your own notes, wishlist, budget, gear and grind. Turning follow & feed off makes your account private again; photos already online stay until you delete the bean or brew, or your account.</div>'+'<button class="profile-btn" id="volg-uit" onclick="toggleFeature(\'social\')">turn off follow &amp; feed</button>';
 }
 function volgZoekHtml(){
   if(!volg.zoekQ)return '';

@@ -138,7 +138,6 @@ test('tare: weights in my gear, aim and check; use as dose',async({page})=>{
  await open(page);
  // in het profiel invullen
  await page.evaluate(()=>go('profile'));
- await page.getByText('My setup').tap();   // my gear: My setup > my gear
  await page.getByRole('button',{name:/my gear/}).tap();
  await page.locator('#tare-naked').fill('512,4');await page.locator('#tare-naked').blur();
  await page.locator('#tare-ring').fill('38.6');await page.locator('#tare-ring').blur();

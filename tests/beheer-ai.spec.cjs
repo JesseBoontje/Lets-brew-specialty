@@ -61,7 +61,7 @@ test('admin turns AI on, the user picks Lets Brew AI, gets an answer and the cou
   await expect(pS.locator('#beheer-card')).toBeHidden();
 
   // jesse (admin): Settings → accounts, AI aan voor sanne
-  await pJ.evaluate(()=>go('profile'));
+  await pJ.evaluate(()=>{go('profile');setToon('beheer-card');});
   const kaart=pJ.locator('#beheer-card');
   await expect(kaart).toBeVisible();
   await expect(kaart).toContainText('Only you see this card.');
@@ -81,7 +81,7 @@ test('admin turns AI on, the user picks Lets Brew AI, gets an answer and the cou
   expect(env.DB.db.prepare("SELECT locked FROM users WHERE handle='troll'").get().locked).toBe(1);
 
   // sanne: na het opnieuw openen van Settings is de keuze er
-  await pS.evaluate(()=>{go('home');go('profile');const c=document.getElementById('ai-card');c.classList.add('open');c.closest('details').open=true;});
+  await pS.evaluate(()=>{go('home');go('profile');const c=document.getElementById('ai-card');setToon('ai-card');});
   await expect(pS.locator('#ai-kies-lb')).toBeVisible();
   await pS.locator('#ai-kies-lb').click();
   await expect(pS.locator('#ai-lb-dag')).toContainText('0 of 50 questions');
@@ -141,7 +141,7 @@ test('without the account flag there is no Lets Brew AI choice and no accounts c
  await page.route(/\/api\//,r=>{calls.push(r.request().url());r.fulfill({status:404,body:'{}'});});
  await page.goto('/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>currentPage==='home'&&typeof BrewWorkspace!=='undefined');
- await page.evaluate(()=>{localStorage.setItem('scc_ai_on','1');localStorage.setItem('scc_ai_prov','letsbrew');go('profile');const c=document.getElementById('ai-card');c.classList.add('open');c.closest('details').open=true;});
+ await page.evaluate(()=>{localStorage.setItem('scc_ai_on','1');localStorage.setItem('scc_ai_prov','letsbrew');go('profile');const c=document.getElementById('ai-card');setToon('ai-card');});
  await expect(page.locator('#ai-eigen')).toBeVisible();
  await expect(page.locator('#ai-kies-lb')).toHaveCount(0);
  await expect(page.locator('#beheer-card')).toBeHidden();

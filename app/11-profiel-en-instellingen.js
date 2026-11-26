@@ -134,7 +134,7 @@ function freshPeakText(b,pk,days){
 /* ---------------- features: het schakelbord ---------------- */
 // alles wat nieuw bijgebouwd wordt staat hier, met eigen aan/uit-knop in profiel.
 const FEATURES=[
-  {id:'shotclock', n:'E61 shot clock', d:'pull the lever on the dial-in screen — time fills in, stays editable', def:true, cat:'app'},
+  {id:'shotclock', n:'shot clock (E61)', d:'pull the lever on the dial-in screen — time fills in, stays editable', def:true, cat:'app'},
   {id:'journey', n:'dial-in journey', d:'your attempts drawn as a line walking into the target band', def:true, cat:'app'},
   {id:'pourcoach', n:'pour coach', d:'filter recipes that run with a clock while you pour', def:true, cat:'app'},
   {id:'drawdown', n:'drawdown & bed', d:'log how long it drained and what the bed looked like', def:true, cat:'app'},
@@ -148,7 +148,7 @@ const FEATURES=[
   {id:'freshgauge', n:'freshness gauge', d:'rest → peak → fading as a dial on each bean', def:true, cat:'app'},
   {id:'smartdefaults', n:'smart defaults', d:'last dose, grind & temp prefilled — never retype', def:true, cat:'app'},
   {id:'peakalert', n:'peak heads-up', d:'a quiet line on home when a bean in stock reaches its best days', def:true, cat:'app'},
-  {id:'route', n:'which way?', d:'an omni bean, or a bean with more methods: pick espresso or filter first, your last choice on top', def:true, cat:'app'},
+  {id:'route', n:'espresso or filter first', d:'an omni bean, or a bean with more methods: pick espresso or filter first, your last choice on top', def:true, cat:'app'},
   {id:'surprise', n:'surprise me', d:'a new recipe for a bean on your shelf — you look it over first, AI makes it smarter', def:true, cat:'app'},
   {id:'cost', n:'cost per cup', d:'price & bag size on a bean → what a cup costs you', def:true, cat:'app'},
   {id:'aibudget', n:'AI budget', d:'what the AI cost you this month, and one heads-up at 20% and 10%', def:true, cat:'smart'},
@@ -183,18 +183,7 @@ function applyFeatures(){
   // de nachtstand is weg (keuze 19-11-2026); een oude instelling mag niets meer doen
   document.documentElement.classList.remove('night');
 }
-function renderFeatures(){
-  const el=document.getElementById('feat-list');if(!el)return;
-  const GROUPS=[['app','in the app'],['people','people & learning'],['smart','smart & connected']];
-  el.innerHTML=GROUPS.map(([c,label])=>{
-    const rows=FEATURES.filter(f=>(f.cat||'app')===c);
-    if(!rows.length)return '';
-    return `<div class="feat-group">${esc(label)}</div>`+rows.map(f=>`<div class="feat-row">
-      <div class="ft"><div class="n">${esc(f.n)}</div><div class="d">${esc(f.d)}</div></div>
-      <div class="toggle ${featOn(f.id)?'on':''}" onclick="toggleFeature('${f.id}')"><div class="knob"></div></div>
-    </div>`).join('');
-  }).join('');
-}
+// renderFeatures staat in app/11-instellingen.js (Settings per onderwerp)
 
 /* ---------------- AI-instellingen ---------------- */
 function aiEnabled(){return localStorage.getItem('scc_ai_on')==='1';}
@@ -225,13 +214,13 @@ function renderProfile(){
   renderShortcuts();
   try{apiStat();}catch(e){}
   try{renderAiBudget();}catch(e){}
+  // my taste staat er altijd; de smaakherinnering zelf alleen met de vlag aan
   const tm=document.getElementById('tm-card');if(tm)tm.style.display=featOn('tastememory')?'block':'none';
-  const wk=document.getElementById('week-card');
-  if(wk)wk.style.display=featOn('tastememory')?'block':'none';
   renderPairing();
   const pu=document.getElementById('push-url');if(pu)pu.value=localStorage.getItem('scc_push_url')||'';
   const cr=document.getElementById('b-cost-row');if(cr)cr.style.display=featOn('cost')?'flex':'none';
   applyAIVisibility();
+  try{instRender();}catch(e){}
 }
 /* ---------------- mijn uitrusting (gear) ----------------
    Een naam alleen zegt niet wat iets IS: "Eureka Libra" kan voor een mens
@@ -977,6 +966,8 @@ async function exportData(){
   const a=document.createElement('a');
   a.href=url;a.download='lets-brew-specialty-backup.json';a.click();
   URL.revokeObjectURL(url);toast('back-up downloaded');
+  try{localStorage.setItem('scc_last_backup',String(Date.now()));}catch(e){}
+  try{setWaarden();}catch(e){}
 }
 function importData(ev){
   const file=ev.target.files&&ev.target.files[0];if(!file)return;
