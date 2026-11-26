@@ -306,7 +306,11 @@ Na een geslaagde sync verkleint de app de eigen `data:`-foto van een bean of bre
 {h}` onthoudt wat er al staat. Online heet hij `foto/<user-id>.<willekeurig>` en
 staat de sleutel in `records.photo_key`. Ophalen kan alleen met dezelfde
 zichtrechten als het record. Wissen via sync, `DELETE /api/foto` of account
-wissen haalt hem ook uit R2. De telefoon houdt zijn eigen foto.
+wissen haalt hem ook uit R2. De telefoon houdt zijn eigen foto. Zet je de vlag
+`social` uit, dan gaat je account online terug naar `private` (lukt dat niet, dan bij de
+volgende sync: `sync.socialUit`), maar foto's die al online staan blijven daar tot je het
+record of je account wist. Opgehaald worden ze met `Cache-Control: private, no-store`.
+Een private profiel zonder geaccepteerd volgen toont alleen handle en naam (`counts:null`).
 
 ### Routes (sessie nodig, `Origin` moet kloppen bij POST/DELETE)
 

@@ -24,7 +24,7 @@ async function vraag(env,wie,method,path,body,headers={}){
  if(body!==undefined&&!(body instanceof Uint8Array))h['Content-Type']='application/json';
  const r=await socialRoute(new Request(ORIGIN+path,{method,headers:h,body:body===undefined?undefined:body instanceof Uint8Array?body:JSON.stringify(body)}),env);
  const type=r.headers.get('Content-Type')||'';
- return {status:r.status,data:type.includes('json')?await r.json():new Uint8Array(await r.arrayBuffer()),type};
+ return {status:r.status,cache:r.headers.get('Cache-Control'),data:type.includes('json')?await r.json():new Uint8Array(await r.arrayBuffer()),type};
 }
 // records rechtstreeks, zoals sync ze zou zetten
 function record(env,wie,kind,id,data,updated=Date.now()){
@@ -88,7 +88,7 @@ test('zichtrechten: private, pending, accepted, public en block; profiel en item
  record(env,open,'bean','o1',{...BEAN,id:'o1',name:'Open bean'});
  // private, niet gevolgd: profiel zichtbaar, items niet
  let p=(await vraag(env,jesse,'GET','/api/social/u/sanne')).data;
- assert.equal(p.profile.canView,false);assert.equal(p.items.length,0);assert.equal(p.profile.counts.brews,1);assert.equal(p.profile.counts.beans,1);
+ assert.equal(p.profile.canView,false);assert.equal(p.items.length,0);assert.equal(p.profile.counts,null);assert.equal(p.profile.handle,'sanne');
  assert.equal((await vraag(env,jesse,'GET','/api/social/u/sanne/items')).status,403);
  // pending: nog steeds niet
  await vraag(env,jesse,'POST','/api/social/follow',{handle:'sanne'});
@@ -97,7 +97,10 @@ test('zichtrechten: private, pending, accepted, public en block; profiel en item
  // accepted: brews en beans, geen dial-in, gear of recepten, geen privévelden
  await vraag(env,sanne,'POST','/api/social/request',{handle:'jesse',accept:true});
  p=(await vraag(env,jesse,'GET','/api/social/u/sanne')).data;
- assert.equal(p.profile.canView,true);
+ assert.equal(p.profile.canView,true);assert.equal(p.profile.counts.brews,1);assert.equal(p.profile.counts.beans,1);
+ // een dial-in-poging is niet te liken
+ assert.equal((await vraag(env,jesse,'POST','/api/social/like',{handle:'sanne',kind:'brew',id:'d1'})).status,404);
+ assert.equal((await vraag(env,jesse,'POST','/api/social/like',{handle:'sanne',kind:'brew',id:'w1'})).status,200);
  assert.deepEqual(p.items.map(i=>i.kind+'/'+i.id).sort(),['bean/b1','brew/w1']);
  const tekst=JSON.stringify(p);
  for(const s of ['geheim','fijner','18.5','shop.example','Comandante','22 clicks'])assert.equal(tekst.includes(s),false,s);
@@ -191,7 +194,7 @@ test('fotos: alleen eigenaar uploadt, jpeg/webp, max 1 MB; ophalen met de rechte
  assert.equal(env.FOTOS.m.has('foto/'+eerste.key),false);assert.equal(env.FOTOS.m.has('foto/'+tweede.key),true);
  // eigenaar ziet hem; een ander pas als volger; het item draagt de url
  let r=await vraag(env,sanne,'GET',tweede.url);
- assert.equal(r.status,200);assert.equal(r.type,'image/jpeg');assert.deepEqual([...r.data],[...JPEG]);
+ assert.equal(r.status,200);assert.equal(r.type,'image/jpeg');assert.equal(r.cache,'private, no-store');assert.deepEqual([...r.data],[...JPEG]);
  assert.equal((await vraag(env,jesse,'GET',tweede.url)).status,404);
  assert.equal((await vraag(env,jesse,'GET','/api/foto/'+eerste.key)).status,404);
  await vraag(env,jesse,'POST','/api/social/follow',{handle:'sanne'});

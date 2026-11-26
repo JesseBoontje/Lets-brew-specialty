@@ -145,7 +145,15 @@ function volgTry(k){
     temp:d.temp>0?d.temp:(fam==='espresso'?93:94),maling:fam==='espresso'?'fijn':'medium',stand:'',molen:null,
     houding:(typeof isAeropress==='function'&&isAeropress(mid))?'normaal':null,
     over:'Uit de feed van @'+h+(d.tags&&d.tags.length?': '+d.tags.join(', '):''),voor:[mid],van:k};
-  if(fam!=='espresso'){
+  if(fam==='espresso'){
+    // zoals het ingebouwde e-classic: dose, tamp, shot, stop op de doeltijd
+    const tSec=(typeof parseTimeSec==='function'&&parseTimeSec(d.time))||28;
+    r.pre={on:false,s:5,rust:3};
+    r.stappen=[{t:0,p:0,k:'dose',klep:null,d:'weeg '+dose+' g en verdeel het maalsel (WDT)'},
+      {t:0,p:0,k:'tamp',klep:null,d:'tamp recht en waterpas'},
+      {t:0,p:0,k:'shot',klep:null,d:'start de shot en de klok'},
+      {t:tSec,p:0,k:'stop',klep:null,d:'stop op '+Math.round(dose*ratio)+' g uit en proef meteen'}];
+  }else{
     const klep=(typeof isSwitch==='function'&&isSwitch(mid))?'open':null;
     r.stappen=[{t:0,p:Math.min(0.2,2/ratio),k:'bloom',klep,d:'bloom: giet 2× je dose tot alles nat is'},
       {t:45,p:1,k:'giet',klep,d:'giet in rustige cirkels tot je eindgewicht'}];
@@ -200,7 +208,7 @@ function volgRender(){
     lijst('followers',me.followers,h=>'<button class="volg-k" onclick="volgVolgerWeg(\''+h+'\')">remove</button>','nobody yet')+
     lijst('following',me.following,h=>{const f=me.following.find(x=>x.handle===h);return (f&&f.status==='pending'?'<span class="volg-st">requested</span>':'')+'<button class="volg-k" onclick="volgOntvolg(\''+h+'\')">'+(f&&f.status==='pending'?'cancel':'unfollow')+'</button>';},'nobody yet')+
     (me.blocked.length?lijst('blocked',me.blocked,h=>'<button class="volg-k" onclick="volgDeblok(\''+h+'\')">unblock</button>',''):'')+
-    '<div class="set-d acct-privacy"><b>what others see:</b> bean name, roaster, origin, process, method, dose, yield, ratio, time, temperature, score, taste tags and the photo. <b>never:</b> price, your own notes, wishlist, budget, gear and grind.</div>';
+    '<div class="set-d acct-privacy"><b>what others see:</b> bean name, roaster, origin, process, method, dose, yield, ratio, time, temperature, score, taste tags and the photo. <b>never:</b> price, your own notes, wishlist, budget, gear and grind. Turning follow & feed off makes your account private again; photos already online stay until you delete the bean or brew, or your account.</div>';
 }
 function volgZoekHtml(){
   if(!volg.zoekQ)return '';
@@ -223,6 +231,13 @@ async function volgPost(path,body,method='POST'){
   catch(e){toast(e.status===429?'slow down a little':(e.message||'that did not work'));return null;}
 }
 async function volgNaam(v){const r=await volgPost('/api/social/profile',{name:v});if(r){volg.me=r;toast('✓ name saved');volgRender();}}
+/* vlag uit: je account gaat online terug naar private (ook als het nu niet lukt: bij de volgende sync) */
+async function volgVlagUit(){
+  if(!featOn('account')||!acctIngelogd())return;
+  const s=acctSync0();s.socialUit=true;
+  try{await acctApi('/api/social/profile',{body:{visibility:'private'}});s.socialUit=false;if(s.user)s.user.visibility='private';}catch(e){}
+  volg.me=null;volg.feed=[];volg.geladen=false;save();
+}
 async function volgZicht(v){const r=await volgPost('/api/social/profile',{visibility:v});if(r){volg.me=r;state.sync.user.visibility=v;save();volgRender();toast(v==='public'?'✓ public: anyone can follow':'✓ private: you decide who follows');}}
 async function volgVerzoek(h,ja){const r=await volgPost('/api/social/request',{handle:h,accept:ja});if(r){volg.me=r;volgRender();toast(ja?'✓ @'+h+' follows you now':'declined');}}
 async function volgVolgerWeg(h){if(!confirm('Remove @'+h+' as a follower?'))return;const r=await volgPost('/api/social/follower',{handle:h},'DELETE');if(r){volg.me=r;volgRender();}}
@@ -278,7 +293,7 @@ function renderPerson(){
     else knop='<button class="profile-btn acct-hoofd" id="person-volg" onclick="volgVolg(\''+h+'\')">'+(pr.visibility==='public'?'follow':'ask to follow')+'</button>';
     if(pr.followsYou==='pending')knop+='<div class="volg-rij"><span>@'+esc(h)+' wants to follow you</span><span class="volg-acties"><button class="volg-k vol" onclick="volgVerzoek(\''+h+'\',true).then(()=>volgLaadPersoon(\''+h+'\'))">accept</button><button class="volg-k" onclick="volgVerzoek(\''+h+'\',false).then(()=>volgLaadPersoon(\''+h+'\'))">decline</button></span></div>';
   }
-  el.innerHTML='<div class="subtitle">'+esc(pr.name||h)+' · '+(pr.visibility==='public'?'public':'private')+'</div>'+volgTellers(pr.counts)+knop+
+  el.innerHTML='<div class="subtitle">'+esc(pr.name||h)+' · '+(pr.visibility==='public'?'public':'private')+'</div>'+(pr.counts?volgTellers(pr.counts):'')+knop+
     (pr.canView
       ?(p.items.length?p.items.map(volgItemHtml).join(''):'<div class="set-d">No brews or beans yet.</div>')+(p.next?'<button class="profile-btn" onclick="volgPersoonMeer()">more</button>':'')
       :'<div class="settings-card sketch soft"><div class="set-d">This account is private. Ask to follow to see their brews and beans.</div></div>')+
@@ -338,7 +353,13 @@ async function volgFotos(){
 }
 
 /* ---------------- starten ---------------- */
+// een recept zonder stappen (van vóór de keuring) breekt de lijsten: herstel met een lege lijst
+function volgHerstelRecepten(){
+  let n=0;for(const r of state.recipes||[])if(r&&!Array.isArray(r.stappen)){r.stappen=[];n++;}
+  if(n)save();
+}
 function volgStart(){
+  try{volgHerstelRecepten();}catch(e){}
   volgNav();
   const reel=document.getElementById('feed-reel');if(reel)reel.addEventListener('scroll',volgFeedScroll,{passive:true});
   // een gedeelde link: ?u=<handle>

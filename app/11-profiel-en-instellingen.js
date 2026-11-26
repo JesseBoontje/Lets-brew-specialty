@@ -172,6 +172,8 @@ function featOn(id){
 function toggleFeature(id){
   if(!state.features)state.features={};
   state.features[id]=!featOn(id);
+  if(id==='social'&&!featOn('social')&&typeof volgVlagUit==='function')volgVlagUit();
+  if(typeof volgNav==='function')volgNav();
   save();applyFeatures();
   if(currentPage==='profile')renderProfile();else renderFeatures();
   const f=FEATURES.find(x=>x.id===id);

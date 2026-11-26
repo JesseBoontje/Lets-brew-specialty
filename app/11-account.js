@@ -144,6 +144,7 @@ async function acctSync(handmatig){
     await save();
     if(handmatig)toast('✓ synced');
     if(typeof volgFotos==='function')volgFotos();
+    if(s.socialUit&&!featOn('social')&&typeof volgVlagUit==='function')volgVlagUit();
     return true;
   }catch(e){
     if(e.status===401){acctMelding='signed out — sign in again to sync';acctUitgelogd();}
@@ -228,7 +229,7 @@ function acctWanneer(t){
   if(s<86400)return Math.round(s/3600)+' h ago';
   return new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 }
-const ACCT_PRIVACY='<b>what is online:</b> a copy of your beans, brews, gear, own recipes and dial-in attempts. Photos stay on this phone, unless you turn on follow & feed: then a smaller copy goes online for the people who may see it. '+
+const ACCT_PRIVACY='<b>what is online:</b> a copy of your beans, brews, gear, own recipes and dial-in attempts. Photos stay on this phone, unless you turn on follow & feed: then a smaller copy goes online for the people who may see it; photos already online stay there until you delete the bean or brew, or your account. '+
   '<b>where:</b> Cloudflare, in the EU. '+
   '<b>private:</b> price and your own notes are never shown to anyone else — also not later, when you share. No password and no email: your iPhone keeps the key in iCloud Keychain. '+
   '<b>delete:</b> the button below removes your account and everything online at once. This phone keeps its own copy.';

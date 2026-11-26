@@ -159,7 +159,8 @@ async function anderProfiel(env,ik,handle,cursor,alleenItems){
  const zien=u.id===ik.id||u.visibility==='public'||r.ikVolg==='accepted';
  const lijst=zien?await items(env,ik.id,{cursor,scope:'r.user_id=?',binds:[u.id]}):{items:[],next:null};
  if(alleenItems)return zien?json(lijst):json({error:'This account is private.'},403);
- return json({profile:{handle:u.handle,name:u.name||u.handle,visibility:u.visibility,counts:await tellers(env,u.id),
+ // private zonder geaccepteerd volgen: alleen handle en naam, geen tellers
+ return json({profile:{handle:u.handle,name:u.name||u.handle,visibility:u.visibility,counts:zien?await tellers(env,u.id):null,
   self:u.id===ik.id,status:r.ikVolg,followsYou:r.zijVolg,canView:zien},...lijst});
 }
 
@@ -194,7 +195,8 @@ async function like(env,ik,body,aan){
  const u=await userOp(env,handleUit(body.handle));
  if(!u||!DEEL_KINDS.includes(body.kind)||typeof body.id!=='string'||!ID.test(body.id))return nietGevonden();
  if(!await magZien(env,ik.id,u))return nietGevonden();
- const rec=await env.DB.prepare('SELECT 1 FROM records WHERE user_id=? AND kind=? AND id=? AND deleted=0').bind(u.id,body.kind,body.id).first();
+ // alleen wat ook in feed of profiel staat: geen dial-in-pogingen
+ const rec=await env.DB.prepare(`SELECT 1 FROM records WHERE user_id=? AND kind=? AND id=? AND deleted=0 AND ${GEEN_DIAL}`).bind(u.id,body.kind,body.id).first();
  if(!rec)return nietGevonden();
  if(aan)await env.DB.prepare('INSERT INTO likes(user_id,owner_id,kind,id,created_at) VALUES(?,?,?,?,?) ON CONFLICT DO NOTHING').bind(ik.id,u.id,body.kind,body.id,Date.now()).run();
  else await env.DB.prepare('DELETE FROM likes WHERE user_id=? AND owner_id=? AND kind=? AND id=?').bind(ik.id,u.id,body.kind,body.id).run();
@@ -268,7 +270,7 @@ async function fotoHaal(env,ik,key){
  if(!rec||!await magZien(env,ik.id,{id:rec.id,visibility:rec.visibility}))return nietGevonden();
  const obj=await env.FOTOS.get('foto/'+key);if(!obj)return nietGevonden();
  const type=obj.httpMetadata?.contentType==='image/webp'?'image/webp':'image/jpeg';
- return new Response(obj.body,{status:200,headers:{'Content-Type':type,'Cache-Control':'private, max-age=600','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'",'Referrer-Policy':'no-referrer'}});
+ return new Response(obj.body,{status:200,headers:{'Content-Type':type,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'",'Referrer-Policy':'no-referrer'}});
 }
 
 /* ---------- router ---------- */

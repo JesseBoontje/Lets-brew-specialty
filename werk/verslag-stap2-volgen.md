@@ -95,3 +95,27 @@ records.photo_key, users.name/visibility). De feed sorteert op `records.updated_
 - Webkit niet lokaal getest; niet op een echte iPhone (deelmenu, scroll-snap-gevoel).
 - In de Playwright-test komen sessies rechtstreeks in de tabel (inloggen zelf is in stap 1
   getest).
+
+## Herstel na keuring (26-11, afgekeurd op 1 blokkerend + 4)
+1. **Espresso-try zonder stappen (blokkerend)**: `volgTry` geeft een espresso-recept nu
+   stappen zoals e-classic (dose, tamp, shot, stop op de doeltijd uit de brew, anders 0:28)
+   en `pre` uit. Weergave robuust gemaakt voor recepten zonder `stappen`:
+   `brew-workspace.js` (lijst brew ideas, recept bij een brew, voorstel bewerken),
+   `app/04-brew-formulier.js` (doeltijd filter, recept openen, pour-status),
+   `app/01-kennis.js` (stappen schalen). Bij het starten krijgt een eigen recept zonder
+   `stappen` een lege lijst (`volgHerstelRecepten`). Playwright-test: try op een
+   espresso-brew, brew ideas openen met ook een oud recept zonder stappen, na herladen
+   hersteld, geen paginafouten.
+2. `like()`: de bestaansquery sluit dial-in-pogingen uit (`GEEN_DIAL`). Node-test: like
+   op een dial-in geeft 404.
+3. Foto's ophalen: `Cache-Control: private, no-store` (getest).
+4. Vlag social uit: de app zet het account online terug op private (`volgVlagUit`; lukt
+   het niet, dan bij de volgende sync via `sync.socialUit`) en de Feed-tab verdwijnt
+   meteen. SCHEMA.md, de privacytekst van de accountkaart en die van de profielkaart
+   zeggen dat foto's die al online staan blijven tot je het record of je account wist.
+   Playwright-test: public → vlag uit → server private.
+5. Private profiel zonder geaccepteerd volgen: alleen handle en naam, `counts:null`
+   (de app toont dan geen tellers). Node-test aangepast.
+
+Uitkomst na herstel: build groen; Node **42 groen, 0 rood**; Playwright chromium
+**53 groen, 0 rood** (volgen.spec.cjs nu 3 tests). Nog steeds geen migratie 0002.

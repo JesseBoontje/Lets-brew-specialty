@@ -131,6 +131,45 @@ test('two accounts: ask, accept, feed shows the brew and photo, try fills recipe
  await cS.close();await cJ.close();
 });
 
+test('try on an espresso brew gives a recipe with steps; brew ideas open without errors, also with an old recipe without steps; flag off makes the account private',async({browser,browserName})=>{
+ test.skip(browserName!=='chromium','one engine is enough for this flow');
+ const env={DB:nep.nepD1(),FOTOS:r2.nepR2()};
+ const jesse=await gebruiker(env,'jesse'),anna=await gebruiker(env,'anna');
+ env.DB.db.prepare("UPDATE users SET visibility='public' WHERE id=?").run(anna.id);
+ env.DB.db.prepare("INSERT INTO records(user_id,kind,id,data,updated_at,deleted,synced_at) VALUES(?,'brew','e1',?,?,0,1)").run(anna.id,JSON.stringify({id:'e1',method:'espresso',beans:'Brazil Cerrado',dose:18,yield:40,ratio:2.2,time:'0:30',temp:94,score:7}),Date.now());
+ const c=await browser.newContext(),page=await c.newPage();
+ const fouten=[];page.on('pageerror',e=>fouten.push(e.message));
+ await open(page,env,jesse);
+ // oude kapotte data: een eigen recept zonder stappen
+ await page.evaluate(async()=>{state.recipes=state.recipes||[];state.recipes.push({id:'r_oud',eigen:true,mid:'espresso',fam:'espresso',naam:'oud zonder stappen',dose:18,ratio:2,temp:93});await save();});
+ await page.evaluate(async()=>{await acctApi('/api/social/follow',{body:{handle:'anna'}});});
+ await page.evaluate(()=>go('feed'));
+ const kaart=page.locator('#feed-reel .feed-kaart',{hasText:'Brazil Cerrado'});
+ await kaart.getByRole('button',{name:'try'}).click();
+ await expect(page.locator('#toast')).toContainText('in your recipes');
+ const rec=await page.evaluate(()=>state.recipes.find(r=>r.van==='anna/brew/e1'));
+ expect(rec.mid).toBe('espresso');
+ expect(rec.stappen.map(x=>x.k)).toEqual(['dose','tamp','shot','stop']);
+ expect(rec.stappen[3].t).toBe(30);
+ await page.evaluate(()=>go('recipes'));
+ await expect(page.locator('#ws-recipe-list')).toContainText('Brazil Cerrado · @anna');
+ await expect(page.locator('#ws-recipe-list')).toContainText('oud zonder stappen');
+ // het herstel bij het starten geeft het oude recept een lege lijst
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>currentPage!=='welcome'&&typeof BrewWorkspace!=='undefined');
+ expect(await page.evaluate(()=>Array.isArray(state.recipes.find(r=>r.id==='r_oud').stappen))).toBe(true);
+ await page.evaluate(()=>go('recipes'));
+ await expect(page.locator('#ws-recipe-list')).toContainText('Brazil Cerrado · @anna');
+ // vlag uit: online weer private
+ await page.evaluate(async()=>{await acctApi('/api/social/profile',{body:{visibility:'public'}});});
+ expect(env.DB.db.prepare('SELECT visibility FROM users WHERE id=?').get(jesse.id).visibility).toBe('public');
+ await page.evaluate(()=>toggleFeature('social'));
+ await expect.poll(()=>env.DB.db.prepare('SELECT visibility FROM users WHERE id=?').get(jesse.id).visibility).toBe('private');
+ await expect(page.locator('#nav-feed')).toBeHidden();
+ expect(fouten).toEqual([]);
+ await c.close();
+});
+
 test('flag off: no feed tab, no profile card, no social calls',async({page})=>{
  await page.route('https://fonts.googleapis.com/**',r=>r.fulfill({contentType:'text/css',body:''}));
  const calls=[];await page.route(/\/api\/social\//,r=>{calls.push(r.request().url());r.fulfill({status:401,body:'{}'});});
