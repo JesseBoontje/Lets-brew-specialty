@@ -511,3 +511,18 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
 - Wacht op Jesse: live of aanpassen. Daarna klus beeldkeuring (functie/beeldkeuring), zie takenbord.
 - Jesse 25-11: "Kan je ook de v60 tekening in de giet coach zetten" -> V60-modus toont m-v60.png (masker, fill var(--ink)).
   Maten per zetter in GEO (zetGeo): v60 x=173+(px-370)*0.233, y=138+(py-125)*0.233. Switch ongewijzigd. Preview opnieuw handmatig gebouwd.
+- 25-11 ~14:06 UTC: PR #23 gemerged na akkoord Jesse (main binnengehaald, CACHE scc-v122), live gecontroleerd: service-worker scc-v122, gietcoach-js met gc-m-v60, m-v60.png 200.
+
+## 25-11: beeldkeuring (branch functie/beeldkeuring)
+- Inventaris: 68 iconen goed; Jesse's png's blijven; grafieken (kaart/meter/band) buiten de stijlregels; docs/opzet-* archief.
+- Voorstellen in mockup FVbPK8y5ApgmuQSLtPEkNW: (1) AeroPress-coach ketel -> schenkkan (proef gebouwd in app/04-aeropress.js:
+  ongespiegeld 0.33x, tip 134,35, pivot 262,57; script scratchpad zet-ap.py = zet.py met S=0.33, geen spiegeling),
+  (2) BREWER_ART v60/chemex/aeropress -> m-*.png als masker met waterstand, (3) E61/Switch/leerkaarten losser: per tekening, later.
+- Wacht op keuze Jesse. Na bouwen: CACHE ophogen, keuring, PR, preview handmatig (trigger abb758cd).
+- 26-11 Jesse (aanwijzing op mockup): splash-1..4 hertekenen, 'vorm en tekst is goed alleen lijnenspel'; groen = logo/icoon/m-*.png goed en voorbeeld.
+  Proef: scratchpad/splash/schoon2.py (skelet -> gekoppelde paden, min 45 px) + overtrek.py --halen 3 --los 2.4 --kriskras 2 --zaad 6+n,
+  samen2.py legt de halen over de originele lijn (vorm exact). Eerdere pogingen (puur skelet, 7/3.6/3) gaven rommel bij kop/schotel.
+  Scripts nog niet in de repo; bij akkoord naar de skill-map en splash-*.png vervangen (+CACHE).
+- 26-11 Jesse: 'alles bouwen', splash samen 2 s met doortikken, splash-tekening opnieuw volgens de skill.
+  Gedaan: docs/tekeningen/splash-teken.py tekent de schone svg's (kop uit splash-1, kan rechtop uit splash-2, kan schenkt uit splash-3,
+  per scherm geplaatst); overtrek 5/2.2/1.6 (7/3.6/3 was op 900 px veel losser dan Jesse's V60); tekst = originele letterpixels.
