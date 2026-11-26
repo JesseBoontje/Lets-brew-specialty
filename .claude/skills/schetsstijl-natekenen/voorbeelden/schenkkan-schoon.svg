@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="85 160 430 280">
+<!-- rand bovenaan: buitenste ellips in twee helften, binnenrand eronder -->
+<path d="M265 189 Q268 179 347 178 Q426 179 430 189"/>
+<path d="M265 189 Q270 199 347 200 Q424 199 430 189"/>
+<path d="M272 191 Q300 185 347 185 Q396 185 424 191"/>
+<!-- romp: links, rechts, bodem -->
+<path d="M266 192 Q263 290 260 360 Q259 395 270 410"/>
+<path d="M429 192 Q432 290 437 355 Q440 395 430 411"/>
+<path d="M270 410 Q300 421 348 422 Q398 421 430 411"/>
+<!-- tuit: twee lijnen van de buis, laag aan de romp, zwanenhals met haakje -->
+<path d="M261 377 Q236 380 214 368 Q196 356 188 318 Q180 270 172 236 Q163 205 140 197 Q120 192 104 196"/>
+<path d="M261 384 Q232 388 207 374 Q190 362 182 322 Q174 274 166 240 Q158 212 138 204 Q122 200 108 201"/>
+<path d="M104 196 Q100 198 101 201 Q104 203 108 201"/>
+<!-- handvat: platte beugel, bovenaan bij de rand, onderaan schuin naar de romp -->
+<path d="M430 204 L485 202 Q497 202 497 214 L490 312 Q488 322 478 328 L438 357"/>
+<path d="M432 213 L481 211 Q487 211 487 219 L481 308 Q480 316 472 321 L437 346"/>
+<!-- rondingslijnen, zoals de ribbels van de V60: geen glans, alleen vorm -->
+<path d="M292 200 Q290 300 288 408"/>
+<path d="M404 200 Q407 300 410 410"/>
+<!-- klinkplaatje -->
+<path d="M427 204 L436 204 L436 238 L427 238"/>
+</svg>

@@ -53,12 +53,12 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 })();
 
 // Start after all controllers are loaded; stored data is never replaced on read failure.
-/* Het beginscherm: drie tekeningen van 0,75 s en dan het logo 2 s (samen
-   4,25 s, zie de keyframes in styles.css). Een tik slaat over. Wie de app via
+/* Het beginscherm: vier tekeningen van 0,35 s en dan het logo 0,6 s (samen
+   2 s, zie de keyframes in styles.css). Een tik slaat over. Wie de app via
    een link naar een ander scherm, een snelkoppeling of een melding opent,
    gaat meteen door. Onder automatische tests ook meteen, tenzij een test
    window.__splashTest zet. */
-const SPLASH_MS=4250;
+const SPLASH_MS=2000;
 function splashWacht(eerst){
   if(eerst!=='home'||pendingQuickBrew||pendingBrewParam)return Promise.resolve();
   if(navigator.webdriver&&!window.__splashTest)return Promise.resolve();
