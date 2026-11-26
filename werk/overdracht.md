@@ -589,3 +589,5 @@ Wacht op nakijkopdracht van Jesse ("Opdracht voor Lets Brew").
   Voor de testlink apart onder Previews Base, daarna preview opnieuw maken (wrangler preview --name na-live-1).
 - Live mergen pas als Jesse "live" zegt (PR van functie/na-live-1 naar main).
 - Werk-branch voor werk/: werk/na-live-2026-11-26.
+
+## 26-11 laat: LIVE via PR #26 (main 276586b, scc-v127). Live gecontroleerd: site 200, sw v127, /api/stem/voices geeft nieuwe Engelse sign_in-melding. Secrets Production: ANTHROPIC_API_KEY + ELEVENLABS_API_KEY. Previews Base: beide als Environment Variable (Jesse gevraagd om te zetten naar Secret). Open: opmerking 11 "My brews".
