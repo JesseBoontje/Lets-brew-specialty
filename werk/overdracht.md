@@ -526,3 +526,4 @@ Jesse vraagt: let op verbruik en context; bij volle context overdracht + nieuwe 
 - 26-11 Jesse: 'alles bouwen', splash samen 2 s met doortikken, splash-tekening opnieuw volgens de skill.
   Gedaan: docs/tekeningen/splash-teken.py tekent de schone svg's (kop uit splash-1, kan rechtop uit splash-2, kan schenkt uit splash-3,
   per scherm geplaatst); overtrek 5/2.2/1.6 (7/3.6/3 was op 900 px veel losser dan Jesse's V60); tekst = originele letterpixels.
+- 26-11: PR #24 gemerged op akkoord Jesse ('zet daarna live'), live gecontroleerd: scc-v124, SPLASH_MS=2000, splash-1/4 nieuwe bestanden (200), brewformulier met bw-m masker.

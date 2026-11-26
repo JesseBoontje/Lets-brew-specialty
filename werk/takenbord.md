@@ -6,7 +6,7 @@ stem) zitten in PR #12 en staan op main (live). Zie werk/archief/.
 | Taak | Wie | Branch | Stand | Volgende stap |
 |---|---|---|---|---|
 | Schenkkan + Jesse's V60-tekening in de gietcoach | architect | main (#23) | LIVE 25-11 (scc-v122), 2 keuringen GOEDGEKEURD | Jesse op iPhone testen |
-| Beeldkeuring tegen skill schetsstijl-natekenen | architect | functie/beeldkeuring | gebouwd 26-11 (e1864ca, scc-v123): splash 1-4 hertekend (strak -> overtrek 5/2.2/1.6, zoals Jesse's V60), splash 2 s + tik, schenkkan in AeroPress, m-*.png in brewformulier; keuring loopt | PR + preview, live na akkoord |
+| Beeldkeuring: splash hertekend + 2 s, schenkkan AeroPress, m-*.png brewformulier | architect | main (#24) | LIVE 26-11 (scc-v124), keuring 1x afgekeurd (tuit door rand bij omgekeerd), hersteld, GOEDGEKEURD | Jesse op iPhone testen; later: E61/Switch/leerkaarten losser (per tekening) |
 | Kleine klussen: versheidsmeter met piekmelding, surprise me, AI-budget realistischer | architect | functie/kleine-klussen | LIVE 24-11 via #14 | Jesse op iPhone testen |
 | Delen als pagina/PDF (brews en bonen) | architect | werk/na-live-2026-11-24 (docs/opzet-delen.html) | akkoord Jesse 25-11 ("bouw later") | https://claude.ai/artifact/791tb3Bh9Y6pEjqxrAx82i ; bouwen in app/06 als Jesse zegt, één keuring |
 | Oude app vervangen (letsbrewspecialty.jesseboontje.workers.dev) | architect | functie/kleine-klussen (map oud-adres/) | klaar 24-11: verhuispagina live, Git-koppeling 7d5fa36f weg | Jesse: oude adres op de telefoon openen en kijken |
