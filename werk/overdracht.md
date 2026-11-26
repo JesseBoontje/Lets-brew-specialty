@@ -541,3 +541,6 @@ Feed staat in de schets op de plek van Learn: bij bouwen voorstel doen waar Lear
 - Na registratie Jesse: UPDATE users SET is_admin=1,ai_allowed=1 WHERE handle=... (preview-D1, later live).
 - Jesse moet ANTHROPIC_API_KEY als secret zetten; voor previews mogelijk apart (wrangler preview secret). Nagaan.
 - Open: feed sorteert op updated_at; geen melding bij volgverzoek; stream-afbreek telt als vraag; niet getest op iPhone/WebKit; handleiding niet bijgewerkt; 6 tabs krap (voorstel Learn naar Home).
+
+## 26-11: Settings herindelen
+Akkoord Jesse op opzet docs/opzet-instellingen.html (https://claude.ai/artifact/Q37grtdUDF262nczdgMVNQ). Bouwen als Jesse het zegt, met nieuwe-feature deel B. Geen instelling weg; vlaggen account/social naar de grote kaart.
