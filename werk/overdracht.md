@@ -576,3 +576,4 @@ https://claude.ai/artifact/PzUpyt2vkPAcJR9yYk37i7. Live gecontroleerd: 200, sw v
 bindingen DB, FOTOS. Open voor Jesse: ANTHROPIC_API_KEY als secret (Production, en Previews Base),
 account op letsbrew.djez.app maken → architect zet is_admin/ai_allowed in live-D1 b737aed4.
 Wacht op nakijkopdracht van Jesse ("Opdracht voor Lets Brew").
+- 26-11: live-account jesseboontje is_admin=1, ai_allowed=1 (bevestigd door Jesse). ANTHROPIC_API_KEY staat nog NIET op lets-brew-specialty (gecontroleerd via API en wrangler).
