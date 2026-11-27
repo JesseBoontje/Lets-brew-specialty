@@ -591,3 +591,6 @@ Wacht op nakijkopdracht van Jesse ("Opdracht voor Lets Brew").
 - Werk-branch voor werk/: werk/na-live-2026-11-26.
 
 ## 26-11 laat: LIVE via PR #26 (main 276586b, scc-v127). Live gecontroleerd: site 200, sw v127, /api/stem/voices geeft nieuwe Engelse sign_in-melding. Secrets Production: ANTHROPIC_API_KEY + ELEVENLABS_API_KEY. Previews Base: beide als Environment Variable (Jesse gevraagd om te zetten naar Secret). Open: opmerking 11 "My brews".
+
+## 27-11: ronde na live 2 klaar op functie/na-live-2 (4d5491a, scc-v128), GOEDGEKEURD, NIET live
+AI-model claude-sonnet-5-5, providerStatus bij fouten AI/stem, ELEVENLABS_MODEL (std eleven_multilingual_v2), splash zonder logo-eind, kapotte brew-kaart verborgen (isBrew), my brews-tekst, locatie pas na tik. Testlink https://na-live-1-lets-brew-specialty.jesseboontje-1aa.workers.dev (met sleutels). Vragen aan Jesse: splash-1 ook weg? hele regel alleen "my brews"?
