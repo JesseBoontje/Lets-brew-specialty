@@ -594,3 +594,4 @@ Wacht op nakijkopdracht van Jesse ("Opdracht voor Lets Brew").
 
 ## 27-11: ronde na live 2 klaar op functie/na-live-2 (4d5491a, scc-v128), GOEDGEKEURD, NIET live
 AI-model claude-sonnet-5-5, providerStatus bij fouten AI/stem, ELEVENLABS_MODEL (std eleven_multilingual_v2), splash zonder logo-eind, kapotte brew-kaart verborgen (isBrew), my brews-tekst, locatie pas na tik. Testlink https://na-live-1-lets-brew-specialty.jesseboontje-1aa.workers.dev (met sleutels). Vragen aan Jesse: splash-1 ook weg? hele regel alleen "my brews"?
+- 27-11: LIVE via PR #27 (main 4c80bdf, scc-v128). Jesse test AI live.
