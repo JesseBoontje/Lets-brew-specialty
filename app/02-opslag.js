@@ -44,10 +44,20 @@ async function load(){
       }
     }catch(e){}
   }
-  if(s&&s.methods&&s.brews){try{BrewSecurity.validateImport(s,{backup:true});}catch(e){storageBlocked=true;throw e;}hadOpgeslagenData=true;state=s;if(!state.beans)state.beans=[];if(!state.gear)state.gear=[];const gekoppeld=n=>(n.brews||[]).filter(b=>b&&b.beanId&&(n.beans||[]).some(x=>x.id===b.beanId)).length;const voor=gekoppeld(state);state=BrewModel.migrate(state);mergeMethodImages();try{bpMigreerWensen();}catch(e){}if((s.dataVersion||0)<2||gekoppeld(state)>voor)await save();return;}
+  if(s&&s.methods&&s.brews){try{BrewSecurity.validateImport(s,{backup:true});}catch(e){storageBlocked=true;throw e;}hadOpgeslagenData=true;state=s;if(!state.beans)state.beans=[];if(!state.gear)state.gear=[];const gekoppeld=n=>(n.brews||[]).filter(b=>b&&b.beanId&&(n.beans||[]).some(x=>x.id===b.beanId)).length;const voor=gekoppeld(state);state=BrewModel.migrate(state);brewTijdHerstel(state);mergeMethodImages();try{bpMigreerWensen();}catch(e){}if((s.dataVersion||0)<2||gekoppeld(state)>voor)await save();return;}
   const demoB=demoBeans();
   state=BrewModel.migrate({methods:JSON.parse(JSON.stringify(DEFAULT_METHODS)),brews:demoBrews(demoB),beans:demoB,gear:[],prepItems:JSON.parse(JSON.stringify(DEFAULT_PREP))});
   save();
+}
+/* een brew zonder geldige ts (bijv. via sync binnengekomen) krijgt zijn updatedAt of
+   at, zodat sorteren en "days ago" kloppen; zonder bruikbare tijd blijft hij leeg */
+function brewTijdHerstel(st){
+  for(const b of (st&&Array.isArray(st.brews)?st.brews:[])){
+    if(!b||typeof b!=='object')continue;
+    const ts=+b.ts;if(Number.isFinite(ts)&&ts>0)continue;
+    const t=+b.updatedAt||Date.parse(b.at||'')||0;
+    if(t>0)b.ts=t;
+  }
 }
 // vul standaard-afbeeldingen aan voor methodes die al opgeslagen waren zonder img
 function mergeMethodImages(){

@@ -9,7 +9,7 @@ import {json,leesBody,gebruiker,wisCookie,AI_LIMIET,aiDag} from './account-worke
 
 const ANTHROPIC='https://api.anthropic.com/v1/messages';
 // standaard hetzelfde model als de app (app/08-ai.js) voor anthropic gebruikt
-export const AI_MODEL_STANDAARD='claude-sonnet-4-6';
+export const AI_MODEL_STANDAARD='claude-sonnet-5-5';
 const MAX_AI_BODY=6*1024*1024, MAX_TOKENS=4000, MAX_BERICHTEN=60, MAX_TEKST=200000, MAX_BEELDEN=4;
 const HANDLE=/^[a-z0-9_]{3,20}$/;
 const fout=e=>Object.assign(Error(e),{fout:e});
@@ -94,14 +94,15 @@ async function ai(request,env){
   res=await fetch(ANTHROPIC,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json','x-api-key':sleutel,'anthropic-version':'2023-06-01'},body:JSON.stringify(lijf)});
  }catch{
   await telTerug(env,user.id,day);
-  return json({error:'The AI service is not reachable right now.'},502,{'X-AI-Left':String(AI_LIMIET-n+1)});
+  return json({error:'The AI service is not reachable right now.',code:'unreachable'},502,{'X-AI-Left':String(AI_LIMIET-n+1)});
  }
  if(!res.ok){
   await telTerug(env,user.id,day);
   try{await res.body?.cancel();}catch{}
-  // geen tekst van de aanbieder doorgeven: alleen een eigen zin en de status
+  // geen tekst van de aanbieder doorgeven: alleen een eigen zin en het nummer (providerStatus)
   const druk=res.status===429||res.status===529;
-  return json({error:druk?'Lets Brew AI is busy. Try again in a minute.':'Lets Brew AI could not answer this time.',providerStatus:res.status},druk?503:502,{'X-AI-Left':String(AI_LIMIET-n+1)});
+  const providerStatus=Number.isInteger(res.status)&&res.status>=100&&res.status<600?res.status:0;
+  return json({error:druk?'Lets Brew AI is busy. Try again in a minute.':'Lets Brew AI could not answer this time.',providerStatus},druk?503:502,{'X-AI-Left':String(AI_LIMIET-n+1)});
  }
  const kop={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-AI-Left':left};
  if(lijf.stream&&res.body)return new Response(res.body,{status:200,headers:{...kop,'Content-Type':'text/event-stream; charset=utf-8'}});

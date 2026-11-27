@@ -92,6 +92,8 @@ function acctToepassen(changes){
       if(c.deleted){if(i>=0){lijst.splice(i,1);n++;}continue;}
       if(!c.data||typeof c.data!=='object'||Array.isArray(c.data))continue;
       const rec=acctMetFotos(c.data,lokaal);rec.id=c.id;rec.updatedAt=c.updatedAt;
+      // een brew zonder geldige tijd: de tijd van de wijziging, anders "NaN days ago" op Home
+      if(c.kind==='brew'&&!(Number.isFinite(+rec.ts)&&+rec.ts>0))rec.ts=c.updatedAt;
       BrewSecurity.validateImport({[veld]:[rec]});
       if(i>=0)lijst[i]=rec;else lijst.push(rec);n++;
     }catch(e){/* ongeldig record van de server: overslaan, de telefoon houdt het zijne */}

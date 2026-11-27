@@ -1,18 +1,23 @@
 const{test,expect}=require('@playwright/test');
-// Startscherm: splash 4 tekeningen + logo (samen 2 s sinds 26-11, tik = overslaan),
+// Startscherm: splash 4 tekeningen, de laatste blijft staan, geen los logo meer (samen 2 s, tik = overslaan),
 // getekende dubbele randen overal (vlag drawnedges), surprise me met de gietcoach-tekening.
 async function open(page,splash){
  await page.route('https://fonts.googleapis.com/**',r=>r.fulfill({contentType:'text/css',body:''}));
  if(splash)await page.addInitScript(()=>{window.__splashTest=true;});
  await page.goto('/',{waitUntil:'domcontentloaded'});
 }
-test('splash: drawings then the old logo, about 2 s, a tap skips it',async({page})=>{
+test('splash: only the new drawing (jug + cup), no separate logo frame, about 2 s, a tap skips it',async({page})=>{
  await open(page,true);
  await expect(page.locator('#page-welcome')).toBeVisible();
  await expect(page.locator('#sf4')).toHaveAttribute('src','splash-4.png');
- await expect(page.locator('#sf5')).toHaveAttribute('src','logo.png');
+ await expect(page.locator('#sf5')).toHaveCount(0);
+ await expect(page.locator('#page-welcome img[src="logo.png"]')).toHaveCount(0);
  await page.waitForTimeout(1000);
  expect(await page.evaluate(()=>currentPage)).toBe('welcome');   // na 1 s nog op de splash
+ // daarna blijft de eindtekening (splash-4) staan tot de splash klaar is
+ await page.waitForTimeout(350);
+ if(await page.evaluate(()=>currentPage)==='welcome')
+  expect(await page.locator('#sf4').evaluate(e=>+getComputedStyle(e).opacity)).toBeGreaterThan(0.9);
  await page.waitForFunction(()=>currentPage==='home',null,{timeout:2500});
  const t=await page.evaluate(()=>performance.now());
  expect(t).toBeGreaterThan(1950);

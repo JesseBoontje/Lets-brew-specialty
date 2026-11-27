@@ -4,7 +4,7 @@
      Worker gebruikt zijn eigen ElevenLabs-sleutel (daglimiet per gebruiker). De
      stem kies je uit de lijst van de server, of de server kiest zijn standaard.
    - Met een eigen ElevenLabs-sleutel én een gekozen stem uit de eigen
-     voices-lijst: geluid van ElevenLabs (model eleven_v4) via de Worker.
+     voices-lijst: geluid van ElevenLabs (model kiest de Worker) via de Worker.
    - Anders, of als iets misgaat: de stem van de telefoon (speechSynthesis).
    De sleutel staat alleen in dit tabblad (een variabele), nooit in
    localStorage, back-up, export of database. De gekozen stem-id (geen geheim)
@@ -65,10 +65,16 @@ globalThis.BrewStem=(()=>{
   try{if(globalThis.speechSynthesis){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}}catch(e){}
  }
  const kop=()=>bron()==='letsbrew'?{'Content-Type':'application/json'}:{'Content-Type':'application/json',Authorization:'Bearer '+sleutel};
+ let lbMeld=false;
  async function haal(tekst){
   const lb=bron()==='letsbrew',id=stemId();
   const r=await fetch('/api/stem/zeg',{method:'POST',headers:kop(),credentials:'same-origin',
    body:JSON.stringify(id||!lb?{text:tekst,voice_id:id}:{text:tekst}),signal:AbortSignal.timeout(8000)});
+  if(lb&&r.status===502&&!lbMeld){
+   // eenmalig laten zien welk nummer de stemdienst gaf (geen tekst of sleutel, alleen het nummer)
+   const b=await r.clone().json().catch(()=>null),ps=b&&Number.isInteger(b.providerStatus)?b.providerStatus:0;
+   if(ps){lbMeld=true;try{if(typeof toast==='function')toast('Lets Brew voice: the voice service said '+ps+' — using the phone voice');}catch(e){}}
+  }
   if(lb&&!r.ok&&r.status!==502){
    // blijvend uit (tot herladen of een andere keuze) alleen als het echt niet kan; een rem
    // (429 zonder code) of een tijdelijke fout: alleen deze zin via de telefoonstem
@@ -141,7 +147,11 @@ globalThis.BrewStem=(()=>{
   const r=await fetch('/api/stem/voices',{method:'POST',headers:kop(),credentials:'same-origin',body:'{}',signal:AbortSignal.timeout(15000)});
   const b=await r.json().catch(()=>null);
   if(r.status===404&&!b?.error)throw Error('The voice route is not on this host yet.');
-  if(!r.ok)throw Error((b&&typeof b.error==='string'&&b.error.slice(0,160))||'Could not load your voices.');
+  if(!r.ok){
+   const ps=b&&Number.isInteger(b.providerStatus)&&b.providerStatus>0?b.providerStatus:0;
+   if(ps)throw Error((bron()==='letsbrew'?'Lets Brew voice: the voice service said ':'ElevenLabs said ')+ps+'.');
+   throw Error((b&&typeof b.error==='string'&&b.error.slice(0,160))||'Could not load your voices.');
+  }
   if(bron()==='letsbrew'){lbUit='';standaard=typeof b?.standaard==='string'&&/^[A-Za-z0-9]{10,40}$/.test(b.standaard)?b.standaard:'';}else afgewezen=false;
   return (Array.isArray(b?.voices)?b.voices:[]).filter(v=>v&&/^[A-Za-z0-9]{10,40}$/.test(v.voice_id||''));
  }

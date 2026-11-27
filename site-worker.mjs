@@ -22,14 +22,16 @@ export async function realtimeSession(request,env={}){
  }catch{return json({error:'The voice service is not reachable right now.'},502);}
 }
 
-/* ElevenLabs-stem (eleven_v4). Twee manieren:
+/* ElevenLabs-stem. Model uit env.ELEVENLABS_MODEL, anders EL_MODEL_STANDAARD. Twee manieren:
    - eigen sleutel: de app stuurt hem mee (Authorization); de Worker bewaart en logt hem nooit.
    - Lets Brew voice: geen sleutel mee, wel ingelogd, niet op slot en ai_allowed=1. Dan de
      sleutel van de server (env.ELEVENLABS_API_KEY) en max STEM_LIMIET zinnen per dag per
      gebruiker, geteld in ai_usage met dag 'stem:JJJJ-MM-DD' (zelfde tabel als /api/ai, geen
      migratie). Standaardstem optioneel in env.ELEVENLABS_VOICE_ID. */
 const EL_API='https://api.elevenlabs.io';
-const EL_MODEL='eleven_v4';
+// eleven_v4 bestond niet als model-id; eleven_multilingual_v2 is het algemene meertalige model
+export const EL_MODEL_STANDAARD='eleven_multilingual_v2';
+export const elModel=env=>{const m=typeof env.ELEVENLABS_MODEL==='string'?env.ELEVENLABS_MODEL.trim():'';return /^[a-z0-9_]{3,60}$/.test(m)?m:EL_MODEL_STANDAARD;};
 export const STEM_LIMIET=300;
 const STEM_ID=/^[A-Za-z0-9]{10,40}$/;
 export const stemDag=(t=Date.now())=>'stem:'+aiDag(t);
@@ -77,7 +79,9 @@ export async function stemRoute(request,env={}){
  let body;try{body=await leesJson(request,2048);}catch(e){return e.groot?json({error:'Request too large.'},413):json({error:'Invalid request.'},400);}
  if(!body||typeof body!=='object'||Array.isArray(body))return json({error:'Invalid request.'},400);
  const standaard=user&&typeof env.ELEVENLABS_VOICE_ID==='string'&&STEM_ID.test(env.ELEVENLABS_VOICE_ID.trim())?env.ELEVENLABS_VOICE_ID.trim():'';
- const fout=status=>status===401||status===403?(user?json({error:'The Lets Brew voice is not available right now. The app uses the phone voice.'},502):json({error:'ElevenLabs does not accept this key. Check your own key.'},401)):status===429?json({error:'ElevenLabs is slowing down: too many requests or no credit left.'},429):json({error:'ElevenLabs gave an error. The app uses the phone voice.'},502);
+ // alleen het nummer van ElevenLabs meegeven (providerStatus), nooit hun tekst of de sleutel
+ const ps=status=>({providerStatus:Number.isInteger(status)&&status>=100&&status<600?status:0});
+ const fout=status=>status===401||status===403?(user?json({error:'The Lets Brew voice is not available right now. The app uses the phone voice.',...ps(status)},502):json({error:'ElevenLabs does not accept this key. Check your own key.',...ps(status)},401)):status===429?json({error:'ElevenLabs is slowing down: too many requests or no credit left.',...ps(status)},429):json({error:'ElevenLabs gave an error. The app uses the phone voice.',...ps(status)},502);
  try{
   if(soort==='voices'){
    if(Object.keys(body).length)return json({error:'Invalid request.'},400);
@@ -103,14 +107,14 @@ export async function stemRoute(request,env={}){
   }
   const left=user?{'X-Stem-Left':String(Math.max(0,STEM_LIMIET-n))}:{};
   let r;
-  try{r=await fetch(EL_API+'/v1/text-to-speech/'+voice+'?output_format=mp3_44100_128',{method:'POST',redirect:'error',headers:{'xi-api-key':key,'Content-Type':'application/json',Accept:'audio/mpeg'},body:JSON.stringify({text,model_id:EL_MODEL}),signal:AbortSignal.timeout(20000)});}
+  try{r=await fetch(EL_API+'/v1/text-to-speech/'+voice+'?output_format=mp3_44100_128',{method:'POST',redirect:'error',headers:{'xi-api-key':key,'Content-Type':'application/json',Accept:'audio/mpeg'},body:JSON.stringify({text,model_id:elModel(env)}),signal:AbortSignal.timeout(20000)});}
   catch(e){if(user)await stemTerug(env,user.id,day);throw e;}
   const terug=async res=>{if(user)await stemTerug(env,user.id,day);try{await r.body?.cancel();}catch{}return res;};
   if(!r.ok)return terug(fout(r.status));
   if(!/^audio\//i.test(r.headers.get('Content-Type')||''))return terug(json({error:'ElevenLabs returned no audio.'},502));
   const len=+(r.headers.get('Content-Length')||0);if(len>2000000)return terug(json({error:'Audio too large.'},502));
   return new Response(r.body,{status:200,headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Strict-Transport-Security':'max-age=15552000',...left}});
- }catch{return json({error:'The voice service is not reachable right now. The app uses the phone voice.'},502);}
+ }catch{return json({error:'The voice service is not reachable right now. The app uses the phone voice.',code:'unreachable'},502);}
 }
 /* Pagina van een brander ophalen, zodat de AI echt leest wat er op de zak staat in plaats van te gokken.
    Alleen GET, alleen https/http naar een gewone domeinnaam, max 1,5 MB, 8 s; terug gaat platte tekst. */
