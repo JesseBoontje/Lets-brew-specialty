@@ -19,7 +19,7 @@ function naarOpenAI(messages){
   });
 }
 const AI_ANTHROPIC={id:'anthropic',naam:'Anthropic',merk:'Claude',hint:'sk-ant-...',
-   model:'claude-sonnet-4-6',prijs:{in:3,uit:15},waar:'console.anthropic.com',
+   model:'claude-sonnet-5-5',prijs:{in:2,uit:10},waar:'console.anthropic.com',
    url:()=>'https://api.anthropic.com/v1/messages',
    kop:k=>({'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true',
             'x-api-key':k,'anthropic-version':'2023-06-01'}),
@@ -189,6 +189,8 @@ async function apiFout(res){
   let m='';
   try{const e=await res.json();
     if(e&&typeof e.code==='string')res._code=e.code;
+    // de eigen server geeft bij een fout van de aanbieder alleen diens nummer mee
+    if(e&&Number.isInteger(e.providerStatus)&&e.providerStatus>0)return 'Lets Brew AI: the AI service said '+e.providerStatus;
     m=(e&&e.error&&(e.error.message||e.error))||'';
     if(typeof m!=='string')m='';
   }catch(_){}

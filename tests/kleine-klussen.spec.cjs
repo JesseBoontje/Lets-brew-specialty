@@ -78,9 +78,9 @@ test('surprise me with AI: validated recipe for the same bean, counted as a surp
  await expect(pop).toContainText('Kenia helder');
  const body=await page.evaluate(()=>JSON.stringify(window.kkBody));
  expect(body).toContain('Kenya');expect(body).not.toContain('sk-ant-synthetic');
- // 2000 in × $3/M + 500 uit × $15/M = $0.0135 (claude-sonnet-4-6)
+ // 2000 in × $2/M + 500 uit × $10/M = $0.009 (standaardmodel claude-sonnet-5-5, prijs uit de prijslijst)
  const tel=await page.evaluate(()=>aiBud().bron['anthropic:surprise']);
- expect(tel.n).toBe(1);expect(tel.ti).toBe(2000);expect(tel.tu).toBe(500);expect(tel.d).toBeCloseTo(0.0135,6);
+ expect(tel.n).toBe(1);expect(tel.ti).toBe(2000);expect(tel.tu).toBe(500);expect(tel.d).toBeCloseTo(0.009,6);
  await pop.getByRole('button',{name:'brew this'}).tap();
  const rec=await page.evaluate(()=>state.recipes[state.recipes.length-1]);
  expect(rec).toMatchObject({naam:'Kenia helder',beanId:'kenya',mid:'v60',source:'surprise-ai',dose:15,temp:95});

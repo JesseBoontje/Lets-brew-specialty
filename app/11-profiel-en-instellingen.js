@@ -175,6 +175,8 @@ function toggleFeature(id){
   if(id==='social'&&!featOn('social')&&typeof volgVlagUit==='function')volgVlagUit();
   if(typeof volgNav==='function')volgNav();
   save();applyFeatures();
+  // weer net aangezet: nu (met jouw tik) mag de app om de locatie vragen
+  if(id==='weather'&&featOn('weather')&&typeof refreshWeather==='function')try{refreshWeather(true);}catch(e){}
   if(currentPage==='profile')renderProfile();else renderFeatures();
   const f=FEATURES.find(x=>x.id===id);
   toast((featOn(id)?'✓ ':'○ ')+f.n+(featOn(id)?' on':' off'));

@@ -3,6 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {aiRoute,aiLijf,AI_MODEL_STANDAARD} from '../ai-worker.mjs';
+
+test('ai: standaardmodel is claude-sonnet-5-5 (claude-sonnet-4-6 bestaat niet meer)',()=>{assert.equal(AI_MODEL_STANDAARD,'claude-sonnet-5-5');});
 import {accountRoute,aiDag} from '../account-worker.mjs';
 import {socialRoute} from '../social-worker.mjs';
 import site from '../site-worker.mjs';
@@ -167,7 +169,16 @@ test('ai: model en max_tokens geforceerd, alleen bekende velden, sleutel nooit i
   try{
    const f=await vraag(env,jesse,'POST','/api/ai',VRAAG);
    assert.equal(f.status,502);assert.ok(!f.tekst.includes(SLEUTEL));assert.ok(!f.tekst.includes('upstream says'));assert.equal(f.left,'49');
+   assert.equal(f.data.providerStatus,401,'alleen het nummer van de aanbieder gaat mee');
   }finally{nep2.herstel();}
+  for(const [st,verwacht] of [[403,502],[404,502],[429,503],[529,503]]){
+   const nep3=nepAnthropic({status:st});
+   try{
+    const f=await vraag(env,jesse,'POST','/api/ai',VRAAG);
+    assert.equal(f.status,verwacht,String(st));assert.equal(f.data.providerStatus,st);
+    assert.deepEqual(Object.keys(f.data).sort(),['error','providerStatus']);assert.ok(!f.tekst.includes(SLEUTEL));
+   }finally{nep3.herstel();}
+  }
   assert.equal(env.DB.db.prepare('SELECT count FROM ai_usage').get().count,1,'mislukte vraag telt niet');
   // een toegestaan ander model uit env.AI_MODEL mag wel
   const env2={...env,AI_MODEL:AI_MODEL_STANDAARD+',ander-model-1'};

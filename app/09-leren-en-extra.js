@@ -374,14 +374,31 @@ function voiceListen(){
     r.start();luisteraar=r;micStand(true);toast('ik luister…');
   }catch(e){luisteraar=null;micStand(false);toast('microphone not available');}
 }
-/* ---------------- weer-bewuste suggestie ---------------- */
-async function refreshWeather(){
+/* ---------------- weer-bewuste suggestie ----------------
+   Locatie pas vragen als je er zelf om vraagt: bij het aanzetten van het weer-onderdeel
+   of als je op de regel tikt. Bij het openen van de app alleen als de locatie al eerder
+   is toegestaan (scc_weather_ok of de browser zegt 'granted'), nooit een vraag uit het niets. */
+async function weatherMag(){
+  try{if(localStorage.getItem('scc_weather_ok')==='1')return true;}catch(e){}
+  try{if(navigator.permissions&&navigator.permissions.query){const p=await navigator.permissions.query({name:'geolocation'});return p.state==='granted';}}catch(e){}
+  return false;
+}
+async function refreshWeather(vraag){
   const el=document.getElementById('weather-line');if(!el)return;
+  el.onclick=null;el.classList.remove('weer-tik');
   if(!featOn('weather')){el.style.display='none';return;}
-  const cached=JSON.parse(localStorage.getItem('scc_weather')||'null');
+  let cached=null;try{cached=JSON.parse(localStorage.getItem('scc_weather')||'null');}catch(e){}
   if(cached&&Date.now()-cached.ts<36e5){weatherLine(cached);return;}
   if(!navigator.geolocation){el.style.display='none';return;}
+  if(vraag!==true&&!(await weatherMag())){
+    // nog geen toestemming: een rustige regel om op te tikken, geen vraag van de browser
+    el.textContent='tap for weather-aware tips (uses your location once an hour)';
+    el.classList.add('weer-tik');el.style.display='block';
+    el.onclick=()=>refreshWeather(true);
+    return;
+  }
   navigator.geolocation.getCurrentPosition(async pos=>{
+    try{localStorage.setItem('scc_weather_ok','1');}catch(e){}
     try{
       const{latitude:la,longitude:lo}=pos.coords;
       const res=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,precipitation`);
@@ -389,7 +406,7 @@ async function refreshWeather(){
       const w={ts:Date.now(),t:d.current.temperature_2m,rain:d.current.precipitation>0};
       localStorage.setItem('scc_weather',JSON.stringify(w));weatherLine(w);
     }catch(e){}
-  },()=>{el.style.display='none';},{timeout:6000,maximumAge:36e5});
+  },()=>{try{localStorage.removeItem('scc_weather_ok');}catch(e){}el.style.display='none';},{timeout:6000,maximumAge:36e5});
 }
 function weatherLine(w){
   const el=document.getElementById('weather-line');if(!el)return;
@@ -399,6 +416,7 @@ function weatherLine(w){
   else if(w.t<=8)tip='crisp out there — something warm and syrupy?';
   else tip='fine brewing weather.';
   el.textContent=Math.round(w.t)+'° — '+tip;
+  el.onclick=null;el.classList.remove('weer-tik');
   el.style.display='block';
 }
 /* ---------------- pairing: smart scale via Web Bluetooth ---------------- */

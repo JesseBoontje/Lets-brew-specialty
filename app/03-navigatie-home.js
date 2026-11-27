@@ -62,11 +62,19 @@ function goBack(){
 }
 
 /* ---------------- home ---------------- */
-function timeAgo(ts){const d=(Date.now()-ts)/86400e3;
+function timeAgo(ts){ts=+ts;if(!Number.isFinite(ts)||ts<=0)return'';const d=(Date.now()-ts)/86400e3;
   if(d<1)return'today';if(d<2)return'yesterday';return Math.floor(d)+' days ago';}
+/* Is dit echt een brew? Elke brew uit de app heeft een methode. Een record zonder
+   methode (bijv. een half record dat via sync of een oud bestand binnenkwam) gaf op
+   Home "undefined, 18 g to 20 g · NaN days ago": zulke records tonen we niet als brew. */
+function isBrew(b){return !!(b&&typeof b==='object'&&typeof b.method==='string'&&b.method.trim());}
+function zichtbareBrews(){return (Array.isArray(state.brews)?state.brews:[]).filter(isBrew);}
+// de naam van de boon: wat er bij de brew staat, anders de gekoppelde boon
+function brewBoonNaam(b){const n=String(b.beans||'').trim();if(n)return n;const bean=b.beanId&&typeof beanById==='function'?beanById(b.beanId):null;return (bean&&bean.name)||'';}
 // een brew als gewone zin: "V60 with Kenya, 15 g to 250 g, 2:45"
 function brewZin(b,m){
-  const delen=[(b.title&&b.title.trim()?m.name+' with ':'')+(b.beans||m.name)];
+  const naam=(m&&m.name)||'brew',boon=brewBoonNaam(b);
+  const delen=[(b.title&&b.title.trim()?naam+' with ':'')+(boon||naam)];
   if(b.dose)delen.push(b.dose+' g'+(b.yield?' to '+b.yield+' g':''));
   if(b.time)delen.push(b.time);
   if(b.temp)delen.push(b.temp+' °C');
@@ -74,20 +82,20 @@ function brewZin(b,m){
 }
 function brewCard(b){
   const m=methodById(b.method);
-  const heading=(b.title&&b.title.trim())?b.title:m.name;
+  const heading=(b.title&&b.title.trim())?b.title:(m.name||'brew');
   return `<div class="card sketch row" style="background:var(${m.tint});cursor:pointer" onclick="openDetail('${b.id}')">
     <div class="brew-thumb">${iconHTML(m,44)}</div>
     <div class="brew-main"><div class="name hand">${esc(heading)}</div>
       <div class="meta">${esc(brewZin(b,m))}</div></div>
     <div class="brew-side"><div class="when">${timeAgo(b.ts)}</div>
-      <div class="score hand">${(+b.score).toFixed(1)}<span>/10</span></div></div></div>`;
+      <div class="score hand">${(+b.score||0).toFixed(1)}<span>/10</span></div></div></div>`;
 }
 function renderHome(){
   const g=document.getElementById('home-greeting');
   if(g)g.textContent=state.userName?('hi '+state.userName):'hi there';
   // recente brews: bonen-die-op-zijn niet prominent tonen (tenzij er niets anders is)
-  const pool=state.brews.filter(b=>!brewBeanGone(b));
-  const recent=[...(pool.length?pool:state.brews)].sort((a,b)=>b.ts-a.ts).slice(0,3);
+  const alle=zichtbareBrews(),pool=alle.filter(b=>!brewBeanGone(b));
+  const recent=[...(pool.length?pool:alle)].sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,3);
   document.getElementById('recent-list').innerHTML =
     recent.length?recent.map(brewCard).join(''):'<div class="empty-note">no brews yet.<br>tap ＋ new brew to get started.</div>';
   try{refreshWeather();}catch(e){}
@@ -146,18 +154,19 @@ function renderSortChips(){
 }
 // de vergelijker die bij de gekozen volgorde hoort
 function brewSorter(){
-  if(brewSort==='score')return (a,b)=>(b.score||0)-(a.score||0)||b.ts-a.ts;
+  const t=(a,b)=>(+b.ts||0)-(+a.ts||0);
+  if(brewSort==='score')return (a,b)=>(b.score||0)-(a.score||0)||t(a,b);
   if(brewSort==='method')return (a,b)=>{
     const na=(methodById(a.method)||{}).name||'', nb=(methodById(b.method)||{}).name||'';
-    return na.localeCompare(nb)||b.ts-a.ts;
+    return na.localeCompare(nb)||t(a,b);
   };
-  return (a,b)=>b.ts-a.ts;
+  return t;
 }
 function setFilter(m){filterMethod=m;renderAll();}
 function renderFilterChips(){
   // alleen de zetters waarmee je echt gezet hebt; anders staat de balk vol met
   // knoppen die niets filteren
-  const used=[...new Set(state.brews.map(b=>b.method))];
+  const used=[...new Set(zichtbareBrews().map(b=>b.method))];
   const methodChips=state.methods.filter(m=>used.includes(m.id));
   let html=`<button class="fc ${filterMethod==='all'?'sel':''}" onclick="setFilter('all')">all</button>`;
   html+=methodChips.map(m=>
@@ -192,7 +201,7 @@ function brewCardNew(b){
   const fam=methodFamily(b.method);
   const titel=(b.title&&b.title.trim())?b.title:m.name;
   const open=!!brewOpen[b.id];
-  const meta=[(b.title&&b.title.trim())?m.name:'',b.beans||'\u2014',
+  const meta=[(b.title&&b.title.trim())?m.name:'',brewBoonNaam(b)||'\u2014',
     b.dose?b.dose+' g':'',b.time||''].filter(Boolean).join(' \u00b7 ');
   const cel=(k,v)=>v?('<div class="bc-cel"><div class="k">'+esc(k)+'</div><div class="v hand">'+esc(v)+'</div></div>'):'';
   const cijfers=cel('dose',b.dose?b.dose+' g':'')+
@@ -212,7 +221,7 @@ function brewCardNew(b){
         <div class="meta">${esc(meta)}</div>
       </div>
       <div class="bc-side"><div class="when">${timeAgo(b.ts)}</div>
-        <div class="sc hand">${(+b.score).toFixed(1)}<span>/10</span></div></div>
+        <div class="sc hand">${(+b.score||0).toFixed(1)}<span>/10</span></div></div>
       <div class="rc-arr">${open?'\u25be':'\u25b8'}</div>
     </div>
     <div class="rc-body">
@@ -235,7 +244,7 @@ function renderAll(){
   let uit='';
 
   // --- je geschiedenis, met de zoekterm en de methodefilters erboven ---
-  const brews=state.brews.filter(b=>{
+  const brews=zichtbareBrews().filter(b=>{
     if(filterMethod!=='all'&&b.method!==filterMethod)return false;
     if(!q)return true;
     const m=methodById(b.method);

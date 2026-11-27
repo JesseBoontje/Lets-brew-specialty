@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {stemRoute} from '../site-worker.mjs';
+import {stemRoute,EL_MODEL_STANDAARD} from '../site-worker.mjs';
 import worker from '../site-worker.mjs';
 const origin='https://letsbrewspecialty.jesseboontje.workers.dev';
 const KEY='sk_'+'a1'.repeat(24);
@@ -32,14 +32,20 @@ test('stem: rem op verzoeken',async()=>{
  const env={STEM_LIMITER:{limit:async({key})=>{assert.ok(key.startsWith('stem:'));return {success:false};}}};
  assert.equal((await stemRoute(zeg({text:'Nu.',voice_id:VOICE}),env)).status,429);
 });
-test('stem: zeg stuurt eleven_v4 met de eigen sleutel en geeft alleen geluid terug',async()=>{
+test('stem: zeg stuurt het standaardmodel met de eigen sleutel en geeft alleen geluid terug',async()=>{
  let gevangen;
  const r=await met(async(url,opt)=>{gevangen={url,opt};return new Response(new Uint8Array([1,2,3]),{headers:{'Content-Type':'audio/mpeg'}});},()=>stemRoute(zeg({text:' Nu: naar 45 gram. ',voice_id:VOICE})));
  assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),'audio/mpeg');assert.equal(r.headers.get('cache-control'),'no-store');
  assert.equal(r.headers.get('access-control-allow-origin'),null);
  assert.equal(gevangen.url,'https://api.elevenlabs.io/v1/text-to-speech/'+VOICE+'?output_format=mp3_44100_128');
  assert.equal(gevangen.opt.headers['xi-api-key'],KEY);assert.equal(gevangen.opt.redirect,'error');
- assert.deepEqual(JSON.parse(gevangen.opt.body),{text:'Nu: naar 45 gram.',model_id:'eleven_v4'});
+ assert.deepEqual(JSON.parse(gevangen.opt.body),{text:'Nu: naar 45 gram.',model_id:'eleven_multilingual_v2'});
+ assert.equal(EL_MODEL_STANDAARD,'eleven_multilingual_v2');
+ // env.ELEVENLABS_MODEL kiest een ander model; iets vreemds valt terug op de standaard
+ for(const [m,verwacht] of [['eleven_flash_v2_5','eleven_flash_v2_5'],['  eleven_v3 ','eleven_v3'],['x"; drop','eleven_multilingual_v2'],['','eleven_multilingual_v2']]){
+  await met(async(url,opt)=>{gevangen={url,opt};return new Response(new Uint8Array([1]),{headers:{'Content-Type':'audio/mpeg'}});},()=>stemRoute(zeg({text:'Nu.',voice_id:VOICE}),{ELEVENLABS_MODEL:m}));
+  assert.equal(JSON.parse(gevangen.opt.body).model_id,verwacht,m);
+ }
  const json=await met(async()=>Response.json({x:1}),()=>stemRoute(zeg({text:'Nu.',voice_id:VOICE})));
  assert.equal(json.status,502);
 });
@@ -47,6 +53,7 @@ test('stem: fouten van ElevenLabs lekken geen sleutel of details',async()=>{
  for(const [st,verwacht] of [[401,401],[429,429],[500,502]]){
   const r=await met(async()=>Response.json({detail:{message:'bad key '+KEY}},{status:st}),()=>stemRoute(zeg({text:'Nu.',voice_id:VOICE})));
   assert.equal(r.status,verwacht);const t=await r.text();assert.ok(!t.includes(KEY));assert.ok(!t.includes('bad key'));
+  assert.equal(JSON.parse(t).providerStatus,st,'alleen het nummer van ElevenLabs gaat mee');
  }
  const weg=await met(async()=>{throw Error('netwerk '+KEY);},()=>stemRoute(zeg({text:'Nu.',voice_id:VOICE})));
  assert.equal(weg.status,502);assert.ok(!(await weg.text()).includes(KEY));

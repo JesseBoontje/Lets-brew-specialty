@@ -62,7 +62,14 @@ test('Lets Brew voice: daglimiet atomair, een fout bij ElevenLabs telt niet, de 
  env.DB.db.prepare('UPDATE ai_usage SET count=5 WHERE user_id=? AND day=?').run(ok.id,stemDag());
  for(const st of [401,500]){
   const r=await met(async()=>Response.json({detail:'bad '+SERVER_KEY},{status:st}),()=>stemRoute(lbReq('/api/stem/zeg',{text:'Nu.',voice_id:VOICE},ok),env));
-  assert.equal(r.status,502);assert.ok(!(await r.text()).includes(SERVER_KEY));
+  assert.equal(r.status,502);const t=await r.text();assert.ok(!t.includes(SERVER_KEY));assert.ok(!t.includes('bad'));
+  assert.equal(JSON.parse(t).providerStatus,st);
+ }
+ // ook /voices met de server-sleutel: 502 met alleen het nummer
+ for(const st of [401,403,404]){
+  const r=await met(async()=>Response.json({detail:{status:'missing_permissions',message:'bad '+SERVER_KEY}},{status:st}),()=>stemRoute(lbReq('/api/stem/voices',{},ok),env));
+  assert.equal(r.status,502);const t=await r.text();assert.ok(!t.includes(SERVER_KEY));assert.ok(!t.includes('missing_permissions'));
+  assert.equal(JSON.parse(t).providerStatus,st);
  }
  const weg=await met(async()=>{throw Error('netwerk '+SERVER_KEY);},()=>stemRoute(lbReq('/api/stem/zeg',{text:'Nu.',voice_id:VOICE},ok),env));
  assert.equal(weg.status,502);assert.ok(!(await weg.text()).includes(SERVER_KEY));

@@ -528,7 +528,7 @@ function delBean(id){
    boon of om van die naam een boon te maken. Er gaat nooit iets weg; de
    ingetypte naam blijft op de brew staan.                                  */
 let unlOpen=false,unlLaatst=[];
-function brewsZonderBoon(){return state.brews.filter(b=>!beanById(b.beanId));}
+function brewsZonderBoon(){return state.brews.filter(b=>(typeof isBrew!=='function'||isBrew(b))&&!beanById(b.beanId));}
 // groepen: brews met dezelfde ingetypte naam samen; zonder naam elk apart
 function unlGroepen(){
   const g=new Map();
